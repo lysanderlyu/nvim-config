@@ -80,8 +80,8 @@ vim.keymap.set("n", "<leader>gP", function()
     print("Not in a git repository!")
   end
 end, { silent = true })
-vim.keymap.set("n", "<leader>gl", ":Git log --graph -10<CR>")       -- log
-vim.keymap.set("n", "<leader>gla", ":Git log --graph --all<CR>")       -- log
+vim.keymap.set("n", "<leader>gl", ":Git log --graph -1000<CR>")       -- log
+vim.keymap.set("n", "<leader>gla", ":Git log --graph --all -1000<CR>")       -- log
 vim.keymap.set("n", "<leader>glt", ":Git log -1 HEAD<CR>")       -- log
 vim.keymap.set("n", "<leader>gbl", ":Git blame<CR>")     -- blame
 vim.keymap.set("n", "<leader>ga", ":Git add %<CR>")
@@ -159,12 +159,12 @@ require("statuscol").setup({
 --})
 --
 -- For color picker
-vim.api.nvim_set_keymap("n", "<leader>cp", "<cmd>CccPick<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>cc", "<cmd>CccConvert<CR>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>cp", "<cmd>CccPick<CR>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>cc", "<cmd>CccConvert<CR>", { noremap = true, silent = true })
 
 -- For colorizer
-vim.api.nvim_set_keymap("n", "<leader>cc", ":ColorizerToggle<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>ca", ":ColorizerAttachToBuffer<CR>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>cc", ":ColorizerToggle<CR>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>ca", ":ColorizerAttachToBuffer<CR>", { noremap = true, silent = true })
 
 -- Scroll through popup messages
 vim.keymap.set("n", "<C-f>", function()

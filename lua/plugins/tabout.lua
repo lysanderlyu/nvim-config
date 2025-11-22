@@ -9,6 +9,7 @@ return {
         act_as_tab = true,            -- shift only when not jumping
         completion = true,            -- integrates with completion plugins
         ignore_beginning = true,      -- don't tab out at beginning of line
+        exclude = { "start" },    -- <— DON'T TABOUT AT LINE START
         tabouts = {
           { open = "'", close = "'" },
           { open = '"', close = '"' },

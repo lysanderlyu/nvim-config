@@ -6,9 +6,32 @@ return {
       "nvim-lua/plenary.nvim",
       -- "nvim-telescope/telescope-fzf-native.nvim",
     },
+
     config = function()
       local telescope = require("telescope")
-      telescope.setup()
+      local previewers = require("telescope.previewers")
+
+      telescope.setup({
+        pickers = {
+          git_branches = {
+            previewer = previewers.new_termopen_previewer({
+              get_command = function(entry)
+                return {
+                  "git",
+                  "-c", "core.pager=cat",
+                  "log",
+                  "-n", "1000", -- limit to 1000 lines
+                  "--decorate",
+                  "--graph",
+                  "--oneline",
+                  entry.value,
+                }
+              end,
+            }),
+          },
+        },
+      })
+
       -- telescope.load_extension("fzf")
 
       local opts = { noremap = true, silent = true }

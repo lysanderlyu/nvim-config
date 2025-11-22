@@ -11,6 +11,7 @@ return{
         },
         tabline = {
           lualine_a = { { "tabs", mode = 2 } }, -- show tab index + filename
+          lualine_x = {},
         },
       }
 

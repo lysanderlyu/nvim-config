@@ -12,6 +12,7 @@ return {
         },
         numhl = true,
         linehl = false,
+        _threaded_diff = true,
         watch_gitdir = { interval = 1000 },
         update_debounce = 100, -- default 100ms
         on_attach = function(bufnr)

@@ -11,3 +11,11 @@
 --     end
 --   end,
 -- })
+
+-- For refresh the gitsigns after fugitive commit the changes
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*",
+  callback = function()
+    vim.cmd("Gitsigns refresh")
+  end,
+})

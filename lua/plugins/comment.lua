@@ -7,7 +7,7 @@ return {
       require("Comment").setup({
         padding = true,      -- add a space between comment and code
         sticky = true,       -- maintain comment state across lines
-        ignore = "^$",        -- ignore empty lines
+        -- ignore = "^$",        -- ignore empty lines
         toggler = {
           line = "gcc",      -- toggle line comment
           block = "gbc",     -- toggle block comment
