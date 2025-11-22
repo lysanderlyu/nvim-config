@@ -1,0 +1,13 @@
+-- -- lua/autocommand.lua
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = "fugitive",
+--   callback = function()
+--     -- Only apply mapping if this is a Git status buffer
+--     if vim.b.git_status then
+--       vim.keymap.set("n", "<CR>", function()
+--         local file = vim.fn.expand("<cfile>")
+--         vim.cmd("rightbelow vsplit " .. file)
+--       end, { buffer = true, silent = true })
+--     end
+--   end,
+-- })
