@@ -40,7 +40,7 @@ return {
       vim.keymap.set("n", "<leader>cf", ":ShowFunctionsTelescope<CR>", opts)
 
       -- Function to grep the content that is in the clipboard
-      vim.keymap.set("n", "<leader>gh", function()
+      vim.keymap.set("n", "<leader>sS", function()
         local yank = vim.fn.getreg('+')
         if yank == "" then
           print("No yanked text")
@@ -49,7 +49,7 @@ return {
         vim.cmd("Rg " .. yank)
       end, opts)
 
-      vim.keymap.set("n", "<leader>fg", function()
+      vim.keymap.set("n", "<leader>ss", function()
         local yank = vim.fn.getreg('"')
         if yank == "" then
           print("No yanked text")

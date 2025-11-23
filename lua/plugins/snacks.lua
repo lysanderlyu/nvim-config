@@ -16,7 +16,23 @@ return {
       },
       picker = { enabled = true },
       quickfile = { enabled = true },
-      scope = { enabled = true },
+      scope = { 
+          enabled = true,
+          animate = {
+            duration = { step = 10, total = 200 },
+            easing = "linear",
+          },
+          animate_repeat = {
+            delay = 100,
+            duration = { step = 5, total = 50 },
+            easing = "linear",
+          },
+          filter = function(buf)
+            return vim.g.snacks_scroll ~= false
+              and vim.b[buf].snacks_scroll ~= false
+              and vim.bo[buf].buftype ~= "terminal"
+          end,
+      },
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
       words = { enabled = true },
@@ -54,7 +70,9 @@ return {
       { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
       { "<leader>sg", function() Snacks.picker.grep() end, desc = "Grep" },
       { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
-      { "<leader>ss", function() local text = vim.fn.getreg('"') if text ~= "" then text = text:gsub("\n", " "):gsub("^%s+", ""):gsub("%s+$", "") Snacks.picker.grep({ search = text, auto = true }) end end, desc = "Grep yanked text immediately", mode = "n", },
+      -- Use native telescope Rg instead
+      -- { "<leader>ss", function() local text = vim.fn.getreg('"') if text ~= "" then text = text:gsub("\n", " "):gsub("^%s+", ""):gsub("%s+$", "") Snacks.picker.grep({ search = text, auto = true }) end end, desc = "Grep yanked text immediately", mode = "n", },
+      
       -- search
       { '<leader>s"', function() Snacks.picker.registers() end, desc = "Registers" },
       { '<leader>s/', function() Snacks.picker.search_history() end, desc = "Search History" },
