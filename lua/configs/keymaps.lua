@@ -54,7 +54,7 @@ vim.keymap.set("n", "<leader>fh", builtin.help_tags, opts)
 vim.keymap.set("n", "<leader>fr", builtin.oldfiles, opts)
 
 -- Fzf finder
-vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
 
 -- telescope Git
 vim.keymap.set("n", "<leader>gD", builtin.git_status, opts)
