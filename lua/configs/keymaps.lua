@@ -82,9 +82,8 @@ vim.keymap.set("n", "<leader>gP", function()
     print("Not in a git repository!")
   end
 end, { silent = true })
-vim.keymap.set("n", "<leader>gl", ":Git log --graph -1000<CR>")       -- log
-vim.keymap.set("n", "<leader>gla", ":Git log --graph --all -1000<CR>")       -- log
-vim.keymap.set("n", "<leader>glt", ":Git log -1 HEAD<CR>")       -- log
+vim.keymap.set("n", "<leader>gL", ":Git log --graph -1000<CR>")       -- log
+vim.keymap.set("n", "<leader>gLa", ":Git log --graph --all -1000<CR>")       -- log
 vim.keymap.set("n", "<leader>gbl", ":Git blame<CR>")     -- blame
 vim.keymap.set("n", "<leader>ga", ":Git add %<CR>")
 vim.keymap.set("n", "<leader>gco", ":Git checkout %<CR>")
