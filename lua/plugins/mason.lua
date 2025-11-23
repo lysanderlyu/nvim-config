@@ -22,18 +22,18 @@ return {
   -- Mason LSP Config
   --------------------------------------------------------
   {
-    "williamboman/mason-lspconfig.nvim",
-    lazy = false,
-    dependencies = { "mason.nvim" },
-    opts = {
-      ensure_installed = {
-        "clangd",       -- C/C++
-        "pyright",      -- Python
-        "bashls",       -- Bash
-        "jdtls",        -- Java
-        "lua_ls",       -- Lua
-      },
-      automatic_installation = true,
-    },
+    -- "williamboman/mason-lspconfig.nvim",
+    -- lazy = false,
+    -- dependencies = { "mason.nvim" },
+    -- opts = {
+    --   ensure_installed = {
+    --     "clangd",       -- C/C++
+    --     "pyright",      -- Python
+    --     "bashls",       -- Bash
+    --     "jdtls",        -- Java
+    --     "lua_ls",       -- Lua
+    --   },
+    --   automatic_installation = true,
+    -- },
   },
 }
