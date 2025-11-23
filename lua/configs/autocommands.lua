@@ -19,3 +19,41 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     vim.cmd("Gitsigns refresh")
   end,
 })
+
+-- For fugitive git status to add the file to staged
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "fugitive",
+  callback = function()
+    -- ga = stage file under cursor
+    vim.keymap.set("n", "<leader>ga", function()
+      vim.cmd("Git add " .. vim.fn.expand("<cfile>"))
+    end, { buffer = true, desc = "Stage file under cursor" })
+  end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "fugitive",
+  callback = function()
+    -- ga = stage file under cursor
+    vim.keymap.set("n", "<leader>gr", function()
+      vim.cmd("Git reset --mixed -- " .. vim.fn.expand("<cfile>"))
+    end, { buffer = true, desc = "UnStage file under cursor" })
+  end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "fugitive",
+  callback = function()
+    -- ga = stage file under cursor
+    vim.keymap.set("n", "<leader>gra", function()
+      vim.cmd("Git reset --mixed")
+    end, { buffer = true, desc = "UnStage all files" })
+  end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "fugitive",
+  callback = function()
+    -- ga = stage file under cursor
+    vim.keymap.set("n", "<leader>gco", function()
+      vim.cmd("Git checkout -- " .. vim.fn.expand("<cfile>"))
+    end, { buffer = true, desc = "Checkout file under the cursor" })
+  end,
+})
