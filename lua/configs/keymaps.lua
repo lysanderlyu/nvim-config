@@ -92,6 +92,7 @@ vim.keymap.set("n", "<leader>gr", ":Git reset --mixed -- %<CR>")
 vim.keymap.set("n", "<leader>gra", ":Git reset --mixed<CR>")
 vim.keymap.set("n", "<leader>grs", ":Git reset --soft HEAD~1<CR>")
 vim.keymap.set("n", "<leader>grd", ":Git reset --hard HEAD~1<CR>")
+vim.keymap.set("n", "<leader>grb", ":Git rebase -i --fork-point<CR>")   -- Rebase the current branch from where it was born
 
 -- LSP
 vim.keymap.set("n", "gi", builtin.lsp_implementations, opts)
