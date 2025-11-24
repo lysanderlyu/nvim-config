@@ -3,8 +3,8 @@ return{
     "sphamba/smear-cursor.nvim",
     event = "VeryLazy",
     opts = {
-      smear_ms = 30,          -- speed of smear
-      smear_length = 18,      -- how long the tail is
+      smear_ms = 50,          -- speed of smear
+      smear_length = 20,      -- how long the tail is
       cursor_color = nil,     -- auto-use highlight color
       keep_smear_on_idle = false,
       hide_builtin_cursor = true,
