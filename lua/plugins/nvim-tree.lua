@@ -31,16 +31,18 @@ return {
           vim.keymap.set('n', '<', api.node.navigate.sibling.prev, opts('Previous Sibling'))
           vim.keymap.set('n', '.', api.node.run.cmd, opts('Run Command'))
           vim.keymap.set('n', '-', api.tree.change_root_to_parent, opts('Up'))
+          vim.keymap.set('n', 'e', api.tree.expand_all, opts('Expand All'))
+          vim.keymap.set('n', 'E', api.tree.collapse_all, opts('Collapse All'))
           vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
           vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
+          vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
+          vim.keymap.set('n', 'p', api.fs.paste, opts('Paste'))
           vim.keymap.set('n', 'D', api.fs.trash, opts('Trash'))
           vim.keymap.set('n', 'r', api.fs.rename, opts('Rename'))
           vim.keymap.set('n', 'R', api.tree.reload, opts('Refresh'))
           vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
-          vim.keymap.set('n', '<2-LeftMouse>', api.node.open.edit, opts('Open'))
-          vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
-          vim.keymap.set('n', '<leader>fe', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
+          vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
         end,
 
         view = {
