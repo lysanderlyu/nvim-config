@@ -47,6 +47,8 @@ vim.keymap.set('n', ';d', delete_n_lines, { desc = "Delete N lines to clipboard"
 vim.keymap.set("v", "';", '"+y', { desc = "Yank to system clipboard" })
 vim.keymap.set({"n", "v"}, ";'", '"+p', { desc = "Paste from system clipboard" })
 
+-- shortcut for select the whole line (without the space on the head and tail)
+vim.keymap.set("n", "vl", '^vg_', { desc = "Select whole line" })
 
 -- Telescope file finder
 vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
