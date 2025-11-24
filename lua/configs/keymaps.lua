@@ -49,12 +49,10 @@ vim.keymap.set({"n", "v"}, ";'", '"+p', { desc = "Paste from system clipboard" }
 
 
 -- Telescope file finder
-vim.keymap.set("n", "<leader>fb", builtin.buffers, opts)
-vim.keymap.set("n", "<leader>fh", builtin.help_tags, opts)
-vim.keymap.set("n", "<leader>fr", builtin.oldfiles, opts)
+vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
 
 -- Fzf finder
--- vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
 
 -- telescope Git
 vim.keymap.set("n", "<leader>gD", builtin.git_status, opts)

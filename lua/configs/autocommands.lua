@@ -57,3 +57,12 @@ vim.api.nvim_create_autocmd("FileType", {
     end, { buffer = true, desc = "Checkout file under the cursor" })
   end,
 })
+
+-- For gitsigns update after fugitive commit
+vim.api.nvim_create_autocmd("User", {
+  pattern = "FugitiveGitPostCommit",
+  callback = function()
+    vim.cmd("silent! e!")           -- reload buffer from HEAD
+    require('gitsigns').refresh(true)
+  end,
+})
