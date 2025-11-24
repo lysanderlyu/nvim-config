@@ -18,13 +18,20 @@ return {
       quickfile = { enabled = true },
       scope = { 
           enabled = true,
+      },
+      scroll = { 
+          enabled = true,
+          -- Main scroll animation
           animate = {
-            duration = { step = 10, total = 200 },
+            -- Smaller step = smaller increments = smoother
+            duration = { step = 8, total = 300 },
+            -- Better easing
             easing = "linear",
           },
+          -- When holding the key (repeat animation)
           animate_repeat = {
             delay = 100,
-            duration = { step = 5, total = 50 },
+            duration = { step = 4, total = 150 },
             easing = "linear",
           },
           filter = function(buf)
@@ -33,7 +40,6 @@ return {
               and vim.bo[buf].buftype ~= "terminal"
           end,
       },
-      scroll = { enabled = true },
       statuscolumn = { enabled = true },
       words = { enabled = true },
       styles = {
