@@ -84,6 +84,7 @@ vim.keymap.set("n", "<leader>gL", ":Git log --graph -1000<CR>")       -- log
 vim.keymap.set("n", "<leader>gLa", ":Git log --graph --all -1000<CR>")       -- log
 vim.keymap.set("n", "<leader>gbl", ":Git blame<CR>")     -- blame
 vim.keymap.set("n", "<leader>ga", ":Git add %<CR>")
+vim.keymap.set("n", "<leader>gA", ":Git add -A<CR>")
 vim.keymap.set("n", "<leader>gco", ":Git checkout %<CR>")
 vim.keymap.set("n", "<leader>gd", ":Gdiffsplit<CR>")
 vim.keymap.set("n", "<leader>gr", ":Git reset --mixed -- %<CR>")
