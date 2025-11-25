@@ -23,7 +23,11 @@ return {
         numhl = true,
         linehl = false,
         _threaded_diff = true,
-        watch_gitdir = { interval = 3000 },
+        watch_gitdir = { 
+            enable = true,
+            follow_files = true,
+            interval = 3000
+        },
         current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
         current_line_blame_opts = {
           virt_text = true,
@@ -33,7 +37,7 @@ return {
           virt_text_priority = 100,
           use_focus = true,
         },
-        current_line_blame_formatter = '<author>, <author_time:%R> - <summary>',
+        current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d %X %A> - <summary>',
         sign_priority = 6,
         update_debounce = 100,
         status_formatter = nil, -- Use default
