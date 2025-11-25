@@ -4,16 +4,26 @@ return {
     config = function()
       require("gitsigns").setup({
         signs = {
-          add = { hl = "GitGutterAdd", text = "│", numhl = "GitSignsAddNr" },
-          change = { hl = "GitGutterChange", text = "│", numhl = "GitSignsChangeNr" },
-          delete = { hl = "GitGutterDelete", text = "_", numhl = "GitSignsDeleteNr" },
-          topdelete = { hl = "GitGutterDelete", text = "‾", numhl = "GitSignsDeleteNr" },
-          changedelete = { hl = "GitGutterChange", text = "~", numhl = "GitSignsChangeNr" },
+          add          = { text = '┃' },
+          change       = { text = '┃' },
+          delete       = { text = '_' },
+          topdelete    = { text = '‾' },
+          changedelete = { text = '~' },
+          untracked    = { text = '┆' },
         },
+        signs_staged = {
+          add          = { text = '┃' },
+          change       = { text = '┃' },
+          delete       = { text = '_' },
+          topdelete    = { text = '‾' },
+          changedelete = { text = '~' },
+          untracked    = { text = '┆' },
+        },
+        signs_staged_enable = true,
         numhl = true,
         linehl = false,
         _threaded_diff = true,
-        watch_gitdir = { interval = 1000 },
+        watch_gitdir = { interval = 3000 },
         current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
         current_line_blame_opts = {
           virt_text = true,
