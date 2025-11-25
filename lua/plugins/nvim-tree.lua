@@ -97,7 +97,7 @@ return {
       ]])
     end,
   },
-  vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = true }),
+  vim.keymap.set('n', '<leader>E', ':NvimTreeToggle<CR>', { noremap = true, silent = true }),
 
   -- Change workspace and Nvim-Tree root
   vim.keymap.set("n", "<leader>cd", function()
