@@ -190,19 +190,3 @@ vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint)
 vim.keymap.set("n", "<leader>B", function() dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end)
 vim.keymap.set("n", "<leader>dr", dap.repl.open)
 vim.keymap.set("n", "<leader>dl", dap.run_last)
-
--- Nvim-tree toggle git changes only
-local show_git_changes_only = false
-
-local function toggle_git_changes()
-  show_git_changes_only = not show_git_changes_only
-  require("nvim-tree").setup({
-    filters = {
-      git_ignored = show_git_changes_only,
-      git_clean   = show_git_changes_only,
-    }
-  })
-  require("nvim-tree.api").tree.reload()
-end
-
-vim.keymap.set("n", "<leader>e", toggle_git_changes, { desc = "Toggle only git changes in nvim-tree" })

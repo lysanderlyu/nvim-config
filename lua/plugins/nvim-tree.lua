@@ -31,8 +31,8 @@ return {
           vim.keymap.set('n', '<', api.node.navigate.sibling.prev, opts('Previous Sibling'))
           vim.keymap.set('n', '.', api.node.run.cmd, opts('Run Command'))
           vim.keymap.set('n', '-', api.tree.change_root_to_parent, opts('Up'))
-          vim.keymap.set('n', 'e', api.tree.expand_all, opts('Expand All'))
-          vim.keymap.set('n', 'E', api.tree.collapse_all, opts('Collapse All'))
+          vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
+          vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
           vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
           vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
           vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
@@ -95,9 +95,62 @@ return {
       vim.cmd([[
         autocmd BufWritePost * lua require('nvim-tree.api').tree.reload()
       ]])
+      -- ======================================
+      -- Git-only toggle/open function
+      -- ======================================
+      local function toggle_tree_git_only()
+        local tree_view = require("nvim-tree.view")
+        local api = require("nvim-tree.api")
+
+        if tree_view.is_visible() then
+          tree_view.close()
+        else
+          require("nvim-tree").setup({
+            filters = {
+              git_ignored = true,
+              git_clean   = true,
+            },
+            renderer = {
+              group_empty = true,
+              root_folder_label = false,
+              indent_width = 1,
+              indent_markers = { enable = false },
+              highlight_git = true,
+            },
+            view = {
+              width = 40,
+              side = "left",
+              preserve_window_proportions = true,
+              float = { enable = false },
+              number = true,
+              relativenumber = true,
+            },
+            actions = {
+              expand_all = { max_folder_discovery = 300 },
+            },
+            -- on_attach = function(bufnr)
+            --   vim.defer_fn(function()
+            --     api.tree.expand_all()
+            --   end, 10)
+            -- end,
+          })
+
+          api.tree.open()
+          api.tree.reload()
+        end
+      end
+
+      -- Keymap for git-only toggle
+      vim.keymap.set(
+        "n",
+        "<leader>ge",
+        toggle_tree_git_only,
+        { desc = "Toggle Nvim-tree (git changes only, list-like view)" }
+      )
     end,
   },
-  vim.keymap.set('n', '<leader>E', ':NvimTreeToggle<CR>', { noremap = true, silent = true }),
+
+  vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = true }),
 
   -- Change workspace and Nvim-Tree root
   vim.keymap.set("n", "<leader>cd", function()

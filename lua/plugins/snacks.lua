@@ -55,7 +55,7 @@ return {
       { "<leader>/", function() Snacks.picker.grep() end, desc = "Grep" },
       { "<leader>:", function() Snacks.picker.command_history() end, desc = "Command History" },
       { "<leader>n", function() Snacks.picker.notifications() end, desc = "Notification History" },
-      { "<leader>se", function() Snacks.explorer() end, desc = "File Explorer" },
+      { "<leader>E", function() Snacks.explorer() end, desc = "File Explorer" },
       -- find
       { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Buffers" },
       { "<leader>fB", function() Snacks.picker.buffers({ actions = { select = function(bufnr) vim.api.nvim_buf_delete(bufnr, { force = true }) end, }, }) end, { desc = "Pick buffer to close" }},
