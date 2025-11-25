@@ -110,12 +110,20 @@ return {
               git_ignored = true,
               git_clean   = true,
             },
+            git = {
+              enable  = true,      -- must be true for git filters to work
+              timeout = 4000,      -- git timeout in milliseconds
+            },
             renderer = {
               group_empty = true,
               root_folder_label = false,
               indent_width = 1,
               indent_markers = { enable = false },
               highlight_git = true,
+            },
+            update_focused_file = {
+              enable = true,      -- highlight the current file in the tree
+              update_root = true, -- optionally change the root to the file's directory
             },
             view = {
               width = 40,
