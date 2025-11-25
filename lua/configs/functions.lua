@@ -2,9 +2,18 @@
 -- Enable diff for exactly two windows
 -----------------------------------------------------------
 function DiffTwoWindows()
-  local wins = vim.api.nvim_list_wins()
+  local wins = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local cfg = vim.api.nvim_win_get_config(win)
+
+    -- only include normal windows (not floating / preview / plugin)
+    if cfg.relative == "" then
+      table.insert(wins, win)
+    end
+  end
+
   if #wins ~= 2 then
-    print("Exactly two windows must be open!")
+    print("Exactly two NORMAL windows must be open!")
     return
   end
 
@@ -13,6 +22,8 @@ function DiffTwoWindows()
       vim.cmd("diffthis")
     end)
   end
+
+  print("Diff mode enabled ✔")
 end
 
 -----------------------------------------------------------
@@ -25,8 +36,8 @@ end
 -----------------------------------------------------------
 -- Keymaps
 -----------------------------------------------------------
-vim.keymap.set("n", "<leader>dw", DiffTwoWindows, { desc = "Diff the two windows" })
-vim.keymap.set("n", "<leader>Dw", CancelDiff, { desc = "Cancel diff mode" })
+vim.keymap.set("n", "<leader>;d", DiffTwoWindows, { desc = "Diff the two windows" })
+vim.keymap.set("n", "<leader>;D", CancelDiff, { desc = "Cancel diff mode" })
 
 local M = {}
 function M.show_functions_telescope()
