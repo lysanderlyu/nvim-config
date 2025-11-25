@@ -2,28 +2,29 @@
 -- Enable diff for exactly two windows
 -----------------------------------------------------------
 function DiffTwoWindows()
-  local wins = {}
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local cfg = vim.api.nvim_win_get_config(win)
+  local wins = vim.api.nvim_tabpage_list_wins(0) -- only current tab
+  local normal_wins = {}
 
-    -- only include normal windows (not floating / preview / plugin)
+  -- filter normal windows (exclude floating / plugin)
+  for _, win in ipairs(wins) do
+    local cfg = vim.api.nvim_win_get_config(win)
     if cfg.relative == "" then
-      table.insert(wins, win)
+      table.insert(normal_wins, win)
     end
   end
 
-  if #wins ~= 2 then
-    print("Exactly two NORMAL windows must be open!")
+  if #normal_wins ~= 2 then
+    print("Exactly two NORMAL windows must be open in this tab!")
     return
   end
 
-  for _, win in ipairs(wins) do
+  for _, win in ipairs(normal_wins) do
     vim.api.nvim_win_call(win, function()
       vim.cmd("diffthis")
     end)
   end
 
-  print("Diff mode enabled ✔")
+  print("Diff mode enabled for this tab ✔")
 end
 
 -----------------------------------------------------------
