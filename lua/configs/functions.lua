@@ -25,8 +25,8 @@ end
 -----------------------------------------------------------
 -- Keymaps
 -----------------------------------------------------------
-vim.keymap.set("n", "<leader>;d", DiffTwoWindows, { desc = "Diff the two windows" })
-vim.keymap.set("n", "<leader>;D", CancelDiff, { desc = "Cancel diff mode" })
+vim.keymap.set("n", "<leader>dw", DiffTwoWindows, { desc = "Diff the two windows" })
+vim.keymap.set("n", "<leader>Dw", CancelDiff, { desc = "Cancel diff mode" })
 
 local M = {}
 function M.show_functions_telescope()
