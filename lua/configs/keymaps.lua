@@ -57,7 +57,7 @@ vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
 vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
 
 -- telescope Git
-vim.keymap.set("n", "<leader>gD", builtin.git_status, opts)
+vim.keymap.set("n", "<leader>go", builtin.git_status, opts)
 vim.keymap.set("n", "<leader>gb", builtin.git_branches, opts)
 
 -- fugitive
@@ -190,3 +190,33 @@ vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint)
 vim.keymap.set("n", "<leader>B", function() dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end)
 vim.keymap.set("n", "<leader>dr", dap.repl.open)
 vim.keymap.set("n", "<leader>dl", dap.run_last)
+
+-- For diff with a specific commit
+vim.keymap.set("n", "<leader>gD", function()
+  local file = vim.fn.expand("%:p")         -- absolute path
+  local repo_path = vim.fn.systemlist(
+      "git -C " .. vim.fn.shellescape(vim.fn.expand("%:h")) .. " rev-parse --show-toplevel"
+  )[1]
+
+  -- convert absolute path → relative path inside repo
+  local rel_file = file:gsub(repo_path .. "/", "")
+
+  Snacks.picker.git_log_file({
+    confirm = function(picker, item)
+      picker:close()
+
+      local hash = item.oid or item.commit
+      if not hash then
+        vim.notify("No valid commit selected", vim.log.levels.ERROR)
+        return
+      end
+
+      vim.schedule(function()
+        -- IMPORTANT: git syntax "<hash>:<relative-file>"
+        local target = hash .. ":" .. rel_file
+
+        vim.cmd("Gvdiffsplit " .. vim.fn.fnameescape(target))
+      end)
+    end,
+  })
+end, { desc = "Git log → Diff commit for current file" })
