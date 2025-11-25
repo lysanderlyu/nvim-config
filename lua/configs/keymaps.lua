@@ -193,28 +193,61 @@ vim.keymap.set("n", "<leader>dl", dap.run_last)
 
 -- For diff with a specific commit
 vim.keymap.set("n", "<leader>gD", function()
-  local file = vim.fn.expand("%:p")         -- absolute path
+  -------------------------------------------------------
+  -- 1. Validate the current buffer
+  -------------------------------------------------------
+  local file = vim.fn.expand("%:p")
+  local filetype = vim.fn.getftype(file)
+
+  if file == "" or filetype ~= "file" then
+    vim.notify("Current cursor is NOT on a valid file", vim.log.levels.ERROR)
+    return
+  end
+
+  -------------------------------------------------------
+  -- 2. Get repo root
+  -------------------------------------------------------
+  local dirname = vim.fn.expand("%:h")
   local repo_path = vim.fn.systemlist(
-      "git -C " .. vim.fn.shellescape(vim.fn.expand("%:h")) .. " rev-parse --show-toplevel"
+    "git -C " .. vim.fn.shellescape(dirname) .. " rev-parse --show-toplevel"
   )[1]
 
-  -- convert absolute path → relative path inside repo
+  if repo_path == nil or repo_path == "" then
+    vim.notify("Not inside a Git repository", vim.log.levels.ERROR)
+    return
+  end
+
+  -------------------------------------------------------
+  -- 3. Get file path relative to repo root
+  -------------------------------------------------------
   local rel_file = file:gsub(repo_path .. "/", "")
 
+  if rel_file == file then
+    vim.notify("Unable to convert file path to repo-relative", vim.log.levels.ERROR)
+    return
+  end
+
+  -------------------------------------------------------
+  -- 4. Open Snacks git_log_file picker
+  -------------------------------------------------------
   Snacks.picker.git_log_file({
     confirm = function(picker, item)
       picker:close()
 
+      ---------------------------------------------------
+      -- 5. Validate commit object
+      ---------------------------------------------------
       local hash = item.oid or item.commit
       if not hash then
         vim.notify("No valid commit selected", vim.log.levels.ERROR)
         return
       end
 
+      ---------------------------------------------------
+      -- 6. Diff commit version of this file
+      ---------------------------------------------------
       vim.schedule(function()
-        -- IMPORTANT: git syntax "<hash>:<relative-file>"
         local target = hash .. ":" .. rel_file
-
         vim.cmd("Gvdiffsplit " .. vim.fn.fnameescape(target))
       end)
     end,
