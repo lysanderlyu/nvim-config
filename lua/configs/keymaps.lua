@@ -54,7 +54,7 @@ vim.keymap.set("n", "vl", '^vg_', { desc = "Select whole line" })
 vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
 
 -- Fzf finder
-vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
 
 -- telescope Git
 vim.keymap.set("n", "<leader>go", builtin.git_status, opts)
