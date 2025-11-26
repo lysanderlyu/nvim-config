@@ -111,7 +111,7 @@ return {
             },
             git = {
               enable  = true,      -- must be true for git filters to work
-              timeout = 4000,      -- git timeout in milliseconds
+              timeout = 6000,      -- git timeout in milliseconds
             },
             renderer = {
               group_empty = true,
@@ -242,7 +242,7 @@ return {
           git = {
             enable = true,      -- show git status icons
             ignore = false,     -- show ignored files
-            timeout = 4000,
+            timeout = 5000,
           },
 
           sync_root_with_cwd = true,
