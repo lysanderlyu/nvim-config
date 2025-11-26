@@ -83,7 +83,7 @@ return {
         git = {
           enable = true,      -- show git status icons
           ignore = false,     -- show ignored files
-          timeout = 4000,
+          timeout = 500,
         },
 
         sync_root_with_cwd = true,
