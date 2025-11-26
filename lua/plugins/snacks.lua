@@ -3,38 +3,6 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
-    config = function()
-      require("snacks").setup({
-        pickers = {
-          files = {
-            mappings = {
-              i = {
-                ["<C-v>"] = function(selection)
-                  vim.cmd("vsplit " .. selection)
-                end,
-                ["<C-s>"] = function(selection)
-                  vim.cmd("split " .. selection)
-                end,
-                ["<C-t>"] = function(selection)
-                  vim.cmd("tabedit " .. selection)
-                end,
-              },
-              n = {
-                ["<C-v>"] = function(selection)
-                  vim.cmd("vsplit " .. selection)
-                end,
-                ["<C-s>"] = function(selection)
-                  vim.cmd("split " .. selection)
-                end,
-                ["<C-t>"] = function(selection)
-                  vim.cmd("tabedit " .. selection)
-                end,
-              },
-            },
-          },
-        },
-    })
-    end,
     ---@type snacks.Config
     opts = {
       bigfile = { enabled = true },
@@ -208,6 +176,7 @@ return {
           Snacks.toggle.inlay_hints():map("<leader>uh")
           Snacks.toggle.indent():map("<leader>ui")
           Snacks.toggle.dim():map("<leader>uD")
+         
         end,
       })
     end,
