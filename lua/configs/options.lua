@@ -14,6 +14,18 @@ vim.o.showmode = false
 vim.lsp.set_log_level("ERROR")
 vim.g.fzf_layout = { window = {width = 0.8, height = 0.9 } }
 
+-- For git diff word based
+vim.opt.diffopt:append("internal")
+vim.opt.diffopt:append("algorithm:patience")
+vim.opt.diffopt:append("indent-heuristic")
+vim.opt.diffopt:append("linematch:60")
+vim.opt.diffopt:append("horizontal")
+vim.opt.diffopt:append("filler")
+vim.opt.diffopt:append("closeoff")
+vim.opt.diffopt:append("linematch:50")
+vim.opt.diffopt:append("iwhite")
+
+
 -- parse .pro file as shell
 vim.api.nvim_create_augroup("tshark_filetype", { clear = true })
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
