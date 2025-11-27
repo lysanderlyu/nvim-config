@@ -253,3 +253,41 @@ vim.keymap.set("n", "<leader>gD", function()
     end,
   })
 end, { desc = "Git log → Diff commit for current file" })
+
+-- View a flattened DTS from a DTB file
+local function view_dtb()
+  local file = vim.fn.expand("%:p")
+  if file == "" then
+    print("No file under cursor")
+    return
+  end
+
+  if not file:match("%.dtb$") then
+    print("Not a DTB file")
+    return
+  end
+
+  -- Temporary output file
+  local tmp = vim.fn.tempname() .. ".dts"
+
+  -- Decompile dtb
+  local cmd = string.format("dtc -I dtb -O dts '%s' -o '%s'", file, tmp)
+  local result = os.execute(cmd)
+  if result ~= 0 then
+    print("Failed to decompile DTB")
+    return
+  end
+
+  -- Replace current buffer with tmp file
+  vim.cmd("edit " .. tmp)
+
+  -- When the buffer is unloaded (closed), remove the tmp file
+  vim.api.nvim_create_autocmd("BufWipeout", {
+    buffer = 0,
+    once = true,
+    callback = function()
+      os.remove(tmp)
+    end,
+  })
+end
+vim.keymap.set("n", "<leader>dt", view_dtb, { desc = "Decompile DTB to DTS" })
