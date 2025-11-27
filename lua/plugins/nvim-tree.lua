@@ -242,7 +242,7 @@ return {
           },
 
           git = {
-            enable = false,      -- show git status icons
+            enable = true,      -- show git status icons
             ignore = false,     -- show ignored files
             timeout = 500,
           },
