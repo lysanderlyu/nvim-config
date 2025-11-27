@@ -1,17 +1,3 @@
--- -- lua/autocommand.lua
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = "fugitive",
---   callback = function()
---     -- Only apply mapping if this is a Git status buffer
---     if vim.b.git_status then
---       vim.keymap.set("n", "<CR>", function()
---         local file = vim.fn.expand("<cfile>")
---         vim.cmd("rightbelow vsplit " .. file)
---       end, { buffer = true, silent = true })
---     end
---   end,
--- })
-
 -- For refresh the gitsigns after fugitive commit the changes
 vim.api.nvim_create_autocmd("BufWritePost", {
   pattern = "*",
@@ -28,39 +14,36 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>ga", function()
       vim.cmd("Git add " .. vim.fn.expand("<cfile>"))
     end, { buffer = true, desc = "Stage file under cursor" })
-  end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "fugitive",
-  callback = function()
-    -- ga = stage file under cursor
+
+    -- gr = reset file from staged under cursor
     vim.keymap.set("n", "<leader>gr", function()
       vim.cmd("Git reset --mixed -- " .. vim.fn.expand("<cfile>"))
     end, { buffer = true, desc = "UnStage file under cursor" })
-  end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "fugitive",
-  callback = function()
-    -- ga = stage file under cursor
+
+    -- gra = reset all the staged files under cursor
     vim.keymap.set("n", "<leader>gra", function()
       vim.cmd("Git reset --mixed")
     end, { buffer = true, desc = "UnStage all files" })
-  end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "fugitive",
-  callback = function()
-    -- ga = stage file under cursor
+
+    -- gco = checkout file under cursor
     vim.keymap.set("n", "<leader>gco", function()
       vim.cmd("Git checkout -- " .. vim.fn.expand("<cfile>"))
     end, { buffer = true, desc = "Checkout file under the cursor" })
+
+    -- Ctrl-x = open file under cursor in horizontal split
+    vim.keymap.set("n", "<C-x>", function()
+      local file = vim.fn.expand("<cfile>")
+      if file ~= "" then
+        vim.cmd("split " .. file)
+      end
+    end, { buffer = true, desc = "Open file in split" })
+
+    -- Ctrl-v = open file under cursor in vertical split
+    vim.keymap.set("n", "<C-v>", function()
+      local file = vim.fn.expand("<cfile>")
+      if file ~= "" then
+        vim.cmd("vsplit " .. file)
+      end
+    end, { buffer = true, desc = "Open file in vsplit" })
   end,
 })
-
--- For auto using nvim-tree when open file
--- vim.api.nvim_create_autocmd({"VimEnter"}, {
---   callback = function()
---     require("nvim-tree.api").tree.open()
---   end,
--- })
