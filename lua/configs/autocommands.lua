@@ -10,6 +10,16 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "fugitive",
   callback = function()
+    -- gS = stash file under cursor
+    vim.keymap.set("n", "<leader>gS", function()
+      vim.cmd("Git stash -- " .. vim.fn.expand("<cfile>"))
+    end, { buffer = true, desc = "Stage file under cursor" })
+
+    -- gSp stash pop up file under cursor
+    vim.keymap.set("n", "<leader>gSp", function()
+      vim.cmd("Git stash pop " .. vim.fn.expand("<cfile>"))
+    end, { buffer = true, desc = "Stage file under cursor" })
+
     -- ga = stage file under cursor
     vim.keymap.set("n", "<leader>ga", function()
       vim.cmd("Git add " .. vim.fn.expand("<cfile>"))
