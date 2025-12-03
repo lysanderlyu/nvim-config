@@ -292,18 +292,23 @@ local function view_dtb()
 end
 vim.keymap.set("n", "<leader>dt", view_dtb, { desc = "Decompile DTB to DTS" })
 
--- Align N lines of // comments using count before the mapping
-local function align_counted()
+-- Align N lines by a given pattern
+local function align_by(pattern)
   local count = vim.v.count
-  if count == 0 then count = 10 end  -- default to 10 lines if no count given
+  if count == 0 then count = 10 end  -- default 10 lines
 
   local start_line = vim.fn.line(".")
   local end_line = start_line + count - 1
   local last_line = vim.fn.line("$")
   if end_line > last_line then end_line = last_line end
 
-  vim.api.nvim_command(string.format("%d,%dTabularize /\\/\\/", start_line, end_line))
+  vim.api.nvim_command(string.format("%d,%dTabularize /%s/", start_line, end_line, pattern))
 end
 
--- Map <leader>ac in normal mode
-vim.keymap.set("n", "<leader>ac", align_counted, { desc = "Align N lines of // comments" })
+-- Align // comments
+vim.keymap.set("n", "<leader>ac", function() align_by("//") end,
+  { desc = "Align N lines of // comments" })
+
+-- Align by = 
+vim.keymap.set("n", "<leader>ae", function() align_by("=") end,
+  { desc = "Align N lines by =" })
