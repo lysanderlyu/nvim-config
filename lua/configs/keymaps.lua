@@ -127,7 +127,7 @@ function _HTOP_TOGGLE()
   htop:toggle()
 end
 -- Map key to toggle htop
-vim.api.nvim_set_keymap("n", "<leader>th", "<cmd>lua _HTOP_TOGGLE()<CR>", {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap("n", "<leader>th", "<cmd>lua _HTOP_TOGGLE()<CR>", {noremap = true, silent = true})
 
 -- statuscol
 require("statuscol").setup({
