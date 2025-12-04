@@ -12,8 +12,8 @@ for i = 1, 9 do
   vim.keymap.set("n", ";" .. i, ":tabn " .. i .. "<CR>", { desc = "Go to tab " .. i })
 end
 vim.keymap.set("n", "<leader>tt", ":tabnew<cr>", { desc = "New Tab" })
-vim.keymap.set("n", "<leader>tl", ":tabnext<cr>", { desc = "Next Tab" })
-vim.keymap.set("n", "<leader>th", ":tabprevious<cr>", { desc = "Previous Tab" })
+vim.keymap.set("n", "<leader>lt", ":tabnext<cr>", { desc = "Next Tab" })
+vim.keymap.set("n", "<leader>ht", ":tabprevious<cr>", { desc = "Previous Tab" })
 
 -- Soil 
 vim.keymap.set("n", "<leader>si", ":Soil<CR>", { noremap = true, silent = true })
