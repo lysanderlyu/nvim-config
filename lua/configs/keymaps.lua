@@ -312,3 +312,8 @@ vim.keymap.set("n", "<leader>ac", function() align_by("//") end,
 -- Align by = 
 vim.keymap.set("n", "<leader>ae", function() align_by("=") end,
   { desc = "Align N lines by =" })
+
+-- Align by { 
+vim.keymap.set("n", "<leader>a{", function() align_by("{") end,
+  { desc = "Align N lines by {" })
+
