@@ -28,8 +28,17 @@ return {
               -- Some examples:
               -- return "feh " .. img
               -- return "xdg-open " .. img
-              execute_to_open = function(img) 
-                  return "nsxiv -g 2540x1400+0+0 -b -z 125 --anti-alias " .. img
+              
+              -- execute_to_open = function(img) 
+              --     return "nsxiv -g 2540x1400+0+0 -b -z 125 --anti-alias " .. img
+              -- end
+              execute_to_open = function(img)
+                      -- feh is a lightweight image viewer similar to nsxiv.
+                      -- --scale-down: Fits the image to the screen if it's too big.
+                      -- --auto-zoom: Zooms small images to fit the window.
+                      -- &: runs it in the background so Neovim doesn't freeze.
+                      -- return "feh --scale-down --auto-zoom " .. img .. " &"
+                      return "open " .. img
               end
           }
       }
