@@ -170,16 +170,19 @@ require("statuscol").setup({
 -- vim.api.nvim_set_keymap("n", "<leader>cc", ":ColorizerToggle<CR>", { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap("n", "<leader>ca", ":ColorizerAttachToBuffer<CR>", { noremap = true, silent = true })
 
--- Scroll through popup messages
-vim.keymap.set("n", "<C-f>", function()
-  if require("noice.lsp").scroll(4) then return end
-  return "<C-f>"
-end, { expr = true, silent = true })
+-- Set shortcut to switch last file
+vim.keymap.set("n", "<C-f>", "<cmd>b#<CR>")
 
-vim.keymap.set("n", "<C-b>", function()
-  if require("noice.lsp").scroll(-4) then return end
-  return "<C-b>"
-end, { expr = true, silent = true })
+-- Scroll through popup messages
+-- vim.keymap.set("n", "<C-f>", function()
+--   if require("noice.lsp").scroll(4) then return end
+--   return "<C-f>"
+-- end, { expr = true, silent = true })
+--
+-- vim.keymap.set("n", "<C-b>", function()
+--   if require("noice.lsp").scroll(-4) then return end
+--   return "<C-b>"
+-- end, { expr = true, silent = true })
 
 -- For nvim-dap
 local dap = require("dap")
