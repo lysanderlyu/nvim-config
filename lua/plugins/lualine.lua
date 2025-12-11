@@ -1,5 +1,4 @@
--- For bufferline (tab and status line)
-return{
+return {
   {
     "nvim-lualine/lualine.nvim",
     config = function()
@@ -53,34 +52,37 @@ return{
           theme = theme,
         },
         refresh = {
-              statusline = 1000,
-              tabline = 1000,
-              winbar = 1000,
-              refresh_time = 16, -- ~60fps
-              events = {
-                'WinEnter',
-                'BufEnter',
-                'BufWritePost',
-                'SessionLoadPost',
-                'FileChangedShellPost',
-                'VimResized',
-                'Filetype',
-                'CursorMoved',
-                'CursorMovedI',
-                'ModeChanged',
-              },
+          statusline = 1000,
+          tabline = 1000,
+          winbar = 1000,
+          refresh_time = 16, -- ~60fps
+          events = {
+            'WinEnter',
+            'BufEnter',
+            'BufWritePost',
+            'SessionLoadPost',
+            'FileChangedShellPost',
+            'VimResized',
+            'Filetype',
+            'CursorMoved',
+            'CursorMovedI',
+            'ModeChanged',
+          },
         },
         tabline = {
-          lualine_a = { { "tabs", mode = 2 } }, -- show tab index + filename
+          lualine_a = { { "tabs", mode = 2 } }, -- tab index + filename
           lualine_x = {},
         },
         sections = {
           lualine_a = {'mode'},
           lualine_b = {'branch', 'diff', 'diagnostics'},
-          lualine_c = {'filename'},
+          lualine_c = {relative_filepath},
           lualine_x = {"os.date('%c')", 'data', 'encoding', 'fileformat', 'filetype'},
           lualine_y = {'progress'},
           lualine_z = {'location'}
+        },
+        winbar = {
+          lualine_c = { current_code_context },  -- full code context in winbar
         },
         inactive_sections = {
           lualine_a = {},
@@ -97,3 +99,4 @@ return{
     end,
   },
 }
+
