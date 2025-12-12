@@ -274,7 +274,7 @@ local function view_dtb()
   local tmp = vim.fn.tempname() .. ".dts"
 
   -- Decompile dtb
-  local cmd = string.format("dtc -I dtb -O dts '%s' -o '%s'", file, tmp)
+  local cmd = string.format("dtc -I dtb -O dts -s '%s' -o '%s'", file, tmp)
   local result = os.execute(cmd)
   if result ~= 0 then
     print("Failed to decompile DTB")
