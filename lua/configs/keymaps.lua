@@ -197,13 +197,11 @@ vim.keymap.set("n", "<leader>dl", dap.run_last)
 -- For diff with a specific commit
 vim.keymap.set("n", "<leader>gD", function()
   -------------------------------------------------------
-  -- 1. Validate the current buffer
+  -- 1. Validate buffer
   -------------------------------------------------------
   local file = vim.fn.expand("%:p")
-  local filetype = vim.fn.getftype(file)
-
-  if file == "" or filetype ~= "file" then
-    vim.notify("Current cursor is NOT on a valid file", vim.log.levels.ERROR)
+  if file == "" or vim.fn.getftype(file) ~= "file" then
+    vim.notify("Not a valid file", vim.log.levels.ERROR)
     return
   end
 
@@ -221,33 +219,33 @@ vim.keymap.set("n", "<leader>gD", function()
   end
 
   -------------------------------------------------------
-  -- 3. Get file path relative to repo root
+  -- 3. Get repo-relative path (correct way)
   -------------------------------------------------------
-  local rel_file = file:gsub(repo_path .. "/", "")
+  local rel_file = vim.fn.systemlist(
+    "git -C " .. vim.fn.shellescape(repo_path)
+    .. " ls-files --full-name "
+    .. vim.fn.shellescape(file)
+  )[1]
 
-  if rel_file == file then
-    vim.notify("Unable to convert file path to repo-relative", vim.log.levels.ERROR)
+  if rel_file == nil or rel_file == "" then
+    vim.notify("File is not tracked by Git", vim.log.levels.ERROR)
     return
   end
 
   -------------------------------------------------------
-  -- 4. Open Snacks git_log_file picker
+  -- 4. Show Git Log for this file
   -------------------------------------------------------
   Snacks.picker.git_log_file({
     confirm = function(picker, item)
       picker:close()
-
-      ---------------------------------------------------
-      -- 5. Validate commit object
-      ---------------------------------------------------
       local hash = item.oid or item.commit
       if not hash then
-        vim.notify("No valid commit selected", vim.log.levels.ERROR)
+        vim.notify("No valid commit", vim.log.levels.ERROR)
         return
       end
 
       ---------------------------------------------------
-      -- 6. Diff commit version of this file
+      -- 5. Use Gvdiffsplit to show diff
       ---------------------------------------------------
       vim.schedule(function()
         local target = hash .. ":" .. rel_file
@@ -256,6 +254,7 @@ vim.keymap.set("n", "<leader>gD", function()
     end,
   })
 end, { desc = "Git log → Diff commit for current file" })
+
 
 -- View a flattened DTS from a DTB file
 local function view_dtb()
