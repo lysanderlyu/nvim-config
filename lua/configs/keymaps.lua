@@ -321,3 +321,26 @@ vim.keymap.set("n", "<leader>ae", function() align_by("=") end,
 vim.keymap.set("n", "<leader>a{", function() align_by("{") end,
   { desc = "Align N lines by {" })
 
+vim.api.nvim_create_user_command("D2", function()
+  local file = vim.fn.expand("%:p")
+  local out  = vim.fn.expand("%:p:r") .. ".png"
+
+  -- compile d2
+  vim.fn.system({ "d2", file, out })
+
+  -- preview
+  vim.fn.system({
+    "nsxiv",
+    "-g", "2540x1400+0+0",
+    "-b",
+    "-z", "125",
+    "--anti-alias",
+    out
+  })
+end, {})
+
+vim.keymap.set("n", "<leader>di", "<cmd>D2<CR>", {
+  noremap = true,
+  silent = true,
+  desc = "Run D2 compile"
+})
