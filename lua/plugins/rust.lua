@@ -4,10 +4,10 @@ return{
         ft = "rust",  -- load only for Rust files
         config = function()
             -- Optional key mappings
-            vim.keymap.set("n", "<leader>rr", ":RustRun<CR>", {silent=true})
-            vim.keymap.set("n", "<leader>rb", ":RustBuild<CR>", {silent=true})
-            vim.keymap.set("n", "<leader>rt", ":RustTest<CR>", {silent=true})
-            vim.keymap.set("n", "<leader>rf", ":RustFmt<CR>", {silent=true})
+            vim.keymap.set("n", "<leader>rb", ":!cargo build<CR>", { silent = true })
+            vim.keymap.set("n", "<leader>rr", ":!cargo run<CR>", { silent = true })
+            vim.keymap.set("n", "<leader>rt", ":!cargo test<CR>", { silent = true })
+            vim.keymap.set("n", "<leader>rf", ":RustFmt<CR>", { silent = true })
         end
     }
 }
