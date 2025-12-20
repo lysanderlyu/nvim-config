@@ -3,8 +3,9 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
+    branch = 'master',
     config = function()
-      require("nvim-treesitter.configs").setup {
+      require("nvim-treesitter").setup {
         ensure_installed = {
           "c", "cpp", "java", "kotlin", "python", "bash", "make", "cmake",
           "json", "yaml", "toml", "rust", "xml", "html", "css", "proto", "asm", "nasm",
