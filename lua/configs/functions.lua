@@ -49,7 +49,7 @@ function M.show_functions_telescope()
     c = "c", cpp = "cpp", java = "java", python = "python", lua = "lua", bash = "bash",
     sh = "bash", xml = "xml", asm = "asm", S = "asm", s = "asm", cs = "c_sharp", make = "make",
     diff = "diff", bp = "bp", vue = "vue", php = "php", markdown = "markdown", rst = "rst",
-    qmljs = "qmljs"
+    qmljs = "qmljs", rust = "rust"
   }
 
   local lang = lang_map[ft]
@@ -62,6 +62,39 @@ function M.show_functions_telescope()
   local root = syntax_tree[1]:root()
 
   local queries = {
+    rust = [[
+    (enum_item
+        name: (type_identifier) @name)
+
+    (struct_item
+        name: (type_identifier) @name
+        body: (field_declaration_list))
+
+    (struct_item
+        name: (type_identifier) @name
+        body: (ordered_field_declaration_list))
+
+    (impl_item
+        trait: (type_identifier)
+        type: (type_identifier) @name)
+
+    (macro_definition
+      name: (identifier) @name)
+
+    (impl_item
+      trait: (generic_type) @name)
+
+    (trait_item
+      (visibility_modifier)
+      name: (type_identifier) @name
+      body: (declaration_list))
+
+    (function_item
+      name: (identifier) @name
+      parameters: (parameters)
+      return_type: (never_type)
+      body: (block))
+    ]],
     qmljs = [[
       (ui_object_definition
         type_name: (identifier) @name)
