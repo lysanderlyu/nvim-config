@@ -10,7 +10,7 @@ return {
           "c", "cpp", "java", "kotlin", "python", "bash", "make", "cmake",
           "json", "yaml", "toml", "rust", "xml", "html", "css", "proto", "asm", "nasm",
           "markdown", "gitcommit", "lua", "c_sharp", "diff", "passwd", "ninja",
-          "smali", "ssh_config", "ruby", "sql", "go", "blueprint", "bp", "php",
+          "smali", "ssh_config", "ruby", "sql", "go", "bp", "php",
           "vue", "zathurarc", "rst", "qmljs", "javascript"
         },
         highlight = {
