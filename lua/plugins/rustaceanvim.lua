@@ -16,6 +16,11 @@ return {
         vim.cmd.RustLsp("renderDiagnostic")
       end, opts)
 
+      -- Rust Doc on HTML
+      vim.keymap.set("n", "<leader>rm", function()
+          vim.cmd.RustLsp('openDocs')
+      end, opts)
+
       -- Code action
       vim.keymap.set("n", "<leader>a", function()
         vim.cmd.RustLsp("codeAction")
