@@ -41,8 +41,10 @@ return {
           },
             
           winopts = {
+            width = 0.95,
+            height = 0.95,
             layout = "horizontal",
-            preview = { layout = "vertical", vertical = "right:50%" },
+            preview = { layout = "vertical", vertical = "right:55%" },
           },
         })
       end, { desc = "Search clipboard (+ register) with native preview" })
@@ -69,8 +71,10 @@ return {
               ["--info"] = "default",
           },
           winopts = {
+            width = 0.95,
+            height = 0.95,
             layout = "horizontal",
-            preview = { layout = "vertical", vertical = "right:50%" },
+            preview = { layout = "vertical", vertical = "right:55%" },
           },
         })
       end, { desc = "Search last yank (\" register) with native preview" })
