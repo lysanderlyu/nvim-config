@@ -78,6 +78,51 @@ return {
           },
         })
       end, { desc = "Search last yank (\" register) with native preview" })
+
+      -- Map <leader>ff to find files
+      vim.keymap.set("n", "<leader>ff", function()
+        fzf.files({
+          prompt = "Files> ",
+          winopts = {
+            width = 0.9,
+            height = 0.9,
+            layout = "horizontal",
+            preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
+          },
+        })
+      end, { desc = "Find files with fzf-lua" })
+
+      vim.keymap.set("n", "<leader>fF", function()
+        local yank = vim.fn.getreg('"')  -- get clipboard
+        if yank == "" then
+          vim.notify("Clipboard is empty", vim.log.levels.INFO)
+          return
+        end
+      
+        yank = yank:gsub("[\r\n]+$", "")  -- trim newlines
+        yank = yank:gsub("^%s*(.-)%s*$", "%1")  -- trim spaces
+      
+        require("fzf-lua").files({
+          prompt = "Files> ",
+          fzf_opts = {
+            ["--query"] = yank,  -- <-- this pre-fills the search prompt
+            ["--ansi"] = "",
+            ["--layout"] = "reverse",
+            ["--info"] = "default",
+          },
+          winopts = {
+            width = 0.9,
+            height = 0.9,
+            layout = "horizontal",
+            preview = {
+              layout = "vertical",
+              vertical = "right:55%",
+              scrollbar = "float",
+            },
+          },
+        })
+      end, { desc = "Find files filtered by clipboard content" })
+
     end,
   },
 }

@@ -60,7 +60,7 @@ return {
       { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Buffers" },
       { "<leader>fB", function() Snacks.picker.buffers({ actions = { select = function(bufnr) vim.api.nvim_buf_delete(bufnr, { force = true }) end, }, }) end, { desc = "Pick buffer to close" }},
       { "<leader>fc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
-      { "<leader>ff", function() Snacks.picker.files() end, desc = "Find Files" },
+      -- { "<leader>ff", function() Snacks.picker.files() end, desc = "Find Files" },
       { "<leader>fG", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
       { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
       { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent" },
