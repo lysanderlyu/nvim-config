@@ -3,7 +3,50 @@ return{
   {
     "nvim-lualine/lualine.nvim",
     config = function()
-      local theme = require("configs.lualine.lualine-theme").dim_tabs  -- load theme from luatheme.lua
+      local theme = require("configs.lualine.lualine-theme").dim_tabs
+
+      -- Treesitter-based function/class context
+      local function current_code_context()
+        local ok, ts_utils = pcall(require, "nvim-treesitter.ts_utils")
+        if not ok then return "" end
+
+        local node = ts_utils.get_node_at_cursor()
+        local context = {}
+
+        while node do
+          local type = node:type()
+          if type:match("function") or type:match("method") or type:match("class") or type:match("module") then
+            local name = ts_utils.get_node_text(node)[1]
+            if name and name ~= "" then
+              table.insert(context, 1, name)  -- insert at front for top-down order
+            end
+          end
+          node = node:parent()
+        end
+
+        if #context > 0 then
+          return "⚕️ " .. table.concat(context, " → ")
+        else
+          return ""
+        end
+      end
+
+      local function relative_filepath()
+        local filepath = vim.api.nvim_buf_get_name(0)  -- full path of current buffer
+        if filepath == "" then return "[No Name]" end
+      
+        local cwd = vim.fn.getcwd()                    -- current working directory
+        local relpath = vim.fn.fnamemodify(filepath, ":." )  -- relative path from cwd
+      
+        -- Append file status
+        if vim.bo.modified then
+          relpath = relpath .. " [+]"  -- unsaved changes
+        elseif vim.bo.readonly then
+          relpath = relpath .. " [RO]" -- read-only
+        end
+      
+        return relpath
+      end
 
       require("lualine").setup {
         options = {
