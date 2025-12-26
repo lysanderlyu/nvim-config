@@ -36,6 +36,14 @@ return {
       
         local cwd = vim.fn.getcwd()                    -- current working directory
         local relpath = vim.fn.fnamemodify(filepath, ":." )  -- relative path from cwd
+      
+        -- Append file status
+        if vim.bo.modified then
+          relpath = relpath .. " [+]"  -- unsaved changes
+        elseif vim.bo.readonly then
+          relpath = relpath .. " [RO]" -- read-only
+        end
+      
         return relpath
       end
 
