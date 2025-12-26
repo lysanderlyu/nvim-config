@@ -92,6 +92,22 @@ return {
         })
       end, { desc = "Find files with fzf-lua" })
 
+      vim.keymap.set("n", "<leader>fr", function()
+        require("fzf-lua").oldfiles({
+          prompt = "Recent Files> ",
+          winopts = {
+            width = 0.9,
+            height = 0.9,
+            layout = "horizontal",
+            preview = {
+              layout = "vertical",
+              vertical = "right:55%",
+              scrollbar = "float",
+            },
+          },
+        })
+      end, { desc = "Find recent files" })
+
       vim.keymap.set("n", "<leader>fF", function()
         local yank = vim.fn.getreg('"')  -- get clipboard
         if yank == "" then
