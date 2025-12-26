@@ -44,6 +44,8 @@ local function delete_n_lines()
   print(" Deleted " .. count .. " line(s) to clipboard")
 end
 vim.keymap.set('n', ';d', delete_n_lines, { desc = "Delete N lines to clipboard", silent = true })
+vim.keymap.set("n", "<leader>dg", ":diffget<CR>")
+vim.keymap.set("n", "<leader>dp", ":diffput<CR>")
 vim.keymap.set("v", "';", '"+y', { desc = "Yank to system clipboard" })
 vim.keymap.set({"n", "v"}, ";'", '"+p', { desc = "Paste from system clipboard" })
 
