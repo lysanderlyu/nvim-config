@@ -13,7 +13,11 @@ return {
         vim.keymap.set("n", "<leader>fm", function() vim.lsp.buf.format({ async = true }) end, { buffer = bufnr })
       end
 
-      -- NEW API (Neovim 0.11+)
+      -- Use the legacy method to invoke lspconfig
+      local lspconfig = require("lspconfig")
+      lspconfig.clangd.setup({ on_attach = on_attach, capabilities = capabilities, })
+
+      -- Only used on NVIM 0.11+
       -- vim.lsp.config.clangd.setup({ on_attach = on_attach, capabilities = capabilities })
       -- vim.lsp.config.pyright.setup({ on_attach = on_attach, capabilities = capabilities })
       -- vim.lsp.config.bashls.setup({ on_attach = on_attach, capabilities = capabilities })
