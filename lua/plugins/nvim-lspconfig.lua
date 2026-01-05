@@ -2,7 +2,7 @@ local function on_attach_common(client, bufnr)
     local opts = { noremap=true, silent=true, buffer=bufnr }
 
     -- Go to definition
-    vim.keymap.set('n', '<leader>lD', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', '<leader>ls', vim.lsp.buf.definition, opts)
 
     -- Show references
     vim.keymap.set('n', '<leader>lr', vim.lsp.buf.references, opts)
