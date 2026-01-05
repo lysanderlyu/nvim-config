@@ -12,7 +12,7 @@ return {
       end, opts)
 
       -- Render diagnostics
-      vim.keymap.set("n", "<leader>rd", function()
+      vim.keymap.set("n", "<leader>ld", function()
         vim.cmd.RustLsp("renderDiagnostic")
       end, opts)
 
