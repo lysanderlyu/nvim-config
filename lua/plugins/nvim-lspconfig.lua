@@ -1,28 +1,43 @@
+local function on_attach_common(client, bufnr)
+    local opts = { noremap=true, silent=true, buffer=bufnr }
+
+    -- Go to definition
+    vim.keymap.set('n', '<leader>lD', vim.lsp.buf.definition, opts)
+
+    -- Show references
+    vim.keymap.set('n', '<leader>lr', vim.lsp.buf.references, opts)
+
+    -- Diagnostics
+    vim.keymap.set('n', '<leader>ld', vim.diagnostic.open_float, opts)
+    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    vim.keymap.set('n', '<leader>ll', function()
+        vim.diagnostic.setloclist({ open = true, severity = { vim.diagnostic.severity.WARN, vim.diagnostic.severity.ERROR } })
+    end, opts)
+
+    -- Hover documentation
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+
+    -- Rename symbol
+    vim.keymap.set('n', '<leader>ln', vim.lsp.buf.rename, opts)
+
+    -- Signature help in insert mode
+    vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, opts)
+end
+
 return {
   {
     "neovim/nvim-lspconfig",
-    lazy = false,  -- <- ensures plugin is loaded before config
+    lazy = false,
     config = function()
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      local on_attach = function(_, bufnr)
-        vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr })
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr })
-        vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = bufnr })
-        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = bufnr })
-        vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = bufnr })
-        vim.keymap.set("n", "<leader>fm", function() vim.lsp.buf.format({ async = true }) end, { buffer = bufnr })
-      end
+        local servers = { "clangd", "bashls", "pyright", "lua_ls", "jdtls" }
 
-      -- NEW API (Neovim 0.11+)
-      -- vim.lsp.config.clangd.setup({ on_attach = on_attach, capabilities = capabilities })
-      -- vim.lsp.config.pyright.setup({ on_attach = on_attach, capabilities = capabilities })
-      -- vim.lsp.config.bashls.setup({ on_attach = on_attach, capabilities = capabilities })
-      -- vim.lsp.config.lua_ls.setup({
-      --   on_attach = on_attach,
-      --   capabilities = capabilities,
-      --   settings = { Lua = { diagnostics = { globals = { "vim" } } } },
-      -- })
-      -- vim.lsp.config.jdtls.setup({ on_attach = on_attach, capabilities = capabilities })
+        for _, server in ipairs(servers) do
+            vim.lsp.config(server, {
+                on_attach = on_attach_common,
+            })
+            vim.lsp.enable(server)
+        end
     end,
   }
 }

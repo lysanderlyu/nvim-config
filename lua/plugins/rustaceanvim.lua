@@ -4,24 +4,27 @@ return {
     version = "^6",
     ft = "rust",
     config = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "rust",
-        callback = function(ev)
-          local opts = { buffer = ev.buf, noremap = true, silent = true }
+      local opts = { noremap = true, silent = true, buffer = true }
 
-          vim.keymap.set("n", "K", function()
-            vim.cmd.RustLsp({ "hover", "actions" })
-          end, opts)
+      -- Hover
+      vim.keymap.set("n", "K", function()
+        vim.cmd.RustLsp({ "hover", "actions" })
+      end, opts)
 
-          vim.keymap.set("n", "<leader>rd", function()
-            vim.cmd.RustLsp("renderDiagnostic")
-          end, opts)
+      -- Render diagnostics
+      vim.keymap.set("n", "<leader>ld", function()
+        vim.cmd.RustLsp("renderDiagnostic")
+      end, opts)
 
-          vim.keymap.set("n", "<leader>a", function()
-            vim.cmd.RustLsp("codeAction")
-          end, opts)
-        end,
-      })
+      -- Rust Doc on HTML
+      vim.keymap.set("n", "<leader>rm", function()
+          vim.cmd.RustLsp('openDocs')
+      end, opts)
+
+      -- Code action
+      vim.keymap.set("n", "<leader>a", function()
+        vim.cmd.RustLsp("codeAction")
+      end, opts)
     end,
   }
 }
