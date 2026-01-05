@@ -1,29 +1,30 @@
 return {
   {
     "mrcjkb/rustaceanvim",
-    enabled = true,   -- enable the plugin
     version = "^6",
-    lazy = false,     -- load immediately
-    ft = "rust",  -- filetype trigger
-
+    ft = "rust",
     config = function()
-      -- Buffer-local keymaps
-      local bufnr = vim.api.nvim_get_current_buf()
-      local opts = { noremap = true, silent = true, buffer = bufnr }
+      local opts = { noremap = true, silent = true, buffer = true }
 
-      -- Hover actions
+      -- Hover
       vim.keymap.set("n", "K", function()
         vim.cmd.RustLsp({ "hover", "actions" })
       end, opts)
 
-      -- Close hover buffer
-      vim.keymap.set("n", "q", "<Cmd>close<CR>", opts)
+      -- Render diagnostics
+      vim.keymap.set("n", "<leader>ld", function()
+        vim.cmd.RustLsp("renderDiagnostic")
+      end, opts)
 
-      -- Rust code actions
+      -- Rust Doc on HTML
+      vim.keymap.set("n", "<leader>rm", function()
+          vim.cmd.RustLsp('openDocs')
+      end, opts)
+
+      -- Code action
       vim.keymap.set("n", "<leader>a", function()
         vim.cmd.RustLsp("codeAction")
       end, opts)
     end,
   }
 }
-
