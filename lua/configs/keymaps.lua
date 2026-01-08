@@ -297,6 +297,125 @@ local function view_dtb()
 end
 vim.keymap.set("n", "<leader>dt", view_dtb, { desc = "Decompile DTB to DTS" })
 
+
+local function detect_elf_arch(path)
+  local out = vim.fn.system({ "readelf", "-h", path })
+  if vim.v.shell_error ~= 0 then
+    return nil, "readelf failed"
+  end
+
+  local class = out:match("Class:%s+(ELF%d+)")
+  local machine = out:match("Machine:%s+([^\n]+)")
+
+  if not class or not machine then
+    return nil, "not an ELF file"
+  end
+
+  -- Normalize
+  machine = machine:lower()
+
+  if class == "ELF32" and machine:match("arm") then
+    return "arm32"
+  elseif class == "ELF64" and machine:match("aarch64") then
+    return "aarch64"
+  elseif class == "ELF64" and machine:match("x86%-64") then
+    return "x86_64"
+  elseif class == "ELF32" and machine:match("intel 80386") then
+    return "x86"
+  end
+
+  return "unknown"
+end
+
+local function objdump_for_arch(arch)
+  local map = {
+    arm32   = "arm-linux-gnueabi-objdump",
+    aarch64 = "aarch64-linux-gnu-objdump",
+    x86_64  = "objdump",
+    x86     = "objdump",
+  }
+
+  return map[arch]
+end
+
+local function view_symbol()
+  local file = vim.fn.expand("%:p")
+  if file == "" then
+    vim.notify("No file", vim.log.levels.WARN)
+    return
+  end
+
+  local arch, err = detect_elf_arch(file)
+  if not arch then
+    vim.notify(err, vim.log.levels.ERROR)
+    return
+  end
+
+  local objdump = objdump_for_arch(arch)
+  if not objdump then
+    vim.notify("No objdump for arch: " .. arch, vim.log.levels.ERROR)
+    return
+  end
+
+  local output = vim.fn.system({ objdump, "-S", file })
+  if vim.v.shell_error ~= 0 then
+    vim.notify("objdump failed", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd("vnew")
+  local buf = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(output, "\n"))
+
+  vim.bo.buftype = "nofile"
+  vim.bo.bufhidden = "wipe"
+  vim.bo.swapfile = false
+  vim.bo.readonly = true
+  vim.bo.filetype = ""
+
+end
+
+vim.keymap.set("n", "<leader>ds", view_symbol, { desc = "Disassemble ELF" })
+
+local function view_assemble()
+  local file = vim.fn.expand("%:p")
+  if file == "" then
+    vim.notify("No file", vim.log.levels.WARN)
+    return
+  end
+
+  local arch, err = detect_elf_arch(file)
+  if not arch then
+    vim.notify(err, vim.log.levels.ERROR)
+    return
+  end
+
+  local objdump = objdump_for_arch(arch)
+  if not objdump then
+    vim.notify("No objdump for arch: " .. arch, vim.log.levels.ERROR)
+    return
+  end
+
+  local output = vim.fn.system({ objdump, "-D", file })
+  if vim.v.shell_error ~= 0 then
+    vim.notify("objdump failed", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd("vnew")
+  local buf = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(output, "\n"))
+
+  vim.bo.buftype = "nofile"
+  vim.bo.bufhidden = "wipe"
+  vim.bo.swapfile = false
+  vim.bo.readonly = true
+  vim.bo.filetype = ""
+
+end
+
+vim.keymap.set("n", "<leader>du", view_assemble, { desc = "Disassemble ELF" })
+
 -- Align N lines by a given pattern
 local function align_by(pattern)
   local count = vim.v.count
