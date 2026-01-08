@@ -413,7 +413,7 @@ local function view_assemble()
 
 end
 
-vim.keymap.set("n", "<leader>du", view_assemble, { desc = "Disassemble ELF" })
+vim.keymap.set("n", "<leader>da", view_assemble, { desc = "Disassemble ELF" })
 
 -- Align N lines by a given pattern
 local function align_by(pattern)
