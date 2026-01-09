@@ -139,6 +139,29 @@ return {
         })
       end, { desc = "Find files filtered by clipboard content" })
 
+      vim.keymap.set("n", "<leader>lS", function()
+        local yank = vim.fn.getreg('"')
+      
+        yank = yank:gsub("[\r\n]+$", "")
+        yank = yank:gsub("^%s*(.-)%s*$", "%1")
+        yank = yank:gsub("[^%w_]+", "")
+      
+        require("fzf-lua").lsp_live_workspace_symbols({
+          -- symbols = { "Struct", "TypeAlias", "Enum", "Class" },
+          previewer = "builtin",
+          query = yank,
+          winopts = {
+            width = 0.9,
+            height = 0.9,
+            layout = "horizontal",
+            preview = {
+              layout = "vertical",
+              vertical = "right:55%",
+              scrollbar = "float",
+            },
+          },
+        })
+      end, { desc = "Live workspace symbols (clangd, seeded)" })
     end,
   },
 }

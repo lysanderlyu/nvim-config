@@ -209,6 +209,7 @@ python3 -m compiledb -n make
 | `]d` | 上一个诊断信息 |
 | `<leader>ll` | 已列表显示所以的ERROR和WARN |
 | `<leader>lD` | 查找定义 |
+| `<leader>lS` | 自定义输入查找符号定义 |
 | `<leader>lr` | 查找引用 |
 | `<leader>ln` | 重命名 |
 | `K` | 悬浮窗口显示光标下变量或函数信息 |
