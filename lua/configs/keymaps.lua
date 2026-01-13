@@ -331,3 +331,15 @@ vim.api.nvim_create_user_command("D2", function()
   vim.fn.system({ "open", out })
 end, {})
 vim.keymap.set("n", "<leader>di", ":D2<CR>", { noremap = true, silent = true, desc = "Run D2 compile" })
+
+-- Delete buffer quickly
+vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "delete current buffer" })
+-- Neovim: keep current buffer only
+vim.keymap.set("n", "<leader>bo", function()
+  local cur = vim.api.nvim_get_current_buf()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if buf ~= cur then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+  end
+end, { desc = "Delete all buffers except current" })

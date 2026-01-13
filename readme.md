@@ -115,7 +115,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>tt` | 新建 tab |
 | `<leader>tq` | 关闭 tab |
 | `<leader>;0` | 跳转到最后一个 tab |
-| `;1..;9` | 跳转到对应 tab |
+| `;N` | 跳转到第N个tab |
 | `<leader>lt` | 下一个 tab |
 | `<leader>ht` | 上一个 tab |
 
@@ -125,11 +125,14 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 |--------|------|
 | `<leader>;w` | 保存 |
 | `<leader>;q` | 关闭 |
+| `<leader>;bd` | 关闭当前Buffer |
 | `<leader>;W` | 保存并关闭 |
 | `<leader>;Q` | 强制关闭 |
+| `<leader>;bo` | 关闭当前Buffer以外的所有Buffer |
 | `<leader>;l` | 执行 `./build.sh` |
 | `<leader>;r` | 删除文件中的 `\r` 字符 |
 | `<leader>;d` | 如果当前窗口打开了两个文件，执行这个快捷键就会比较这两个文件 |
+| `<leader>;D` | 如果当前窗口打开了两个文件，执行这个快捷键就会取消比较这两个文件 |
 
 ### 4. Telescope / Fzf 文件搜索
 
@@ -142,6 +145,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
 | `<leader>ff` | 全局文件搜索 |
+| `<leader>fb` | 查看已打开的Buffer |
 
 ### 5. Git 快捷键
 
@@ -229,9 +233,11 @@ python3 -m compiledb -n make
 
 ### 8. 文件Exploer侧边栏
 
+| 快捷键 | 功能 |
+|--------|------|
 | `<leader>e` | 触发文件浏览器侧边栏 |
 | `<leader>ge` | 触发Git变更文件浏览器侧边栏 |
-以下快捷键是在文件浏览器中才能使用的快捷键
+| 以下快捷键是在文件浏览侧边栏中才能使用的快捷键 | |
 | `C-k` | 显示光标下文件的基本信息 |
 | `c` | 复制当前光标下的文件 |
 | `p` | 粘贴当前光标下的文件，尽量将光标移动到你想粘贴到的位置再按 |
@@ -246,10 +252,11 @@ python3 -m compiledb -n make
 | 快捷键 | 功能 |
 |--------|------|
 | `<leader>dt` | 查看 DTB 文件的 DTS 展开 |
+| `<leader>ds` | 使用本地编译器将ELF文件展开查看Symbol |
+| `<leader>da` | 使用本地编译器将ELF文件展开查看Assemble |
 | `<leader>di` | 编译 D2 图并打开 |
 | `<leader>ac`, `<leader>ae`, `<leader>a{` | 对齐 N 行注释、等号、花括号 |
 | `<leader>cn` | 复制当前文件绝对路径 |
-| `<C-f>` | 切换到上一个文件 |
 | `<leader>sC` | 打开系统终端 |
 
 ---
