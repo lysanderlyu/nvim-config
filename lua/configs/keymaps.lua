@@ -452,6 +452,8 @@ vim.keymap.set("n", "<leader>di", ":D2<CR>", { noremap = true, silent = true, de
 
 -- Delete buffer quickly
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "delete current buffer" })
+-- reload current buffer
+vim.keymap.set("n", "<leader>br", ":e!<CR>", { desc = "reload current buffer" })
 -- Neovim: keep current buffer only
 vim.keymap.set("n", "<leader>bo", function()
   local cur = vim.api.nvim_get_current_buf()
