@@ -24,7 +24,7 @@ return {
         end
 
         if #context > 0 then
-          return "⚕️ " .. table.concat(context, " → ")
+          return "" .. table.concat(context, " → ")
         else
           return ""
         end
