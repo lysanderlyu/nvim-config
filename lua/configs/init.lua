@@ -35,7 +35,7 @@ require("configs.keymaps")
 require("configs.autocommands")
 
 local luasnip = require("luasnip")
-require("luasnip.loaders.from_lua").load({ paths = vim.fn.stdpath("config") .. "/snippets" })
+require("luasnip.loaders.from_lua").load({ paths = vim.fn.stdpath("config") .. "/snips" })
 require("luasnip.loaders.from_lua").lazy_load({ paths = vim.fn.stdpath("config") .. "/syntax" })
 
 -- Load the c/cpp code manpage hover function
