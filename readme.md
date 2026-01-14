@@ -66,7 +66,7 @@ nvim
 ├── lua
 │   ├── configs        # 各插件及 LSP 配置
 │   └── plugins        # 插件列表
-├── snippets           # 代码片段
+├── snips              # 代码片段
 └── syntax             # 自定义语法文件
 ```
 
@@ -274,8 +274,9 @@ python3 -m compiledb -n make
 
 这个是用来配合补全功能来使用的片段快捷插入功能
 
-放在 `snippets/` 目录中，支持不同语言：
+放在 `snips/` 目录中，支持不同语言：
 
+- `snippets/c.json`：vs-code 样式的代码片段  
 - `all.lua`：通用片段  
 - `c.lua`：C 语言片段  
     当你打开的是C语言文件，并输入`fn1` 或者 `fn2` 然后回车，就会自动插入预定好的片段：
