@@ -70,8 +70,23 @@ return {
           },
         },
         tabline = {
-          lualine_a = { { "tabs", mode = 2 } }, -- tab index + filename
+          lualine_a = {
+                {
+                  'tabs',
+                  show_filename_only = true,   -- Shows shortened names to fit more
+                  hide_filename_extension = false,
+                  show_modified_status = true,
+                  mode = 2, -- 0: bufnr, 1: name, 2: name + bufnr, 3: name + index
+                  max_length = vim.o.columns, -- Force it to use available width
+                  filetypes_denylist = {'qf', 'packer'}, 
+                  symbols = { modified = ' +', alternate_file = '#', directory = '' },
+                }
+              },
+          lualine_b = {},
+          lualine_c = {},
           lualine_x = {},
+          lualine_y = {},
+          lualine_z = {},
         },
         sections = {
           lualine_a = {'mode'},
