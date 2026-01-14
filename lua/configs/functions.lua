@@ -62,6 +62,88 @@ function M.show_functions_telescope()
   local root = syntax_tree[1]:root()
 
   local queries = {
+    rust = [[
+    (enum_item
+        name: (type_identifier) @name)
+
+    (struct_item
+        name: (type_identifier) @name
+        body: (field_declaration_list))
+
+    (struct_item
+        name: (type_identifier) @name
+        body: (ordered_field_declaration_list))
+
+    (impl_item
+        trait: (type_identifier)
+        type: (type_identifier) @name)
+
+    (macro_definition
+      name: (identifier) @name)
+
+    (impl_item
+      trait: (generic_type) @name
+      type: (primitive_type) @type)
+
+    (impl_item
+      trait: (generic_type) @name
+      type: (reference_type) @type)
+
+    (impl_item
+      trait: (generic_type) @name
+      type: (generic_type) @type)
+
+    (impl_item
+      trait: (generic_type) @name
+      type: (scoped_type_identifier) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (primitive_type) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (reference_type) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (generic_type) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (scoped_type_identifier) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (tuple_type) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (generic_type) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (tuple_type) @type)
+
+    (impl_item
+      trait: (type_identifier) @name
+      type: (scoped_type_identifier) @type)
+
+    (impl_item
+      trait: (scoped_type_identifier) @name
+      type: (primitive_type) @type)
+
+    (trait_item
+      (visibility_modifier)
+      name: (type_identifier) @name
+      body: (declaration_list))
+
+    (function_item
+      name: (identifier) @name
+      parameters: (parameters)
+      return_type: (never_type)
+      body: (block))
+    ]],
     qmljs = [[
       (ui_object_definition
         type_name: (identifier) @name)
@@ -339,10 +421,21 @@ function M.show_functions_telescope()
   for id, node in query:iter_captures(root, bufnr) do
     if query.captures[id] == "name" then
       local name = vim.treesitter.get_node_text(node, bufnr)
+
+      -- find sibling type node
+      local type_node = node:parent():field("type")[1]  -- returns the first type field
+      local type_text = ""
+      if type_node then
+        type_text = vim.treesitter.get_node_text(type_node, bufnr)
+      end
+
+      -- combine name and type
+      local combined = name .. ": " .. type_text
+
       local ok, start_row, _, _ = pcall(node.start, node)
       if ok then
       table.insert(items, {
-        text = name,
+        text = combined,
         filename = vim.api.nvim_buf_get_name(bufnr),
         lnum = start_row + 1
       })
