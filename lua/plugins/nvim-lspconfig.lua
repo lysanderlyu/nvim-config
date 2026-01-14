@@ -21,6 +21,9 @@ local function on_attach_common(client, bufnr)
     -- Show references
     vim.keymap.set('n', '<leader>lr', vim.lsp.buf.references, opts)
 
+    -- Code action
+    vim.keymap.set("n", "<leader>la", function() vim.lsp.buf.code_action() end, opts)
+
     -- Diagnostics
     vim.keymap.set('n', '<leader>ld', vim.diagnostic.open_float, opts)
     vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
