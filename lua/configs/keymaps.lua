@@ -456,10 +456,14 @@ vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "delete current buffer" })
 vim.keymap.set("n", "<leader>br", ":e!<CR>", { desc = "reload current buffer" })
 -- Neovim: keep current buffer only
 vim.keymap.set("n", "<leader>bo", function()
+  -- Close all other tabs first (cleaner for the UI)
+  vim.cmd("tabonly")
+  
+  -- Delete all other buffers
   local cur = vim.api.nvim_get_current_buf()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if buf ~= cur then
+    if buf ~= cur and vim.bo[buf].buflisted then
       vim.api.nvim_buf_delete(buf, { force = true })
     end
   end
-end, { desc = "Delete all buffers except current" })
+end)
