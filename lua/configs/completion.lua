@@ -3,7 +3,7 @@ local cmp = require("cmp")
 local luasnip = require("luasnip")
 
 -- Load snippets (optional: friendly-snippets)
-require("luasnip.loaders.from_lua").load({ paths = "../../snippets" })
+require("luasnip.loaders.from_lua").load({ paths = "../../snips" })
 
 cmp.setup({
   snippet = {
