@@ -18,6 +18,22 @@ local function on_attach_common(client, bufnr)
         end)
     end, opts)
 
+    -- Go to implementation
+    vim.keymap.set("n", "<leader>li", function()
+        local params = vim.lsp.util.make_position_params()
+        vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, _)
+            if err or not result or vim.tbl_isempty(result) then
+                print("Implementation not found")
+                return
+            end
+    
+            local impl = result[1]  -- pick the first implementation
+            -- Open in horizontal split (top/bottom)
+            vim.cmd("vsplit")
+            vim.lsp.util.jump_to_location(impl, "utf-8")
+        end)
+    end, opts)
+
     -- Show references
     vim.keymap.set('n', '<leader>lr', vim.lsp.buf.references, opts)
 
