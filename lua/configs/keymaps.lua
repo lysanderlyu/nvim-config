@@ -394,7 +394,7 @@ local function view_symbol()
   vim.bo.bufhidden = "wipe"
   vim.bo.swapfile = false
   vim.bo.readonly = true
-  vim.bo.filetype = ""
+  vim.bo.filetype = "asm"
 
 end
 
