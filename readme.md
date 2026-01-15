@@ -213,6 +213,7 @@ python3 -m compiledb -n make
 | `[d` | 下一个诊断信息 |
 | `]d` | 上一个诊断信息 |
 | `<leader>ll` | 已列表显示所以的ERROR和WARN |
+| `<leader>li` | 显示Implementation |
 | `<leader>la` | 显示当前符号的可用操作 |
 | `<leader>lD` | 查找定义 |
 | `<leader>lS` | 自定义输入查找符号定义 |
