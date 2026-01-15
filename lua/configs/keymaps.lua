@@ -97,13 +97,6 @@ vim.keymap.set("n", "<leader>grs", ":Git reset --soft HEAD~1<CR>")
 vim.keymap.set("n", "<leader>grd", ":Git reset --hard HEAD~1<CR>")
 vim.keymap.set("n", "<leader>grb", ":Git rebase -i --fork-point<CR>")   -- Rebase the current branch from where it was born
 
--- LSP
-vim.keymap.set("n", "gi", builtin.lsp_implementations, opts)
-vim.keymap.set("n", "gr", builtin.lsp_references, opts)
-vim.keymap.set("n", "<leader>ds", builtin.lsp_document_symbols, opts)
-vim.keymap.set("n", "<leader>ws", builtin.lsp_workspace_symbols, opts)
-vim.keymap.set("n", "<leader>qf", function() vim.diagnostic.setqflist() vim.cmd("copen") end, { desc = "Quickfix: show LSP errors" })
-
 -- Others
 vim.keymap.set("n", "<leader>km", builtin.keymaps, opts)
 vim.keymap.set("n", "<leader>cm", builtin.commands, opts)
@@ -296,45 +289,75 @@ local function view_dtb()
 end
 vim.keymap.set("n", "<leader>dt", view_dtb, { desc = "Decompile DTB to DTS" })
 
+local function readelf_for_arch()
+    local candidates = {
+        "readelf",
+        "aarch64-linux-gnu-readelf",
+        "arm-none-eabi-readelf",
+        "x86_64-linux-gnu-readelf",
+    }
+
+    for _, cmd in ipairs(candidates) do
+        if vim.fn.executable(cmd) == 1 then
+            return cmd
+        end
+    end
+
+    return nil
+end
 
 local function detect_elf_arch(path)
-  local out = vim.fn.system({ "readelf", "-h", path })
-  if vim.v.shell_error ~= 0 then
-    return nil, "readelf failed"
-  end
+    local readelf = readelf_for_arch()
+    if not readelf then
+        return nil, "no readelf found"
+    end
 
-  local class = out:match("Class:%s+(ELF%d+)")
-  local machine = out:match("Machine:%s+([^\n]+)")
+    local out = vim.fn.system({ readelf, "-h", path })
+    if vim.v.shell_error ~= 0 then
+        return nil, "readelf failed"
+    end
 
-  if not class or not machine then
-    return nil, "not an ELF file"
-  end
+    local class = out:match("Class:%s+(ELF%d+)")
+    local machine = out:match("Machine:%s+([^\n]+)")
 
-  -- Normalize
-  machine = machine:lower()
+    if not class or not machine then
+        return nil, "not an ELF file"
+    end
 
-  if class == "ELF32" and machine:match("arm") then
-    return "arm32"
-  elseif class == "ELF64" and machine:match("aarch64") then
-    return "aarch64"
-  elseif class == "ELF64" and machine:match("x86%-64") then
-    return "x86_64"
-  elseif class == "ELF32" and machine:match("intel 80386") then
-    return "x86"
-  end
+    -- Normalize
+    machine = machine:lower()
 
-  return "unknown"
+    if class == "ELF32" and machine:match("arm") then
+        return "arm32"
+    elseif class == "ELF64" and machine:match("aarch64") then
+        return "aarch64"
+    elseif class == "ELF64" and machine:match("x86%-64") then
+        return "x86_64"
+    elseif class == "ELF32" and machine:match("intel 80386") then
+        return "x86"
+    end
+
+    return "unknown"
 end
 
 local function objdump_for_arch(arch)
-  local map = {
-    arm32   = "arm-linux-gnueabi-objdump",
-    aarch64 = "aarch64-linux-gnu-objdump",
-    x86_64  = "objdump",
-    x86     = "objdump",
-  }
+    local map = {
+        arm32   = { "arm-none-eabi-objdump", "arm-linux-gnueabi-objdump", "rust-objdump"},
+        aarch64 = { "aarch64-linux-gnu-objdump", "aarch64-none-elf-objdump" },
+        x86_64  = { "objdump" },
+        x86     = { "objdump" },
+    }
 
-  return map[arch]
+    local candidates = map[arch]
+    if not candidates then return nil end
+
+    for _, cmd in ipairs(candidates) do
+        if vim.fn.executable(cmd) == 1 then
+            return cmd
+        end
+    end
+
+    return nil
 end
 
 local function view_symbol()
