@@ -142,37 +142,39 @@ function M.show_functions_telescope()
       ;; Match typedef
       (type_definition
         type: (_)
-        declarator: (type_identifier) @name)
+        declarator: (type_identifier) @name) @symbol
 
-      ;; Match fucntion with attribute modified on the head like:
-      (ERROR
-      (type_descriptor
-        type: (type_identifier) @name))
+      (declaration
+        type: (macro_type_specifier
+          name: (identifier) @name))
 
-      ;; Match general function without
+      ;; Better Function Match
       (function_definition
-      type: (_)
-      declarator: (_
-       declarator: (_) @name))
+        type: (_)
+        declarator: [
+          (function_declarator declarator: (identifier) @name)
+          (pointer_declarator declarator: (function_declarator declarator: (identifier) @name))
+        ]
+      ) @symbol
 
       ;; Macro function
       (preproc_function_def
-        name: (identifier) @name)
+        name: (identifier) @name) @symbol
 
       ;; Struct definition match 
       (struct_specifier
           name: (type_identifier) @name
-          body: (_))
+          body: (_)) @symbol
  
       ;; Union definition match 
       (union_specifier
           name: (type_identifier) @name
-          body: (_))
+          body: (_)) @symbol
 
       ;; Enum definition match 
       (enum_specifier
           name: (type_identifier) @name
-          body: (_))
+          body: (_)) @symbol
     ]],
     xml = [[
       (STag
@@ -316,19 +318,20 @@ function M.show_functions_telescope()
 
       local start_row, _, _, _ = dict.name:range()
   
-      table.insert(items, {
-        text = combined,
-        filename = vim.api.nvim_buf_get_name(bufnr),
-        lnum = start_row + 1
-      })
-    end
-  end
+          table.insert(items, {
+            text = combined,
+            filename = vim.api.nvim_buf_get_name(bufnr),
+            lnum = start_row + 1
+          })
+        end
+      end
 
   require("telescope.pickers").new({}, {
     prompt_title = lang:sub(1,1):upper() .. lang:sub(2) .. " Outline",
     finder = require("telescope.finders").new_table({
       results = items,
       entry_maker = function(entry)
+        local safe_lnum = tonumber(entry.lnum) or 1
         return {
           value = entry,
           display = entry.text,
