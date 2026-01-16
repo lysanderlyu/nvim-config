@@ -64,79 +64,33 @@ function M.show_functions_telescope()
   local queries = {
     rust = [[
     (enum_item
-        name: (type_identifier) @name)
+        name: (_) @name)
 
     (struct_item
-        name: (type_identifier) @name
+        name: (_) @name
         body: (field_declaration_list))
 
     (struct_item
-        name: (type_identifier) @name
+        name: (_) @name
         body: (ordered_field_declaration_list))
-
-    (impl_item
-        trait: (type_identifier)
-        type: (type_identifier) @name)
 
     (macro_definition
       name: (identifier) @name)
 
     (impl_item
-      trait: (generic_type) @name
-      type: (primitive_type) @type)
+        type: (_) @type
+        body: (declaration_list
+            (function_item
+                name: (identifier) @name)))
 
     (impl_item
-      trait: (generic_type) @name
-      type: (reference_type) @type)
-
-    (impl_item
-      trait: (generic_type) @name
-      type: (generic_type) @type)
-
-    (impl_item
-      trait: (generic_type) @name
-      type: (scoped_type_identifier) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (primitive_type) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (reference_type) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (generic_type) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (scoped_type_identifier) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (tuple_type) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (generic_type) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (tuple_type) @type)
-
-    (impl_item
-      trait: (type_identifier) @name
-      type: (scoped_type_identifier) @type)
-
-    (impl_item
-      trait: (scoped_type_identifier) @name
-      type: (primitive_type) @type)
+        trait: (_) @name
+        type: (_) @type)
 
     (trait_item
       (visibility_modifier)
-      name: (type_identifier) @name
-      body: (declaration_list))
+      name: (_) @name
+      body: (_))
 
     (function_item
       name: (identifier) @name
@@ -155,15 +109,6 @@ function M.show_functions_telescope()
     markdown = [[
       (section
         (atx_heading) @name)
-
-      (section
-        (atx_heading)
-        (list
-          (list_item
-            (list_marker_minus)
-            (paragraph
-              (inline) @name))))
-
     ]],
     markdown_inline = [[
 ;;               (inline
@@ -194,52 +139,40 @@ function M.show_functions_telescope()
         type: (identifier) @name)
     ]],
     c = [[
-      ;; Match typedef strcut
+      ;; Match typedef
       (type_definition
-        type: (struct_specifier)
-        declarator: (type_identifier) @name) @struct_name
+        type: (_)
+        declarator: (type_identifier) @name)
 
       ;; Match fucntion with attribute modified on the head like:
       (ERROR
-        (type_descriptor
-          type: (type_identifier) @name))
+      (type_descriptor
+        type: (type_identifier) @name))
 
-      ;; Match normal function without qualified_identifier
+      ;; Match general function without
       (function_definition
-        declarator: (function_declarator
-          declarator: (identifier) @name)) @func
-    
-      ;; Match pointer function without qualified_identifier
-      (function_definition
-        declarator: (pointer_declarator
-         declarator: (function_declarator
-           declarator: (identifier) @name))) @func
-
-      ;; Match pointer function that has two level pointer
-      (function_definition
-        declarator: (pointer_declarator
-          declarator: (pointer_declarator
-            declarator: (function_declarator
-              declarator: (identifier) @name))))
+      type: (_)
+      declarator: (_
+       declarator: (_) @name))
 
       ;; Macro function
-        (preproc_function_def
-          name: (identifier) @name) @func
+      (preproc_function_def
+        name: (identifier) @name)
 
       ;; Struct definition match 
-        (struct_specifier
-            name: (type_identifier) @name
-            body: (field_declaration_list)) @struct_name
+      (struct_specifier
+          name: (type_identifier) @name
+          body: (_))
  
       ;; Union definition match 
-        (union_specifier
-            name: (type_identifier) @name
-            body: (field_declaration_list)) @union_name
+      (union_specifier
+          name: (type_identifier) @name
+          body: (_))
 
       ;; Enum definition match 
-        (enum_specifier
-            name: (type_identifier) @name
-            body: (enumerator_list)) @enum_name
+      (enum_specifier
+          name: (type_identifier) @name
+          body: (_))
     ]],
     xml = [[
       (STag
@@ -267,132 +200,66 @@ function M.show_functions_telescope()
     lua = [[
       ;; Named functions
       (function_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
     
       ;; Local functions
       (function_declaration
         name: (dot_index_expression
-                field: (identifier) @name)) @func
+                field: (identifier) @name))
     
       ;; Anonymous functions assigned to a variable
       (assignment_statement
         (variable_list (identifier) @name)
-        (expression_list (function_definition))) @func
+        (expression_list (function_definition)))
     ]],
     cpp = [[
-        ;; Match the struct definition on qt like struct QT_EXPORT QMetaObject \ {
+        ;; Match all the regular and constructor/destructor with class qualified_identifier
         (function_definition
-          type: (struct_specifier)
-          declarator: (identifier) @name)
-
-        ;; Match the class definition on qt like class QT_EXPORT QBytearray \ {
-        (function_definition
-          type: (class_specifier)
-          declarator: (identifier) @name)
-
-        ;; Match label statement on cpp class like public: private: slot:
-        (function_definition
-          body: (compound_statement
-            (labeled_statement
-              label: (statement_identifier) @name)))
+          declarator: (function_declarator
+            declarator: (_) @name))
 
         ;; Match the enum on .h header
         (enum_specifier
           name: (type_identifier) @name)
 
         ;; Match the typdef enum that does not has name only has typedef
-      (type_definition
-        type: (enum_specifier
-          body: (enumerator_list))
-        declarator: (type_identifier) @name) @func
+        (type_definition
+          type: (_
+            body: (_))
+          declarator: (type_identifier) @name)
 
-        ;; Match the typdef struct that does not has name only has typedef
-      (type_definition
-        type: (struct_specifier
-          body: (field_declaration_list))
-        declarator: (type_identifier) @name) @func
-
-        ;; Match regular functions that without class name specific
-      (function_definition
-        declarator: (function_declarator
-          declarator: (field_identifier) @name)) @func
-
-        ;; Match regular functions that with class name specific (include constructor)
-      (function_definition
-        declarator: (function_declarator
-          declarator: (qualified_identifier
-            name: (identifier) @name))) @func
-
-        ;; Match reference returned functions that with class name specific
-      (function_definition
-       declarator: (reference_declarator
-         (function_declarator
-           declarator: (qualified_identifier
-             name: (identifier) @name))) @func
-      )
-
-      ;; Match destructor function
-     (function_definition
-       declarator: (function_declarator
-         declarator: (qualified_identifier
-           scope: (namespace_identifier)
-           name: (destructor_name) @name))) @func
-
-      ;; Match normal function without qualified_identifier
-      (function_definition
-        declarator: (function_declarator
-          declarator: (identifier) @name)) @func
-    
-      ;; Match pointer function without qualified_identifier and storage_class_specifier
-      (function_definition
-        declarator: (pointer_declarator
-         declarator: (function_declarator
-           declarator: (identifier) @name))) @func
-
-      ;; Match reference function without qualified_identifier
-      (function_definition
-       declarator: (reference_declarator
-         (function_declarator
-             name: (identifier) @name)) @func
-      )
-
-      ;; Match operators (e.g., operator==, operator=)
-      (function_definition
-        declarator: (function_declarator
-          declarator: (operator_name) @name)) @func
-
-      ;; Macro function
+        ;; Macro function
         (preproc_function_def
           name: (identifier) @name) @func
 
-      ;; Class definition match 
+        ;; Class definition match 
         (class_specifier
             name: (type_identifier) @name
-            body: (field_declaration_list)) @class_name
+            body: (_))
 
-      ;; Struct definition match 
+        ;; Struct definition match 
         (struct_specifier
             name: (type_identifier) @name
-            body: (field_declaration_list)) @struct_name
+            body: (_))
  
-      ;; Union definition match 
+        ;; Union definition match 
         (union_specifier
             name: (type_identifier) @name
-            body: (field_declaration_list)) @union_name
+            body: (_))
     ]],
     java = [[
       (method_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
 
       (constructor_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
     
       (class_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
     ]],
     python = [[
       (function_definition
-        name: (identifier) @name) @func
+        name: (identifier) @name)
     ]],
     bash = [[
         (function_definition
@@ -400,17 +267,15 @@ function M.show_functions_telescope()
     ]],
     c_sharp = [[
       (method_declaration
-        name: (identifier) @name) @func
-      (property_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
       (constructor_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
       (class_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
       (enum_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
       (struct_declaration
-        name: (identifier) @name) @func
+        name: (identifier) @name)
     ]]
   }
 
@@ -418,28 +283,44 @@ function M.show_functions_telescope()
   local query = vim.treesitter.query.parse(lang, query_str)
 
   local items = {}
-  for id, node in query:iter_captures(root, bufnr) do
-    if query.captures[id] == "name" then
-      local name = vim.treesitter.get_node_text(node, bufnr)
-
-      -- find sibling type node
-      local type_node = node:parent():field("type")[1]  -- returns the first type field
+  for pattern, match in query:iter_matches(root, bufnr) do
+    -- match is a table where keys are capture IDs
+    -- We need to map the IDs back to names
+    local dict = {}
+    for id, nodes in pairs(match) do
+      local name = query.captures[id]
+      dict[name] = nodes[1] -- Grab the first node for this capture name
+    end
+  
+    if dict.name then
+      local name_text = vim.treesitter.get_node_text(dict.name, bufnr)
       local type_text = ""
-      if type_node then
-        type_text = vim.treesitter.get_node_text(type_node, bufnr)
+      
+      if dict.type then
+        type_text = vim.treesitter.get_node_text(dict.type, bufnr)
       end
 
-      -- combine name and type
-      local combined = name .. ": " .. type_text
+      -- Helper to check if a string is not nil and not just whitespace
+      local function is_valid(s)
+        return s and s:find("%S") ~= nil
+      end
+  
+      local combined = ""
+        if is_valid(type_text) and is_valid(name_text) then
+          combined = type_text .. ": " .. name_text
+        elseif is_valid(type_text) then
+          combined = type_text
+        elseif is_valid(name_text) then
+          combined = name_text
+        end
 
-      local ok, start_row, _, _ = pcall(node.start, node)
-      if ok then
+      local start_row, _, _, _ = dict.name:range()
+  
       table.insert(items, {
         text = combined,
         filename = vim.api.nvim_buf_get_name(bufnr),
         lnum = start_row + 1
       })
-      end
     end
   end
 
@@ -471,52 +352,6 @@ function M.show_functions_telescope()
     end,
   }):find()
 end
-
--- Line number shows version
---require("telescope.pickers").new({}, {
---  prompt_title = lang:sub(1,1):upper() .. lang:sub(2) .. " Outline",
---  finder = require("telescope.finders").new_table({
---    results = items,
---    entry_maker = function(entry)
---      return {
---        value = entry,
---        display = entry.text,
---        ordinal = entry.text,
---        filename = entry.filename,
---        lnum = entry.lnum,
---        col = 1,
---      }
---    end,
---  }),
---  sorter = require("telescope.config").values.generic_sorter({}),
---  previewer = require("telescope.previewers").new_buffer_previewer({
---    define_preview = function(self, entry, status)
---      local filename = entry.filename
---      if vim.fn.filereadable(filename) == 1 then
---        vim.api.nvim_buf_set_option(self.state.bufnr, "number", true)
---        vim.api.nvim_buf_set_option(self.state.bufnr, "relativenumber", false)
---        vim.api.nvim_buf_set_option(self.state.bufnr, "wrap", false)
---        local start_line = math.max(0, entry.lnum - 10)
---        local end_line = entry.lnum + 20
---        local lines = vim.fn.readfile(filename, start_line + 1, end_line + 1)
---        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
---        vim.api.nvim_buf_set_option(self.state.bufnr, "modifiable", false)
---      else
---        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, {"File not found: " .. filename})
---      end
---    end,
---  }),
---
---  attach_mappings = function(prompt_bufnr)
---    require("telescope.actions").select_default:replace(function()
---      local selection = require("telescope.actions.state").get_selected_entry()
---      require("telescope.actions").close(prompt_bufnr)
---      vim.api.nvim_win_set_cursor(0, {selection.value.lnum, 0})
---    end)
---    return true
---  end,
---}):find()
---end
 
 -- Register as command
 vim.api.nvim_create_user_command("ShowFunctionsTelescope", M.show_functions_telescope, {})
