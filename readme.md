@@ -134,6 +134,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>;r` | 删除文件中的 `\r` 字符 |
 | `<leader>;d` | 如果当前窗口打开了两个文件，执行这个快捷键就会比较这两个文件 |
 | `<leader>;D` | 如果当前窗口打开了两个文件，执行这个快捷键就会取消比较这两个文件 |
+| `<leader>mt` | 使用Typora打开此markdown文件 |
+| `<leader>mc` | 使用playwright渲染此markdown文件到PNG文件并打开 |
 
 ### 4. Telescope / Fzf 文件搜索
 

@@ -474,6 +474,55 @@ vim.api.nvim_create_user_command("D2", function()
 end, {})
 vim.keymap.set("n", "<leader>di", ":D2<CR>", { noremap = true, silent = true, desc = "Run D2 compile" })
 
+-- For render to png with playwright
+vim.api.nvim_create_user_command("Mc", function()
+  local base = vim.fn.expand("%:p:r")
+  local md   = base .. ".md"
+  local html = base .. ".html"
+  local png  = base .. ".png"
+
+  -- md -> html
+  vim.fn.system({
+    "pandoc", md,
+    "-o", html,
+    "--standalone",
+    "--wrap=none",
+  })
+
+  -- html -> high-dpi png
+  vim.fn.system({
+    "npx", "playwright", "screenshot",
+    "--full-page",
+    "--device=Desktop Chrome HiDPI",
+    "--viewport-size=800,1400",
+    html,
+    png,
+  })
+
+  vim.fn.system({ "rm", html })
+  -- open image cross-platform
+  local sys = vim.loop.os_uname().sysname
+  if sys == "Darwin" then
+    vim.fn.system({ "open", png })
+  else
+    vim.fn.system({ "xdg-open", png })
+  end
+end, {})
+vim.keymap.set("n", "<leader>mc", ":Mc<CR>", { noremap = true, silent = true, desc = "View Markdown on image" })
+
+-- For display with typora
+vim.api.nvim_create_user_command("Mt", function()
+  local file = vim.fn.expand("%:p")
+  -- Open PNG
+  local sys = vim.loop.os_uname().sysname
+  if sys == "Darwin" then
+    vim.fn.system({ "open","-a","typora", file })
+  else
+    vim.fn.system({ "typora", file })
+  end
+end, {})
+vim.keymap.set("n", "<leader>mt", ":Mt<CR>", { noremap = true, silent = true, desc = "View Markdown on typora" })
+
 -- Delete buffer quickly
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "delete current buffer" })
 -- reload current buffer
