@@ -3,10 +3,8 @@
     "L3MON4D3/LuaSnip",
     version = "v2.*",        -- latest release
     build = "make install_jsregexp",
-    dependencies = { "rafamadriz/friendly-snippets" }, -- optional: ready-made snippets
     config = function()
       local ls = require("luasnip")
-      require("luasnip.loaders.from_vscode").lazy_load() -- load VS Code snippet JSONs
       require("luasnip.loaders.from_vscode").load({ paths = "~/.config/nvim/snips" })
       -- Keymaps for expanding/jumping snippets
       vim.keymap.set({"i", "s"}, "<C-k>", function() ls.expand_or_jump() end, {silent = true})
