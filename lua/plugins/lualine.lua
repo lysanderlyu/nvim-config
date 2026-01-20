@@ -30,21 +30,30 @@ return {
         end
       end
 
-      local function relative_filepath()
-        local filepath = vim.api.nvim_buf_get_name(0)  -- full path of current buffer
-        if filepath == "" then return "[No Name]" end
-      
-        local cwd = vim.fn.getcwd()                    -- current working directory
-        local relpath = vim.fn.fnamemodify(filepath, ":." )  -- relative path from cwd
-      
-        -- Append file status
-        if vim.bo.modified then
-          relpath = relpath .. " [+]"  -- unsaved changes
-        elseif vim.bo.readonly then
-          relpath = relpath .. " [RO]" -- read-only
-        end
-      
-        return relpath
+      local function get_smart_path()
+        local filepath = vim.api.nvim_buf_get_name(0)
+          if filepath == "" then return "[No Name]" end
+        
+          local home = os.getenv("HOME")
+          local display_path = ""
+        
+          -- Check if the file is under the home directory
+          if filepath:find(home, 1, true) == 1 then
+            -- Show path starting with ~/
+            display_path = vim.fn.fnamemodify(filepath, ":~")
+          else
+            -- Show path relative to the Current Working Directory
+            display_path = vim.fn.fnamemodify(filepath, ":.")
+          end
+        
+          -- Append file status
+          if vim.bo.modified then
+            display_path = display_path .. " [+]"
+          elseif vim.bo.readonly then
+            display_path = display_path .. " [RO]"
+          end
+        
+          return display_path
       end
 
       require("lualine").setup {
@@ -91,7 +100,7 @@ return {
         sections = {
           lualine_a = {'mode'},
           lualine_b = {'branch', 'diff', 'diagnostics'},
-          lualine_c = {relative_filepath},
+          lualine_c = {get_smart_path},
           lualine_x = {"os.date('%c')", 'data', 'encoding', 'fileformat', 'filetype'},
           lualine_y = {'progress'},
           lualine_z = {'location'}
