@@ -328,6 +328,15 @@ function M.show_functions_telescope()
 
   require("telescope.pickers").new({}, {
     prompt_title = lang:sub(1,1):upper() .. lang:sub(2) .. " Outline",
+    -- 1. Define the layout strategy
+    layout_strategy = 'horizontal',
+    -- 2. Configure the 90% size and 1:1 split
+    layout_config = {
+        width = 0.85,   -- 95% of screen width
+        height = 0.98,  -- 99% of screen height
+        preview_width = 0.55 -- 0.5 means 50% of the total width (1:1 split)
+    },
+
     finder = require("telescope.finders").new_table({
       results = items,
       entry_maker = function(entry)
