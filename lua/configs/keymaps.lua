@@ -486,6 +486,7 @@ vim.api.nvim_create_user_command("Mc", function()
     "pandoc", md,
     "-o", html,
     "--standalone",
+    "--number-sections",
     "--wrap=none",
   })
 
