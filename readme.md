@@ -136,6 +136,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>;D` | 如果当前窗口打开了两个文件，执行这个快捷键就会取消比较这两个文件 |
 | `<leader>mt` | 使用Typora打开此markdown文件 |
 | `<leader>mc` | 使用playwright渲染此markdown文件到PNG文件并打开 |
+| `<leader>p` | 将图片通过picgo上传至服务器并返回链接以供Markdown渲染(按p会将链接粘贴) |
 
 ### 4. Telescope / Fzf 文件搜索
 
@@ -227,14 +228,13 @@ python3 -m compiledb -n make
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<F5>` | 开始 / 继续 |
-| `<F10>` | 单步跳过 |
-| `<F11>` | 单步进入 |
-| `<F12>` | 单步跳出 |
+| `<leader>5` | 开始 / 继续 |
+| `<leader>6` | 单步进入 |
+| `<leader>7` | 单步跳过 |
+| `<leader>8` | 单步跳出 |
 | `<leader>b` | 切换断点 |
 | `<leader>B` | 设置条件断点 |
-| `<leader>dr` | 打开 REPL |
-| `<leader>dl` | 运行上一次调试 |
+| `<leader>gdb` | 启动openocd调试 |
 
 ### 8. 文件Exploer侧边栏
 

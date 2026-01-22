@@ -541,3 +541,6 @@ vim.keymap.set("n", "<leader>bo", function()
     end
   end
 end)
+
+-- For picgo
+vim.keymap.set("n", "<leader>p", ":UploadClipboard<CR>")
