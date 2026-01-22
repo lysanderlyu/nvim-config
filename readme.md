@@ -106,6 +106,9 @@ nvim
 | `<leader>sg` | 打开文本全局搜索框 |
 | `<leader>ss` | 将当前`"`寄存器的文本进行全局搜索 |
 | `<leader>sS` | 将当前`+`寄存器（也就是系统剪切板）的文本进行全局搜索 |
+| `<leader>tl` | 使用谷歌翻译当前行 |
+| `<leader>tr` | 使用谷歌翻译当前选中内容 |
+| `<leader>n<leader>tr` | 使用谷歌翻译n行 |
 
 ### 2. Tab 操作
 Neovim 支持多开TAB，就像VScode多开文件一样
