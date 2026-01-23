@@ -1,4 +1,9 @@
 {
+    "indent": {
+        "prefix": "ind",
+        "body": ["&nbsp;&nbsp;&nbsp;&nbsp;${0}"],
+        "description": "Adding indent"
+    },
     "header 1": {
         "prefix": "h1",
         "body": ["# ${0}"],
