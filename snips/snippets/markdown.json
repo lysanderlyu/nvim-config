@@ -379,12 +379,12 @@
     },
     "Insert subscript": {
         "prefix": "sub",
-        "body": ["${1}<sub>${0}"],
+        "body": ["<sub>${0}</sub>"],
         "description": "Create a subscript."
     },
     "Insert superscript": {
         "prefix": "sup",
-        "body": ["${1}<sup>${0}"],
+        "body": ["<sup>${0}</sup>"],
         "description": "Create a superscript."
     },
     "Insert Note": {
