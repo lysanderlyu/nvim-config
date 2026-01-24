@@ -413,7 +413,7 @@
         "description": "Insert Warning"
     },
     "Insert Caution": {
-        "prefix": ["caution", "c"],
+        "prefix": ["caution", "ca"],
         "body": "> [!CAUTION]\n> ",
         "description": "Insert Caution"
     }
