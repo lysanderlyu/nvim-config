@@ -1,4 +1,9 @@
 {
+    "indent": {
+        "prefix": "ind",
+        "body": ["&nbsp;&nbsp;&nbsp;&nbsp;${0}"],
+        "description": "Adding indent"
+    },
     "header 1": {
         "prefix": "h1",
         "body": ["# ${0}"],
@@ -379,12 +384,12 @@
     },
     "Insert subscript": {
         "prefix": "sub",
-        "body": ["${1}<sub>${0}"],
+        "body": ["${1}<sub>${0}</sub>"],
         "description": "Create a subscript."
     },
     "Insert superscript": {
         "prefix": "sup",
-        "body": ["${1}<sup>${0}"],
+        "body": ["${1}<sup>${0}</sup>"],
         "description": "Create a superscript."
     },
     "Insert Note": {
