@@ -550,3 +550,47 @@ end)
 
 -- For picgo
 vim.keymap.set("n", "<leader>p", ":UploadClipboard<CR>")
+
+
+local function open_current_file()
+  local path
+
+  -- If in nvim-tree
+  if vim.bo.filetype == "NvimTree" then
+    local api = require("nvim-tree.api")
+    local node = api.tree.get_node_under_cursor()
+    if not node or not node.absolute_path then
+      vim.notify("No file under cursor", vim.log.levels.WARN)
+      return
+    end
+    path = node.absolute_path
+  else
+    path = vim.fn.expand("%:p")
+  end
+
+  if vim.fn.isdirectory(path) == 1 then
+    vim.notify("Directory selected", vim.log.levels.INFO)
+    return
+  end
+
+  if path == "" then
+    vim.notify("No file to open", vim.log.levels.WARN)
+    return
+  end
+
+  local cmd
+  local sys = vim.loop.os_uname().sysname
+  if sys == "Darwin" then
+    cmd = { "open", path }
+  else
+    cmd = { "xdg-open", path }
+  end
+
+  vim.fn.jobstart(cmd, { detach = true })
+end
+
+vim.keymap.set("n", "<leader>op", open_current_file, {
+  desc = "Open file with system app",
+  silent = true,
+})
+
