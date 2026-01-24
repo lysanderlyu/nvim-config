@@ -469,7 +469,13 @@ vim.api.nvim_create_user_command("D2", function()
   local file = vim.fn.expand("%:p")
   local out  = vim.fn.expand("%:p:r") .. ".png"
   vim.fn.system({ "d2", file, out })
-  vim.fn.system({ "open", out })
+
+  -- preview according to different system
+  if sys == "Darwin" then
+    vim.fn.system({ "open", out })
+  else
+    vim.fn.system({ "xdg-open", png })
+  end
 end, {})
 vim.keymap.set("n", "<leader>di", ":D2<CR>", { noremap = true, silent = true, desc = "Run D2 compile" })
 
