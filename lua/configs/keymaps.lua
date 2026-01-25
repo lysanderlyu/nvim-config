@@ -114,15 +114,6 @@ end)
 --   p = { "<cmd>PasteImage<cr>", "Paste image from clipboard" },
 --}, { prefix = "<leader>" })
 
--- Open a terminal and run a command
-local Terminal  = require('toggleterm.terminal').Terminal
-local htop = Terminal:new({ cmd = "htop", hidden = true })
-function _HTOP_TOGGLE()
-  htop:toggle()
-end
--- Map key to toggle htop
--- vim.api.nvim_set_keymap("n", "<leader>th", "<cmd>lua _HTOP_TOGGLE()<CR>", {noremap = true, silent = true})
-
 -- statuscol
 require("statuscol").setup({
   segments = {
