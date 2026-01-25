@@ -37,7 +37,7 @@ return {
         },
       })
 
-      require("luasnip.loaders.from_vscode").load({ paths = "~/.config/nvim/snips" })
+      require("luasnip.loaders.from_vscode").lazy_load({ paths = "~/.config/nvim/snips" })
 
       -- Your existing Keymaps
 
