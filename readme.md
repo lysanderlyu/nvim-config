@@ -41,9 +41,8 @@ ln -s nvim-linux-x86_64/bin/nvim ./
 ```bash
 git clone https://github.com/lysanderlyu/nvim-config ~/.config/nvim
 cd ~/.config/nvim
-git checkout for-linux          # 这个适用与Linux本地使用
 git checkout for-ssh-client     # 这个适用于远程SSH客户端使用, 主要是适配远程拷贝到本地系统剪切板功能
-git checkout master             # 这个适合MACOS系统使用
+git checkout master             # 这个适合本地系统使用
 ```
 
 2. 打开 Neovim：
