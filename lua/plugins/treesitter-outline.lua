@@ -8,7 +8,7 @@ return {
     config = function()
       -- optional if you want to configure or set keymaps here
       local outline = require("treesitter_outline")
-      vim.keymap.set("n", "<leader>so", outline.show_functions_telescope, { desc = "Show Outline" })
+      vim.keymap.set("n", "<leader>so", ":ShowFunctionsTelescope<CR>", { desc = "Show Outline" })
     end,
   }
 }
