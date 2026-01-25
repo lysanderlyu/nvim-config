@@ -140,6 +140,10 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>mt` | 使用Typora打开此markdown文件 |
 | `<leader>mc` | 使用playwright渲染此markdown文件到PNG文件并打开 |
 | `<leader>p` | 将图片通过picgo上传至服务器并返回链接以供Markdown渲染(按p会将链接粘贴) |
+| `<leader>cf` | 打开函数/结构体/类/标题查询跳转窗口 |
+| `<leader>ao` | 打开函数/结构体/类/标题浏览窗口 |
+| `]f` | 定位到上一个函数 |
+| `[f` | 定位到下一个函数 |
 
 ### 4. Telescope / Fzf 文件搜索
 
