@@ -37,7 +37,7 @@ return {
       local opts = { noremap = true, silent = true }
 
       -- Function Outline with Treesitter
-      vim.keymap.set("n", "<leader>cf", ":ShowFunctionsTelescope<CR>", opts)
+      -- vim.keymap.set("n", "<leader>cf", ":ShowFunctionsTelescope<CR>", opts)
 
     end,
   },

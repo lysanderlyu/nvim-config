@@ -41,332 +41,235 @@ vim.keymap.set("n", "<leader>;d", DiffTwoWindows, { desc = "Diff the two windows
 vim.keymap.set("n", "<leader>;D", CancelDiff, { desc = "Cancel diff mode" })
 
 local M = {}
-function M.show_functions_telescope()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local ft = vim.bo[bufnr].filetype
 
-  local lang_map = {
-    c = "c", cpp = "cpp", java = "java", python = "python", lua = "lua", bash = "bash",
-    sh = "bash", xml = "xml", asm = "asm", S = "asm", s = "asm", cs = "c_sharp", make = "make",
-    diff = "diff", bp = "bp", vue = "vue", php = "php", markdown = "markdown", rst = "rst",
-    qmljs = "qmljs", rust = "rust"
-  }
-
-  local lang = lang_map[ft]
-  if not lang then print("Unsupported filetype for function outline: " .. ft) return end
-
-  local lang_tree = vim.treesitter.get_parser(bufnr, lang)
-  if not lang_tree then print("No parser found for language: " .. lang) return end
-
-  local syntax_tree = lang_tree:parse()
-  local root = syntax_tree[1]:root()
-
-  local queries = {
-    rust = [[
-    (enum_item
-        name: (_) @name)
-
-    (struct_item
-        name: (_) @name
-        body: (field_declaration_list))
-
-    (struct_item
-        name: (_) @name
-        body: (ordered_field_declaration_list))
-
-    (macro_definition
-      name: (identifier) @name)
-
-    (impl_item
-        type: (_) @type
-        body: (declaration_list
-            (function_item
-                name: (identifier) @name)))
-
-    (impl_item
-        trait: (_) @name
-        type: (_) @type)
-
-    (trait_item
-      (visibility_modifier)
-      name: (_) @name
-      body: (_))
-
-    (function_item
-      name: (identifier) @name
-      parameters: (parameters)
-      return_type: (never_type)
-      body: (block))
-    ]],
-    qmljs = [[
-      (ui_object_definition
-        type_name: (identifier) @name)
-    ]],
-    rst = [[
-      (section
-          (title) @name)
-    ]],
-    markdown = [[
-      (section
-        (atx_heading) @name)
-    ]],
-    markdown_inline = [[
-;;               (inline
-;;                 (code_span) @name)  ; <-- capture code_span here
-    ]],
-    php = [[
-      (class_declaration
-        name: (name) @name)
-
-      (method_declaration
-        name: (name) @name)
-    ]],
-    vue = [[
-      (template_element
-        (start_tag
-          (tag_name) @name))
-
-      (element
-       (start_tag
-        (tag_name) @name))
-
-      (script_element
-       (start_tag
-        (tag_name) @name))
-    ]],
-    bp = [[
-      (module
-        type: (identifier) @name)
-    ]],
-    c = [[
-      ;; Match typedef
-      (type_definition
-        type: (_)
-        declarator: (type_identifier) @name) @symbol
-
-      (declaration
-        type: (macro_type_specifier
-          name: (identifier) @name))
-
-      ;; Better Function Match
-      (function_definition
-        type: (_)
-        declarator: [
-          (function_declarator declarator: (identifier) @name)
-          (pointer_declarator declarator: (function_declarator declarator: (identifier) @name))
-        ]
-      ) @symbol
-
-      ;; Macro function
-      (preproc_function_def
-        name: (identifier) @name) @symbol
-
-      ;; Struct definition match 
-      (struct_specifier
-          name: (type_identifier) @name
-          body: (_)) @symbol
- 
-      ;; Union definition match 
-      (union_specifier
-          name: (type_identifier) @name
-          body: (_)) @symbol
-
-      ;; Enum definition match 
-      (enum_specifier
-          name: (type_identifier) @name
-          body: (_)) @symbol
-    ]],
-    xml = [[
-      (STag
-          (Name) @name)
-    ]],
-    diff = [[
-      (block                                                                                                                                                                                         
-         (command                                                                                                                                                                                             
-            (filename) @name))
-    ]],
-    make = [[
-        (rule
-         (targets
-            (word) @name))
-    ]],
-    asm = [[
-      (label
-        (ident) @name) @label
-
-      (instruction
-        kind: (word)
-        (ptr
-          (reg) @name))
-    ]],
-    lua = [[
-      ;; Named functions
-      (function_declaration
-        name: (identifier) @name)
-    
-      ;; Local functions
-      (function_declaration
-        name: (dot_index_expression
-                field: (identifier) @name))
-    
-      ;; Anonymous functions assigned to a variable
-      (assignment_statement
-        (variable_list (identifier) @name)
-        (expression_list (function_definition)))
-    ]],
-    cpp = [[
-        ;; Match all the regular and constructor/destructor with class qualified_identifier
-        (function_definition
-          declarator: (function_declarator
-            declarator: (_) @name))
-
-        ;; Match the enum on .h header
-        (enum_specifier
-          name: (type_identifier) @name)
-
-        ;; Match the typdef enum that does not has name only has typedef
-        (type_definition
-          type: (_
-            body: (_))
-          declarator: (type_identifier) @name)
-
-        ;; Macro function
-        (preproc_function_def
-          name: (identifier) @name) @func
-
-        ;; Class definition match 
-        (class_specifier
-            name: (type_identifier) @name
-            body: (_))
-
-        ;; Struct definition match 
-        (struct_specifier
-            name: (type_identifier) @name
-            body: (_))
- 
-        ;; Union definition match 
-        (union_specifier
-            name: (type_identifier) @name
-            body: (_))
-    ]],
-    java = [[
-      (method_declaration
-        name: (identifier) @name)
-
-      (constructor_declaration
-        name: (identifier) @name)
-    
-      (class_declaration
-        name: (identifier) @name)
-    ]],
-    python = [[
-      (function_definition
-        name: (identifier) @name)
-    ]],
-    bash = [[
-        (function_definition
-        name: (word) @name) @func
-    ]],
-    c_sharp = [[
-      (method_declaration
-        name: (identifier) @name)
-      (constructor_declaration
-        name: (identifier) @name)
-      (class_declaration
-        name: (identifier) @name)
-      (enum_declaration
-        name: (identifier) @name)
-      (struct_declaration
-        name: (identifier) @name)
-    ]]
-  }
-
-  local query_str = queries[lang]
-  local query = vim.treesitter.query.parse(lang, query_str)
-
-  local items = {}
-  for pattern, match in query:iter_matches(root, bufnr) do
-    -- match is a table where keys are capture IDs
-    -- We need to map the IDs back to names
-    local dict = {}
-    for id, nodes in pairs(match) do
-      local name = query.captures[id]
-      dict[name] = nodes[1] -- Grab the first node for this capture name
-    end
-  
-    if dict.name then
-      local name_text = vim.treesitter.get_node_text(dict.name, bufnr)
-      local type_text = ""
-      
-      if dict.type then
-        type_text = vim.treesitter.get_node_text(dict.type, bufnr)
-      end
-
-      -- Helper to check if a string is not nil and not just whitespace
-      local function is_valid(s)
-        return s and s:find("%S") ~= nil
-      end
-  
-      local combined = ""
-        if is_valid(type_text) and is_valid(name_text) then
-          combined = type_text .. ": " .. name_text
-        elseif is_valid(type_text) then
-          combined = type_text
-        elseif is_valid(name_text) then
-          combined = name_text
-        end
-
-      local start_row, _, _, _ = dict.name:range()
-  
-          table.insert(items, {
-            text = combined,
-            filename = vim.api.nvim_buf_get_name(bufnr),
-            lnum = start_row + 1
-          })
-        end
-      end
-
-  require("telescope.pickers").new({}, {
-    prompt_title = lang:sub(1,1):upper() .. lang:sub(2) .. " Outline",
-    -- 1. Define the layout strategy
-    layout_strategy = 'horizontal',
-    -- 2. Configure the 90% size and 1:1 split
-    layout_config = {
-        width = 0.85,   -- 95% of screen width
-        height = 0.98,  -- 99% of screen height
-        preview_width = 0.55 -- 0.5 means 50% of the total width (1:1 split)
-    },
-
-    finder = require("telescope.finders").new_table({
-      results = items,
-      entry_maker = function(entry)
-        local safe_lnum = tonumber(entry.lnum) or 1
-        return {
-          value = entry,
-          display = entry.text,
-          ordinal = entry.text,
-          filename = entry.filename,
-          lnum = entry.lnum,
-          col = 1,
-        }
-      end,
-    }),
-    sorter = require("telescope.config").values.generic_sorter({}),
-    previewer = require("telescope.config").values.grep_previewer({}),
-
-    attach_mappings = function(prompt_bufnr)
-      require("telescope.actions").select_default:replace(function()
-        local selection = require("telescope.actions.state").get_selected_entry()
-        require("telescope.actions").close(prompt_bufnr)
-        vim.api.nvim_win_set_cursor(0, {selection.value.lnum, 0})
-      end)
-      return true
-    end,
-  }):find()
-end
-
--- Register as command
-vim.api.nvim_create_user_command("ShowFunctionsTelescope", M.show_functions_telescope, {})
+-- local has_telescope, telescope = pcall(require, "telescope")
+-- if not has_telescope then
+--   vim.notify("telescope.nvim not found", vim.log.levels.ERROR)
+--   return M
+-- end
+-- 
+-- local pickers = require("telescope.pickers")
+-- local finders = require("telescope.finders")
+-- local conf = require("telescope.config").values
+-- local actions = require("telescope.actions")
+-- local action_state = require("telescope.actions.state")
+-- 
+-- ---------------------------------------------------------------------
+-- -- Icons (Nerd Font recommended)
+-- ---------------------------------------------------------------------
+-- local ICONS = {
+--   function_ = "󰊕",
+--   method    = "󰆧",
+--   struct    = "󰙅",
+--   class     = "󰌗",
+--   enum      = "󰕘",
+--   macro     = "󰏿",
+--   heading   = "󰉫",
+--   variable  = "󰀫",
+--   module    = "󰏗",
+--   label     = "󰌋",
+--   default   = "󰈙",
+-- }
+-- 
+-- ---------------------------------------------------------------------
+-- -- Filetype → Treesitter language map
+-- ---------------------------------------------------------------------
+-- local LANG_MAP = {
+--   c = "c",
+--   cpp = "cpp",
+--   java = "java",
+--   python = "python",
+--   lua = "lua",
+--   bash = "bash",
+--   sh = "bash",
+--   xml = "xml",
+--   asm = "asm",
+--   s = "asm",
+--   S = "asm",
+--   cs = "c_sharp",
+--   make = "make",
+--   diff = "diff",
+--   bp = "bp",
+--   vue = "vue",
+--   php = "php",
+--   markdown = "markdown",
+--   rst = "rst",
+--   qmljs = "qmljs",
+--   rust = "rust",
+-- }
+-- 
+-- ---------------------------------------------------------------------
+-- -- Treesitter queries (semantic captures)
+-- ---------------------------------------------------------------------
+-- local QUERIES = {
+--   c = [[
+--     (function_definition
+--       declarator: [
+--         (function_declarator declarator: (identifier) @function_)
+--         (pointer_declarator declarator:
+--           (function_declarator declarator: (identifier) @function_))
+--       ])
+--     (struct_specifier name: (type_identifier) @struct body:(_))
+--     (enum_specifier name: (type_identifier) @enum body:(_))
+--     (preproc_function_def name: (identifier) @macro)
+--   ]],
+-- 
+--   cpp = [[
+--     (function_definition declarator: (function_declarator declarator: (_) @function_))
+--     (class_specifier name: (type_identifier) @class)
+--     (struct_specifier name: (type_identifier) @struct)
+--     (enum_specifier name: (type_identifier) @enum)
+--     (preproc_function_def name: (identifier) @macro)
+--   ]],
+-- 
+--   rust = [[
+--     (function_item name: (identifier) @function_)
+--     (struct_item name: (type_identifier) @struct)
+--     (enum_item name: (type_identifier) @enum)
+--     (impl_item body: (declaration_list
+--         (function_item name: (identifier) @method)))
+--   ]],
+-- 
+--   lua = [[
+--     (function_declaration name: (identifier) @function_)
+--     (assignment_statement
+--       (variable_list (identifier) @function_)
+--       (expression_list (function_definition)))
+--   ]],
+-- 
+--   python = [[
+--     (function_definition name: (identifier) @function_)
+--     (class_definition name: (identifier) @class)
+--   ]],
+-- 
+--   java = [[
+--     (method_declaration name: (identifier) @method)
+--     (class_declaration name: (identifier) @class)
+--     (constructor_declaration name: (identifier) @method)
+--   ]],
+-- 
+--   bash = [[
+--     (function_definition name: (word) @function_)
+--   ]],
+-- 
+--   c_sharp = [[
+--     (method_declaration name: (identifier) @method)
+--     (constructor_declaration name: (identifier) @method)
+--     (class_declaration name: (identifier) @class)
+--     (struct_declaration name: (identifier) @struct)
+--     (enum_declaration name: (identifier) @enum)
+--   ]],
+-- 
+--   markdown = [[
+--     (section (atx_heading) @heading)
+--   ]],
+-- 
+--   rst = [[
+--     (section (title) @heading)
+--   ]],
+-- 
+--   qmljs = [[
+--     (ui_object_definition type_name: (identifier) @class)
+--   ]],
+-- }
+-- 
+-- ---------------------------------------------------------------------
+-- -- Main function
+-- ---------------------------------------------------------------------
+-- function M.show_functions_telescope()
+--   local bufnr = vim.api.nvim_get_current_buf()
+--   local ft = vim.bo[bufnr].filetype
+--   local lang = LANG_MAP[ft]
+-- 
+--   if not lang then
+--     vim.notify("Unsupported filetype: " .. ft, vim.log.levels.WARN)
+--     return
+--   end
+-- 
+--   local query_str = QUERIES[lang]
+--   if not query_str then
+--     vim.notify("No Treesitter query for: " .. lang, vim.log.levels.WARN)
+--     return
+--   end
+-- 
+--   local parser = vim.treesitter.get_parser(bufnr, lang)
+--   if not parser then
+--     vim.notify("No Treesitter parser for: " .. lang, vim.log.levels.WARN)
+--     return
+--   end
+-- 
+--   local tree = parser:parse()[1]
+--   local root = tree:root()
+--   local query = vim.treesitter.query.parse(lang, query_str)
+-- 
+--   local items = {}
+-- 
+--   for _, match in query:iter_matches(root, bufnr) do
+--     for id, nodes in pairs(match) do
+--       local capture = query.captures[id]
+--       local node = nodes[1]
+-- 
+--       if node then
+--         local text = vim.treesitter.get_node_text(node, bufnr)
+--         local icon = ICONS[capture] or ICONS.default
+--         local row = select(1, node:range())
+-- 
+--         table.insert(items, {
+--           text = string.format("%s  %s", icon, text),
+--           kind = capture,
+--           filename = vim.api.nvim_buf_get_name(bufnr),
+--           lnum = row + 1,
+--         })
+--       end
+--     end
+--   end
+-- 
+--   if vim.tbl_isempty(items) then
+--     vim.notify("No symbols found", vim.log.levels.INFO)
+--     return
+--   end
+-- 
+--   pickers.new({}, {
+--     prompt_title = lang:upper() .. " Outline",
+--     layout_strategy = "horizontal",
+--     layout_config = {
+--       width = 0.9,
+--       height = 0.95,
+--       preview_width = 0.55,
+--     },
+--     finder = finders.new_table {
+--       results = items,
+--       entry_maker = function(entry)
+--         return {
+--           value = entry,
+--           display = entry.text,
+--           ordinal = entry.kind .. " " .. entry.text,
+--           filename = entry.filename,
+--           lnum = entry.lnum,
+--           col = 1,
+--         }
+--       end,
+--     },
+--     sorter = conf.generic_sorter({}),
+--     previewer = conf.grep_previewer({}),
+--     attach_mappings = function(prompt_bufnr)
+--       actions.select_default:replace(function()
+--         local selection = action_state.get_selected_entry()
+--         actions.close(prompt_bufnr)
+--         vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
+--       end)
+--       return true
+--     end,
+--   }):find()
+-- end
+-- 
+-- ---------------------------------------------------------------------
+-- -- User command
+-- ---------------------------------------------------------------------
+-- vim.api.nvim_create_user_command(
+--   "ShowFunctionsTelescope",
+--   M.show_functions_telescope,
+--   { desc = "Treesitter outline (functions / structs / classes / headings)" }
+-- )
 
 return M
-
