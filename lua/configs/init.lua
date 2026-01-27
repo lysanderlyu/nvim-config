@@ -40,3 +40,19 @@ require("luasnip.loaders.from_lua").lazy_load({ paths = vim.fn.stdpath("config")
 
 -- Load the c/cpp code manpage hover function
 require("configs.c_hover")
+
+-- Set the file  that ends with .rules as udev filetype
+vim.filetype.add({
+  extension = {
+    rules = function(path, bufnr)
+      -- Use 'udevrules' (the standard name for udev syntax)
+      -- We check for '/udev/' anywhere in the path to be safe
+      if path:match("/udev/") then
+        return "udevrules"
+      end
+
+      -- like hog filetype, force it to udevrules anyway:
+      return "udevrules" 
+    end,
+  },
+})
