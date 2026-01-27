@@ -54,7 +54,8 @@ nvim
 3. Lazy.nvim 会自动安装插件  
 4. 使用上述快捷键快速操作  
 5. 本配置的说明没有覆盖vi/vim的基础按键的用法说明，如果在此配置文件找不到对应的说明，可以参考vi/vim 使用手册 [vi/vim 原生快捷键手册](https://vim.rtorr.com/) 
-
+6. 如果想要查看当前可用的所有快捷键，只需按下Esc进入Normal模式，然后 空格+sk即可查看所有可用快捷键
+![查看可用快捷键](http://106.55.165.251:9000/images/2026/01/118849ffeb2ba8084be46f63b51fa86a.png)
 ---
 
 ## 三、配置目录结构
@@ -140,7 +141,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>mt` | 使用Typora打开此markdown文件 |
 | `<leader>mc` | 使用playwright渲染此markdown文件到PNG文件并打开 |
 | `<leader>p` | 将图片通过picgo上传至服务器并返回链接以供Markdown渲染(按p会将链接粘贴) |
-| `<leader>cf` | 打开函数/结构体/类/标题查询跳转窗口 |
+| `<leader>so` | 打开大纲/函数/结构体/类/标题查询跳转窗口 |
 | `<leader>ao` | 打开函数/结构体/类/标题浏览窗口 |
 | `]f` | 定位到上一个函数 |
 | `[f` | 定位到下一个函数 |
