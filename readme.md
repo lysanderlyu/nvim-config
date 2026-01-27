@@ -88,9 +88,8 @@ nvim
 ---
 
 ## 五、快捷键说明
-    Neovim支持用户自定义快捷键，但这些快捷都是基础快捷键之外的快捷键，比如j，k，l，h这些快捷键依然是原生的Neovim快捷键
-这里不会覆盖。
-需要注意的是，以下的快捷键是我自定义的快捷键，如果快捷键含有`<leader>`字眼，说明这个快捷键是空格开头的，需要先按空格再按后面的才会生效
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neovim支持用户自定义快捷键，但这些快捷都是基础快捷键之外的快捷键，比如j，k，l，h这些快捷键依然是原生的Neovim快捷键这里不会覆盖。
+> 需要注意的是，以下的快捷键是我自定义的快捷键，如果快捷键含有`<leader>`字眼，说明这个快捷键是空格开头的，需要先按空格再按后面的才会生效
 
 ### 1. 文本操作（搜索查询复制粘贴）
 
@@ -152,8 +151,6 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 |--------|------|
 | `<leader>sh` | 搜索帮助标签 |
 | `<leader>/` | 当前缓冲区模糊查找 |
-| `<leader>go` | Git 状态 |
-| `<leader>gb` | Git 分支 |
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
 | `<leader>ff` | 全局文件搜索 |
@@ -163,22 +160,26 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<leader>gs` | 打开 Git status |
+| `<leader>gs` | 打开 Git status, 可git add 和checkout 和reset |
+| `<leader>go` | Git 状态总览窗口 |
+| `<leader>gb` | Git 分支切换窗口 |
 | `<leader>gS` | Git stash 当前文件 |
 | `<leader>gSa` | Git stash 所有 |
-| `<leader>gSp` | Git stash pop |
-| `<leader>gcm` | Git commit |
-| `<leader>gp` | Git pull |
-| `<leader>gP` | Git push 当前分支 |
-| `<leader>gl` | Git log 列表浏览模式 |
-| `<leader>gL` | Git log 这个模式进入看详情 |
-| `<leader>gbl` | Git blame |
-| `<leader>ga` | Git add 当前文件 |
-| `<leader>gA` | Git add 所有修改 |
-| `<leader>gco` | Git checkout 当前文件 |
-| `<leader>gd` | Git diff split |
+| `<leader>gSp` | Git stash pop 恢复最近一次暂存 |
+| `<leader>gcm` | Git commit 弹出提交窗口|
+| `<leader>gp` | Git pull 拉取当前分支最新提交|
+| `<leader>gP` | Git push 推送当前分支到Origin仓库 |
+| `<leader>gl` | Git log 列表浏览模式查看Git log |
+| `<leader>gL` | Git log 这个模式进入看详情Git log |
+| `<leader>gbl` | Git blame 在文件侧边显示当前文件的Git blame信息 |
+| `<leader>ga` | Git add Git添加当前文件 |
+| `<leader>gA` | Git add Git添加所有修改 |
+| `<leader>gco` | Git checkout Git恢复当前文件 |
+| `<leader>gd` | Git diff split Git diff 当前文件，与最近一次提交进行比较 |
 | `<leader>gD` | 弹出窗口，选择当前文件与特定提交点进行差异比较 |
-| `<leader>gr*` | Git reset / rebase 相关命令 |
+| `<leader>gra` | 执行 Git reset --mixed |
+| `<leader>grs` | 执行 Git reset --soft HEAD~1 |
+| `<leader>grd` | 执行 Git reset --hard HEAD~1 |
 
 ### 6. LSP
 #### 6.1 环境准备
@@ -320,7 +321,7 @@ python3 -m compiledb -n make
 
 
 - 本配置适合 macOS / Linux / Windows  
-- 推荐配合 `git`, `rg`, `bat` 等工具  
+- 推荐配合 `git`, `rg`, `bat`, `fzf` 等工具  
 - 可以根据自己的习惯修改 `lua/plugins/` 或 `lua/configs/` 中的配置
 - `Keymaps.lua`文件中并不是包含所有的快捷键映射，独立的插件文件比如`lua/plugins/fzf-lua.lua`插件文件也有自己的快捷键映射，但不是放在`keymaps.lua`文件中
 
