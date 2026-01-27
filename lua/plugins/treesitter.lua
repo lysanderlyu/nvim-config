@@ -16,8 +16,13 @@ return {
           "asm", "nasm", "markdown", "gitcommit",
           "lua", "c_sharp", "diff", "passwd",
           "ninja", "smali", "ssh_config", "ruby",
-          "sql", "go", "bp", "php", "vue",
+          "sql", "go", "bp", "php", "vue", "awk",
           "zathurarc", "rst", "qmljs", "javascript",
+          "arduino", "csv", "cuda", "desktop", "devicetree",
+          "disassembly", "dockerfile", "dot", "git_config",
+          "git_rebase", "gitattributes", "gitignore", "http",
+          "javadoc", "kconfig", "llvm", "luadoc",
+          "matlab","perl", "strace", "udev",
         },
 
         highlight = {
