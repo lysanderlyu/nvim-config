@@ -1,7 +1,7 @@
 # Neovim 配置说明
 
-这是一个个人的 Neovim 配置，包含了常用插件、LSP 支持、Telescope/Fzf 文件查找、Git 操作、调试工具、快捷键和自定义命令，适合日常开发使用。  
-当前文件快捷键说明暂未完全覆盖，后续会一一完善
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这是一个个人的 Neovim 配置，包含了常用插件、LSP 支持、Telescope/Fzf 文件查找、Git 操作、调试工具、快捷键和自定义命令，适合日常开发使用。  
+
 
 ---
 
@@ -53,6 +53,7 @@ nvim
 
 3. Lazy.nvim 会自动安装插件  
 4. 使用上述快捷键快速操作  
+5. 本配置的说明没有覆盖vi/vim的基础按键的用法说明，如果在此配置文件找不到对应的说明，可以参考vi/vim 使用手册 [vi/vim 原生快捷键手册](https://vim.rtorr.com/) 
 
 ---
 
