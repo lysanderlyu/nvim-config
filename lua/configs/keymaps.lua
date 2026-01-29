@@ -15,8 +15,6 @@ vim.keymap.set("n", "<leader>tt", ":tabnew<cr>", { desc = "New Tab" })
 vim.keymap.set("n", "<leader>lt", ":tabnext<cr>", { desc = "Next Tab" })
 vim.keymap.set("n", "<leader>ht", ":tabprevious<cr>", { desc = "Previous Tab" })
 
--- Soil 
-vim.keymap.set("n", "<leader>si", ":Soil<CR>", { noremap = true, silent = true })
 -- :w and :q 
 vim.keymap.set("n", "<leader>;w", ":w<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>;q", ":q<CR>", { noremap = true, silent = true })
@@ -55,47 +53,9 @@ vim.keymap.set("n", "vl", '^vg_', { desc = "Select whole line" })
 -- Telescope file finder
 vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
 
--- Fzf finder
--- vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
-
 -- telescope Git
 vim.keymap.set("n", "<leader>go", builtin.git_status, opts)
 vim.keymap.set("n", "<leader>gb", builtin.git_branches, opts)
-
--- fugitive
-vim.keymap.set("n", "<leader>gs", ":Git<CR>")           -- git status
-vim.keymap.set("n", "<leader>gS", ":Git stash<CR>")           -- git stash 
-vim.keymap.set("n", "<leader>gSp", ":Git stash pop<CR>")           -- git stash pop
-vim.keymap.set("n", "<leader>gcm", ":Git commit<CR>")    -- commit
-vim.keymap.set("n", "<leader>gp", ":Git pull<CR>")      -- push
-local function current_branch()
-  -- Get current branch name using git
-  local handle = io.popen("git rev-parse --abbrev-ref HEAD 2>/dev/null")
-  local result = handle:read("*a")
-  handle:close()
-  result = result:gsub("\n", "")  -- remove newline
-  return result
-end
-vim.keymap.set("n", "<leader>gP", function()
-  local branch = current_branch()
-  if branch ~= "" then
-    vim.cmd("Git push -u origin " .. branch)
-  else
-    print("Not in a git repository!")
-  end
-end, { silent = true })
-vim.keymap.set("n", "<leader>gL", ":Git log --graph -1000<CR>")       -- log
-vim.keymap.set("n", "<leader>gLa", ":Git log --graph --all -1000<CR>")       -- log
-vim.keymap.set("n", "<leader>gbl", ":Git blame<CR>")     -- blame
-vim.keymap.set("n", "<leader>ga", ":Git add %<CR>")
-vim.keymap.set("n", "<leader>gA", ":Git add -A<CR>")
-vim.keymap.set("n", "<leader>gco", ":Git checkout %<CR>")
-vim.keymap.set("n", "<leader>gd", ":Gdiffsplit<CR>")
-vim.keymap.set("n", "<leader>gr", ":Git reset --mixed -- %<CR>")
-vim.keymap.set("n", "<leader>gra", ":Git reset --mixed<CR>")
-vim.keymap.set("n", "<leader>grs", ":Git reset --soft HEAD~1<CR>")
-vim.keymap.set("n", "<leader>grd", ":Git reset --hard HEAD~1<CR>")
-vim.keymap.set("n", "<leader>grb", ":Git rebase -i --fork-point<CR>")   -- Rebase the current branch from where it was born
 
 -- Others
 vim.keymap.set("n", "<leader>km", builtin.keymaps, opts)
@@ -122,31 +82,6 @@ require("statuscol").setup({
   },
 })
 
---local cmp = require("cmp")
---local tabout = require("tabout")
---
---cmp.setup({
---  mapping = {
---    ["<Tab>"] = cmp.mapping(function(fallback)
---      if tabout.jumpable() then
---        tabout.jump_forward()
---      elseif cmp.visible() then
---        cmp.select_next_item()
---      else
---        fallback()
---      end
---    end, { "i", "s" }),
---    
---    ["<S-Tab>"] = cmp.mapping(function(fallback)
---      if tabout.jumpable(true) then
---        tabout.jump_backward()
---      else
---        fallback()
---      end
---    end, { "i", "s" }),
---  },
---})
---
 -- For color picker
 -- vim.api.nvim_set_keymap("n", "<leader>cp", "<cmd>CccPick<CR>", { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap("n", "<leader>cc", "<cmd>CccConvert<CR>", { noremap = true, silent = true })
@@ -168,17 +103,6 @@ vim.keymap.set("n", "<C-f>", "<cmd>b#<CR>")
 --   if require("noice.lsp").scroll(-4) then return end
 --   return "<C-b>"
 -- end, { expr = true, silent = true })
-
--- For nvim-dap
-local dap = require("dap")
-vim.keymap.set("n", "<F5>", dap.continue)
-vim.keymap.set("n", "<F10>", dap.step_over)
-vim.keymap.set("n", "<F11>", dap.step_into)
-vim.keymap.set("n", "<F12>", dap.step_out)
-vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint)
-vim.keymap.set("n", "<leader>B", function() dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end)
-vim.keymap.set("n", "<leader>dr", dap.repl.open)
-vim.keymap.set("n", "<leader>dl", dap.run_last)
 
 -- For diff with a specific commit
 vim.keymap.set("n", "<leader>gD", function()
@@ -428,32 +352,6 @@ local function view_assemble()
 end
 
 vim.keymap.set("n", "<leader>da", view_assemble, { desc = "Disassemble ELF" })
-
--- Align N lines by a given pattern
-local function align_by(pattern)
-  local count = vim.v.count
-  if count == 0 then count = 10 end  -- default 10 lines
-
-  local start_line = vim.fn.line(".")
-  local end_line = start_line + count - 1
-  local last_line = vim.fn.line("$")
-  if end_line > last_line then end_line = last_line end
-
-  vim.api.nvim_command(string.format("%d,%dTabularize /%s/", start_line, end_line, pattern))
-end
-
--- Align // comments
-vim.keymap.set("n", "<leader>ac", function() align_by("//") end,
-  { desc = "Align N lines of // comments" })
-
--- Align by = 
-vim.keymap.set("n", "<leader>ae", function() align_by("=") end,
-  { desc = "Align N lines by =" })
-
--- Align by { 
-vim.keymap.set("n", "<leader>a{", function() align_by("{") end,
-  { desc = "Align N lines by {" })
-
 
 -- For D2 compilation
 vim.api.nvim_create_user_command("D2", function()
