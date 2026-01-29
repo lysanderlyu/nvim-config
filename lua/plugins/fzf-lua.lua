@@ -11,14 +11,37 @@ return {
           ["<C-d>"] = "preview-page-down",
           ["<C-u>"] = "preview-page-up",
         },
+        builtin = {
+          -- true,        -- uncomment to inherit all the below in your custom config
+          ["<M-Esc>"]     = "hide",     -- hide fzf-lua, `:FzfLua resume` to continue
+          ["<F1>"]        = "toggle-help",
+          ["<F2>"]        = "toggle-fullscreen",
+          -- Only valid with the 'builtin' previewer
+          ["<F3>"]        = "toggle-preview-wrap",
+          ["<F4>"]        = "toggle-preview",
+          -- Rotate preview clockwise/counter-clockwise
+          ["<F5>"]        = "toggle-preview-cw",
+          -- Preview toggle behavior default/extend
+          ["<F6>"]        = "toggle-preview-behavior",
+          -- `ts-ctx` binds require `nvim-treesitter-context`
+          ["<F7>"]        = "toggle-preview-ts-ctx",
+          ["<F8>"]        = "preview-ts-ctx-dec",
+          ["<F9>"]        = "preview-ts-ctx-inc",
+          ["<S-Left>"]    = "preview-reset",
+          ["<S-down>"]    = "preview-page-down",
+          ["<S-up>"]      = "preview-page-up",
+          ["<M-S-down>"]  = "preview-down",
+          ["<M-S-up>"]    = "preview-up",
+        },
       },
     },
     ---@diagnostics enable: missing-fields
     config = function(_, opts)
       local fzf = require("fzf-lua")
+      local actions = fzf.actions
       fzf.setup(opts)
 
-      -- 🔹 Search clipboard (+ register)
+      --  Search clipboard (+ register)
       vim.keymap.set("n", "<leader>sS", function()
         local yank = vim.fn.getreg("+")
         if yank == "" then
@@ -49,7 +72,7 @@ return {
         })
       end, { desc = "Search clipboard (+ register) with native preview" })
 
-      -- 🔹 Search unnamed register (" register)
+      --  Search unnamed register (" register)
       vim.keymap.set("n", "<leader>ss", function()
         local yank = vim.fn.getreg('"')
         if yank == "" then
@@ -78,6 +101,28 @@ return {
           },
         })
       end, { desc = "Search last yank (\" register) with native preview" })
+
+      vim.keymap.set("n", "<leader>sg", function()
+        fzf.grep({
+          search = "",  -- just the raw string
+          prompt = "Search> ",
+          fzf_opts = {
+              ["--ansi"] = "",
+              ["--layout"] = "reverse",
+              ["--info"] = "default",
+          },
+          winopts = {
+            width = 0.95,
+            height = 0.95,
+            layout = "horizontal",
+            preview = { layout = "vertical", vertical = "right:55%" },
+          },
+          actions = {
+            ["ctrl-g"]      = { actions.grep_lgrep },
+            ["ctrl-r"]   = { actions.toggle_ignore }
+          },
+        })
+      end, { desc = "Search native preview" })
 
       -- Map <leader>ff to find files
       vim.keymap.set("n", "<leader>ff", function()
@@ -120,6 +165,7 @@ return {
       
         require("fzf-lua").files({
           prompt = "Files> ",
+          no_ignore = false,         -- respect ".gitignore"  by default
           fzf_opts = {
             ["--query"] = yank,  -- <-- this pre-fills the search prompt
             ["--ansi"] = "",
@@ -162,6 +208,15 @@ return {
           },
         })
       end, { desc = "Live workspace symbols (clangd, seeded)" })
+
+    vim.keymap.set("n", "<leader>fb", "<cmd>FzfLua buffers<CR>", { desc = "Fzf Buffers" })
+    vim.keymap.set("n", "<leader>fG", "<cmd>FzfLua git_files<CR>", { desc = "Fzf Git files" })
+    vim.keymap.set("n", "<leader>:", "<cmd>FzfLua command_history<CR>", { desc = "Fzf command_history" })
+    vim.keymap.set("n", "<leader>sb", "<cmd>FzfLua lgrep_curbuf<CR>", { desc = "Fzf lgrep_curbuf" })
+    vim.keymap.set("n", '<leader>s"', "<cmd>FzfLua registers<CR>", { desc = "Fzf registers" })
+    vim.keymap.set("n", "<leader>gf", "<cmd>FzfLua git_files<CR>", { desc = "Fzf git_files" })
+    vim.keymap.set("n", "<leader>gf", "<cmd>FzfLua git_files<CR>", { desc = "Fzf git_files" })
+    vim.keymap.set("n", "<leader>sw", "<cmd>FzfLua grep_cword<CR>", { desc = "Fzf grep_cword" })
     end,
   },
 }
