@@ -5,7 +5,7 @@ return {
 
     opts = {
       preset = "classic",
-
+      delay = 800,
       plugins = {
         marks = true,
         registers = true,
