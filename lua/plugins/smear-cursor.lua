@@ -1,25 +1,21 @@
-return{
+return {
   {
     "sphamba/smear-cursor.nvim",
     event = "VeryLazy",
     opts = {
-      smear_ms = 50,          -- speed of smear
-      smear_length = 20,      -- how long the tail is
-      cursor_color = nil,     -- auto-use highlight color
+      smear_ms = 50,
+      smear_length = 20,
+      cursor_color = nil,
       keep_smear_on_idle = false,
       hide_builtin_cursor = true,
-      -- Smear cursor when switching buffers or windows.
+      
+      -- Disable smear while typing
+      enabled_in_insert_mode = false,
+      enabled_in_terminal_mode = false, -- Also usually better to off in terminal
+
       smear_between_buffers = true,
-  
-      -- Smear cursor when moving within line or to neighbor lines.
-      -- Use `min_horizontal_distance_smear` and `min_vertical_distance_smear` for finer control
       smear_between_neighbor_lines = true,
-  
-      -- Draw the smear in buffer space instead of screen space when scrolling
       scroll_buffer_space = true,
-  
-      -- Set to `true` if your font supports legacy computing symbols (block unicode symbols).
-      -- Smears and particles will look a lot less blocky.
       legacy_computing_symbols_support = false,
     },
   }
