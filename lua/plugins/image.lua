@@ -1,8 +1,33 @@
+local function is_image_terminal()
+  local term = vim.env.TERM or ""
+
+  -- Wezterm
+  if term:find("wezterm") or vim.env.WEZTERM_WINDOW_ID then
+    return true
+  end
+
+  -- Kitty
+  if term:find("kitty") or vim.env.KITTY_WINDOW_ID then
+    return true
+  end
+
+  -- Ghostty
+  if term:find("ghostty") or vim.env.GHOSTTY_RESOURCES_DIR then
+    return true
+  end
+
+  return false
+end
+
 return {
   {
     "3rd/image.nvim",
-    -- IMPORTANT: We disable the build step that requires hererocks/lua 5.1
     build = false, 
+
+    cond = function()
+      return is_image_terminal()
+    end,
+
     config = function()
       require("image").setup({
         backend = "kitty", -- Ghostty supports this natively
