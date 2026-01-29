@@ -96,8 +96,7 @@ return {
       -- { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
       -- { "<leader>gf", function() Snacks.picker.git_log_file() end, desc = "Git Log File" },
       -- Grep
-      -- { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
-      -- { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
+      { "<leader>sB", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
       -- { "<leader>sg", function() Snacks.picker.grep() end, desc = "Grep" },
       -- { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
       -- Use native telescope Rg instead

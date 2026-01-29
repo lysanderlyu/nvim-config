@@ -212,7 +212,7 @@ return {
     vim.keymap.set("n", "<leader>fb", "<cmd>FzfLua buffers<CR>", { desc = "Fzf Buffers" })
     vim.keymap.set("n", "<leader>fG", "<cmd>FzfLua git_files<CR>", { desc = "Fzf Git files" })
     vim.keymap.set("n", "<leader>:", "<cmd>FzfLua command_history<CR>", { desc = "Fzf command_history" })
-    vim.keymap.set("n", "<leader>sb", "<cmd>FzfLua lgrep_curbuf<CR>", { desc = "Fzf lgrep_curbuf" })
+    vim.keymap.set("n", "<leader>sb", "<cmd>FzfLua lines<CR>", { desc = "Fzf lines" })
     vim.keymap.set("n", '<leader>s"', "<cmd>FzfLua registers<CR>", { desc = "Fzf registers" })
     vim.keymap.set("n", "<leader>gf", "<cmd>FzfLua git_files<CR>", { desc = "Fzf git_files" })
     vim.keymap.set("n", "<leader>gf", "<cmd>FzfLua git_files<CR>", { desc = "Fzf git_files" })
