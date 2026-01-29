@@ -1,34 +1,34 @@
 -- bufferline.lua
 return {
-  -- "akinsho/bufferline.nvim",
-  -- version = "*",
-  -- dependencies = { "nvim-tree/nvim-web-devicons" },
-  --
-  -- config = function()
-  --   require("bufferline").setup({
-  --     options = {
-  --       mode = "buffers",
-  --       numbers = "none",
-  --       diagnostics = "nvim_lsp",
-  --
-  --       -- Integrate with Nvim-tree
-  --       offsets = {
-  --         {
-  --           filetype = "NvimTree",
-  --           text = "File Explorer",
-  --           highlight = "Directory",
-  --           text_align = "left",
-  --           separator = true,  -- Add a vertical line between tree and tabs
-  --         },
-  --       },
-  --
-  --       show_buffer_close_icons = true,
-  --       show_close_icon = false,
-  --       always_show_bufferline = true,
-  --
-  --       -- Optional styling
-  --       separator_style = "slant",
-  --     },
-  --   })
-  -- end,
+  "akinsho/bufferline.nvim",
+  version = "*",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+
+  config = function()
+    require("bufferline").setup({
+      options = {
+        mode = "buffers",
+        numbers = "none",
+        diagnostics = "nvim_lsp",
+
+        -- Integrate with Nvim-tree
+        offsets = {
+          {
+            filetype = "NvimTree",
+            text = "File Explorer",
+            highlight = "Directory",
+            text_align = "left",
+            separator = true,  -- Add a vertical line between tree and tabs
+          },
+        },
+
+        show_buffer_close_icons = true,
+        show_close_icon = false,
+        always_show_bufferline = true,
+
+        -- Optional styling
+        separator_style = "slant",
+      },
+    })
+  end,
 }
