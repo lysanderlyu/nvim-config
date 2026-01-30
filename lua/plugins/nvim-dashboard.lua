@@ -15,15 +15,39 @@ return {
               icon_hl = '@variable',
               desc = 'Find Files',
               group = 'Label',
-              action = 'FzfLua files',
               key = 'f',
+              action = function()
+                require('fzf-lua').files({
+                  winopts = {
+                    width = 0.95,
+                    height = 0.95,
+                    layout = "horizontal",
+                    preview = { 
+                      layout = "vertical", 
+                      vertical = "right:55%" 
+                    },
+                  },
+                })
+              end,
             },
             {
               icon = ' ',
               desc = 'Search content',
               group = 'Label',
-              action = 'FzfLua live_grep',
               key = 'g',
+              action = function()
+                require('fzf-lua').live_grep({
+                  winopts = {
+                    width = 0.95,
+                    height = 0.95,
+                    layout = "horizontal",
+                    preview = { 
+                      layout = "vertical", 
+                      vertical = "right:55%" 
+                    },
+                  },
+                })
+              end,
             },
             {
               icon = ' ',
