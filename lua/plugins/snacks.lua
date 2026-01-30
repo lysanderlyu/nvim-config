@@ -1,3 +1,24 @@
+local function is_graphical_terminal()
+  local term = vim.env.TERM or ""
+
+  -- Kitty
+  if term:find("kitty") or vim.env.KITTY_WINDOW_ID then
+    return true
+  end
+
+  -- Ghostty
+  if term:find("ghostty") or vim.env.GHOSTTY_RESOURCES_DIR then
+    return true
+  end
+
+  -- WezTerm
+  if vim.env.WEZTERM_EXECUTABLE or vim.env.WEZTERM_PANE then
+    return true
+  end
+
+  return false
+end
+
 return {
   {
     "lysanderlyu/snacks.nvim",
@@ -19,25 +40,28 @@ return {
       scope = { 
           enabled = true,
       },
-      image = {
-          formats = {
-            "png",
-            "jpg",
-            "jpeg",
-            "gif",
-            "bmp",
-            "webp",
-            "tiff",
-            "heic",
-            "avif",
-            "mp4",
-            "mov",
-            "avi",
-            "mkv",
-            "webm",
-            "pdf",
-            "icns",
-          },
+      image = is_graphical_terminal() and {
+        enabled = true,
+        formats = {
+          "png",
+          "jpg",
+          "jpeg",
+          "gif",
+          "bmp",
+          "webp",
+          "tiff",
+          "heic",
+          "avif",
+          "mp4",
+          "mov",
+          "avi",
+          "mkv",
+          "webm",
+          "pdf",
+          "icns",
+        },
+      } or {
+        enabled = false,
       },
       scroll = { 
           enabled = true,
