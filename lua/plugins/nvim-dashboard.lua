@@ -85,6 +85,14 @@ return {
                 end)
               end,
             },
+            {
+              icon = '󰈆 ',
+              icon_hl = '@variable',
+              desc = 'Quit',
+              group = 'Label',
+              key = 'q',
+              action = 'q',
+            },
           },
           -- project = { enable = true, limit = 8, icon = '󰉋 ', label = 'Projects Folders' },
           project = {
