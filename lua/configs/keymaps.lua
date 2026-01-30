@@ -385,3 +385,26 @@ vim.keymap.set("n", "<leader>bo", function()
     end
   end
 end)
+
+-- Dashboard shortkey
+vim.keymap.set("n", "<leader>db", function()
+  if vim.bo.filetype == "dashboard" then
+    -- 1. Get a list of all valid buffers
+    local bufs = vim.fn.getbufinfo({ buflisted = 1 })
+    
+    -- 2. If only the dashboard is open, create a new file
+    if #bufs <= 1 then
+      vim.cmd("enew")
+    else
+      -- 3. Otherwise, switch to the last used buffer (the "alternate" buffer)
+      -- This is the equivalent of pressing Ctrl + ^
+      local success = pcall(vim.cmd, "buffer #")
+      if not success then
+        vim.cmd("bnext") -- Fallback if alternate buffer is invalid
+      end
+    end
+  else
+    -- If not on dashboard, open it
+    vim.cmd("Dashboard")
+  end
+end, { desc = "Toggle Dashboard / Smart Back" })
