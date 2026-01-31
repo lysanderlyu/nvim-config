@@ -11,8 +11,11 @@ local function is_graphical_terminal()
     return true
   end
 
-  -- WezTerm
-  if vim.env.WEZTERM_EXECUTABLE or vim.env.WEZTERM_PANE then
+  -- WezTerm (WSL-safe)
+  if term == "wezterm"
+     or vim.env.TERM_PROGRAM == "WezTerm"
+     or vim.env.WEZTERM_PANE
+  then
     return true
   end
 
