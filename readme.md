@@ -130,6 +130,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>;q` | 关闭 |
 | `<leader>;bd` | 关闭当前Buffer |
 | `<leader>;br` | 重新打开当前Buffer |
+| `<leader>;bR` | 重新打开所有Buffer |
 | `<leader>;W` | 保存并关闭 |
 | `<leader>;Q` | 强制关闭 |
 | `<leader>;bo` | 关闭当前Buffer以外的所有Buffer |
@@ -237,13 +238,14 @@ python3 -m compiledb -n make
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<leader>5` | 开始 / 继续 |
-| `<leader>6` | 单步进入 |
-| `<leader>7` | 单步跳过 |
-| `<leader>8` | 单步跳出 |
+| `<F5>` | 开始 / 继续 |
+| `<F10>` | 单步跳过 |
+| `<F11>` | 单步进入 |
+| `<F12>` | 单步跳出 |
 | `<leader>b` | 切换断点 |
 | `<leader>B` | 设置条件断点 |
-| `<leader>gdb` | 启动openocd调试 |
+| `<leader>dr` | 打开 REPL |
+| `<leader>dl` | 运行上一次调试 |
 
 ### 8. 文件Exploer侧边栏
 
