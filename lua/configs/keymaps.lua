@@ -372,6 +372,7 @@ vim.keymap.set("n", "<leader>di", ":D2<CR>", { noremap = true, silent = true, de
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "delete current buffer" })
 -- reload current buffer
 vim.keymap.set("n", "<leader>br", ":e!<CR>", { desc = "reload current buffer" })
+vim.keymap.set("n", "<leader>bR", ":bufdo e!<CR>", { desc = "reload all buffers" })
 -- Neovim: keep current buffer only
 vim.keymap.set("n", "<leader>bo", function()
   -- Close all other tabs first (cleaner for the UI)
