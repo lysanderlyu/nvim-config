@@ -9,7 +9,7 @@ return {
         extension = "png",            -- default extension
         file_name = "%Y-%m-%d-%H-%M-%S",
         use_absolute_path = false,
-        relative_to_current_file = false,
+        relative_to_current_file = true,
         template = "![$LABEL]($FILE_PATH)",  -- default template for Markdown
         embed_image_as_base64 = false,
       },
@@ -24,7 +24,7 @@ return {
       },
     },
     keys = {
-      { "<leader>p", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard" },
+      { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard and store it on assets dir" },
     },
     config = function(_, opts)
       require("img-clip").setup(opts)
