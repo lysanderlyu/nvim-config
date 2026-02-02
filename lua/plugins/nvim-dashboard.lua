@@ -65,7 +65,7 @@ return {
               key = 'c',
             },
             {
-              icon = '󰊄 ',
+              icon = '󰚰 ',
               desc = 'Update Config',
               group = '@property',
               key = 'u',
@@ -75,11 +75,16 @@ return {
                 vim.api.nvim_set_current_dir(config_path)
             
                 -- 2. Run git pull (using '!' for shell execution)
-                print("Pulling latest config...")
-                vim.cmd("!git pull")
+                vim.notify("Pulling latest config...", vim.log.levels.INFO)
+                -- Use system() to run git pull silently without leaving the dashboard
+                local output = vim.fn.system("git pull")
+                
+                -- Notify the user of the git result (useful for seeing if there were conflicts)
+                vim.notify(output, vim.log.levels.INFO)
             
                 -- 3. Run Lazy update
                 -- We use vim.schedule to ensure Lazy starts after the git process finishes
+                vim.notify("configs updated!, you need to reload the nvim to make newest config take effect", vim.log.levels.INFO)
                 vim.schedule(function()
                   require("lazy").update()
                 end)

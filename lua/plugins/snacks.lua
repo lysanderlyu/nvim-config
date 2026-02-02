@@ -97,7 +97,7 @@ return {
     },
     keys = {
       -- Top Pickers & Explorer
-      { "<leader><space>", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
+      -- { "<leader><space>", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
       -- { "<leader>,", function() Snacks.picker.buffers() end, desc = "Buffers" },
       -- { "<leader>n", function() Snacks.picker.notifications() end, desc = "Notification History" },
       { "<leader>E", function() Snacks.explorer() end, desc = "File Explorer" },
