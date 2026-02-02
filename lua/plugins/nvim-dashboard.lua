@@ -58,6 +58,24 @@ return {
               key = 'n',
             },
             {
+              icon = '󰙅 ',
+              desc = 'Explorer',
+              group = 'Number',
+              action = function()
+                local api = require("nvim-tree.api")
+                
+                -- 1. Open the tree
+                api.tree.open()
+                
+                -- 2. Use schedule to wait a tiny bit for the UI to settle
+                vim.schedule(function()
+                  -- 3. Maximize the current window (makes it full screen)
+                  vim.cmd("only")
+                end)
+              end,
+              key = 'e',
+            },
+            {
               icon = ' ',
               desc = 'Config',
               group = 'Number',
