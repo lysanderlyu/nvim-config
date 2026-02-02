@@ -128,6 +128,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 |--------|------|
 | `<leader>;w` | 保存 |
 | `<leader>;q` | 关闭 |
+| `<leader>cr` | 重命名当前文件 |
 | `<leader>;bd` | 关闭当前Buffer |
 | `<leader>;br` | 重新打开当前Buffer |
 | `<leader>;bR` | 重新打开所有Buffer |
