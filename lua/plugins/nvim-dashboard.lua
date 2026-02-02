@@ -32,9 +32,9 @@ return {
             },
             {
               icon = ' ',
-              desc = 'Search content',
+              desc = 'Search',
               group = 'Label',
-              key = 'g',
+              key = 's',
               action = function()
                 require('fzf-lua').live_grep({
                   winopts = {
@@ -52,7 +52,7 @@ return {
             {
               icon = ' ',
               icon_hl = '@variable',
-              desc = 'New File',
+              desc = 'New',
               group = 'Label',
               action = 'ene | startinsert',
               key = 'n',
@@ -60,7 +60,7 @@ return {
             {
               icon = '󰙅 ',
               desc = 'Explorer',
-              group = 'Number',
+              group = 'Label',
               action = function()
                 local api = require("nvim-tree.api")
                 
@@ -77,14 +77,14 @@ return {
             },
             {
               icon = ' ',
-              desc = 'Config',
+              desc = 'Configs',
               group = 'Number',
               action = 'e ~/.config/nvim',
               key = 'c',
             },
             {
               icon = '󰚰 ',
-              desc = 'Update Config',
+              desc = 'Update',
               group = '@property',
               key = 'u',
               action = function()
