@@ -140,8 +140,6 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>;D` | 如果当前窗口打开了两个文件，执行这个快捷键就会取消比较这两个文件 |
 | `<leader>mt` | 使用Typora打开此markdown文件 |
 | `<leader>mc` | 使用playwright渲染此markdown文件到PNG文件并打开 |
-| `<leader>p` | 将图片通过picgo上传至服务器并返回链接以供Markdown渲染(按p会将链接粘贴) |
-| `<leader>P` | 将剪切板的图片放置当前Markdown同级目录并返回链接以供Markdown渲染(按P会将链接粘贴) |
 | `<leader>so` | 打开大纲/函数/结构体/类/标题查询跳转窗口 |
 | `<leader>ao` | 打开函数/结构体/类/标题浏览窗口 |
 | `]f` | 定位到上一个函数 |
