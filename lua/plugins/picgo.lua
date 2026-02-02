@@ -4,6 +4,8 @@ return {
     "lysanderlyu/nvim-picgo",
     config = function()
       require("nvim-picgo").setup()
-    end
+    end,
+    -- For picgo
+    vim.keymap.set("n", "<leader>p", ":UploadClipboard<CR>")
   }
 }

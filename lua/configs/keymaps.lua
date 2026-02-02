@@ -437,8 +437,6 @@ vim.keymap.set("n", "<leader>bo", function()
   end
 end)
 
--- For picgo
-vim.keymap.set("n", "<leader>p", ":UploadClipboard<CR>")
 
 
 local function open_current_file()
