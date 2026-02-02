@@ -1,15 +1,26 @@
 return {
   {
-    -- "norcalli/nvim-colorizer.lua",
-    -- lazy = true,
-    -- cmd = { "ColorizerAttachToBuffer", "ColorizerToggle" },
-    -- config = function()
-    --   require("colorizer").setup({
-    --     '*', -- apply to all filetypes
-    --     css = { rgb_fn = true; }, -- enable rgb() functions in css
-    --     html = { names = true; }, -- enable color names
-    --     lua = { rgb_fn = true; },
-    --   })
-    -- end,
-  }
+    "norcalli/nvim-colorizer.lua",
+    -- Load on specific commands or when opening these file types
+    cmd = { "ColorizerAttachToBuffer", "ColorizerToggle" },
+    ft = { "lua", "css", "html", "cs", "javascript", "qml", "java", "cpp", "python" }, 
+    config = function()
+      require("colorizer").setup({
+        -- Filetype specific overrides
+        "lua",
+        "css",
+        "html",
+        -- Global settings for everything else
+        ["*"] = {
+          RGB = true,         -- #RGB hex codes
+          RRGGBB = true,      -- #RRGGBB hex codes 
+          names = true,       -- "Name" codes like Blue Red Green
+          RRGGBBAA = true,    -- Alpha support
+          rgb_fn = true,      -- CSS rgb() and rgba() functions
+          hsl_fn = true,      -- CSS hsl() and hsla() functions
+          mode = "background", -- Set the display mode
+        },
+      })
+    end,
+  },
 }
