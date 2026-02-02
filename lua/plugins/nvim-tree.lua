@@ -32,7 +32,7 @@ return {
           vim.keymap.set('n', '-', api.tree.change_root_to_parent, opts('Up'))
           vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
           vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
-          vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
+          -- vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
           vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
           vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
           vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
@@ -43,6 +43,13 @@ return {
           vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
+          -- Copy the file using cb copy
+          vim.keymap.set(
+            "n",
+            "C",
+            require("utils.clipboard").copy_fs_object_from_nvim_tree,
+            { noremap = true, silent = true, desc = "Copy filesystem object" }
+          )
         end,
 
         view = {
@@ -149,12 +156,7 @@ return {
       end
 
       -- Keymap for git-only toggle
-      vim.keymap.set(
-        "n",
-        "<leader>ge",
-        toggle_tree_git_only,
-        { desc = "Toggle Nvim-tree (git changes only, list-like view)" }
-      )
+      vim.keymap.set( "n", "<leader>ge", toggle_tree_git_only, { desc = "Toggle Nvim-tree (git changes only, list-like view)" })
 
       local function open_normal_tree()
         local tree_view = require("nvim-tree.view")
@@ -191,7 +193,7 @@ return {
             vim.keymap.set('n', '.', api.node.run.cmd, opts('Run Command'))
             vim.keymap.set('n', '-', api.tree.change_root_to_parent, opts('Up'))
             vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
-            vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
+            -- vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
             vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
             vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
             vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
@@ -203,6 +205,13 @@ return {
             vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
             vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
+            -- Copy the file using cb copy
+            vim.keymap.set(
+              "n",
+              "C",
+              require("utils.clipboard").copy_fs_object_from_nvim_tree,
+              { noremap = true, silent = true, desc = "Copy filesystem object" }
+            )
           end,
 
           view = {

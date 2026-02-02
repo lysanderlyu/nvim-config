@@ -5,6 +5,16 @@ local opts = { noremap = true, silent = true }
 -- Quick select all the text
 vim.keymap.set("n", "<leader>;a", "ggVG", { desc = "Select All" })
 
+-- Quick copy current file to clipboard
+vim.keymap.set(
+  "n",
+  "<leader>C",
+  function()
+    require("utils.clipboard").copy_current_file()
+  end,
+  { noremap = true, silent = true, desc = "Copy current file" }
+)
+
 -- tab keymaps
 vim.keymap.set("n", "<leader>tq", ":tabclose<cr>", { desc = "Close tab" })
 vim.keymap.set("n", "<leader>;0", ":tablast<cr>", { desc = "Last Tab" })
@@ -503,3 +513,5 @@ vim.keymap.set("n", "<leader>db", function()
     vim.cmd("Dashboard")
   end
 end, { desc = "Toggle Dashboard / Smart Back" })
+
+
