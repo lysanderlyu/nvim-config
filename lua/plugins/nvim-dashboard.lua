@@ -102,10 +102,12 @@ return {
             
                 -- 3. Run Lazy update
                 -- We use vim.schedule to ensure Lazy starts after the git process finishes
-                vim.notify("configs updated!, you need to reload the nvim to make newest config take effect", vim.log.levels.INFO)
-                vim.schedule(function()
-                  require("lazy").update()
-                end)
+                vim.notify("Configs Updated!, you need to reload the nvim to make newest config take effect", vim.log.levels.INFO)
+                vim.notify("Quiting nvim", vim.log.levels.INFO)
+                -- 3. Wait 2 seconds (2000ms) then quit
+                vim.defer_fn(function()
+                  vim.cmd("qa!")
+                end, 3000)
               end,
             },
             {
