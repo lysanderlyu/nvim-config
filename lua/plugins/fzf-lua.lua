@@ -195,7 +195,7 @@ return {
         require("fzf-lua").lsp_live_workspace_symbols({
           -- symbols = { "Struct", "TypeAlias", "Enum", "Class" },
           previewer = "builtin",
-          query = yank,
+          -- query = yank,
           winopts = {
             width = 0.9,
             height = 0.9,
