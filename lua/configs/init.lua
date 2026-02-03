@@ -29,7 +29,8 @@ end
 require("lazy").setup(plugin_specs)
 
 -- Load other configs after plugins
-require("configs.functions")
+require("utils.functions")
+
 require("configs.completion")
 require("configs.keymaps")
 require("configs.autocommands")
