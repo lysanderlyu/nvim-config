@@ -43,7 +43,8 @@ return {
       scope = { 
           enabled = true,
       },
-      image = is_graphical_terminal() and {
+      -- image = is_graphical_terminal() and {
+      image = {
         enabled = true,
         formats = {
           "png",
