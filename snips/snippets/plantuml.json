@@ -197,6 +197,11 @@
         "body": "title $0",
         "description": "The document title"
     },
+    "Sentence": {
+        "prefix": ":",
+        "body": ":$0;",
+        "description": "Activity sentence"
+    },
     "Theme": {
         "prefix": "th",
         "body": "!theme mars\n",
