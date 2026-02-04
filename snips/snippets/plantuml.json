@@ -134,12 +134,12 @@
     },
     "If-else": {
         "prefix": "if",
-        "body": ["if ($1) then (ok)\n  :$2;\nelse (no)\n  :$3;\nendif\n"],
+        "body": ["if ($1) then ($2)\n  :$3;\nelse ($4)\n  :$5;\nendif\n"],
         "description": "The if else on activity"
     },
     "If-elseif": {
         "prefix": "ifei",
-        "body": ["if ($1) then (ok)\n:$2;\nelseif ($3) then (no)\n:$4;\nelse (fi)\n:$5;\nendif\n"],
+        "body": ["if ($1) then ($2)\n:$3;\nelseif ($4) then ($5)\n:$6;\nelse ($7)\n:$8;\nendif\n"],
         "description": "The stop of the activity"
     },
     "Initial State activity": {
