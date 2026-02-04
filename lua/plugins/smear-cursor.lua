@@ -4,7 +4,7 @@ return {
     event = "VeryLazy",
     opts = {
       stiffness = 0.3,
-      trailing_stiffness = 0.3,
+      trailing_stiffness = 0.5,
       matrix_pixel_threshold = 0.3,
       damping = 0.95,
       damping_insert_mode = 0.95,
@@ -20,7 +20,7 @@ return {
       particle_gravity = -50,
       min_distance_emit_particles = 0,
 
-      time_interval = 7,
+      time_interval = 4,
       smear_ms = 50,
       smear_length = 20,
       cursor_color = "#C6C8C5",
