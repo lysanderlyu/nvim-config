@@ -19,8 +19,8 @@ return {
   
           -- If you want to customize the image showed when running this plugin
           image = {
-              darkmode = true, -- Enable or disable darkmode
-              format = "png", -- Choose between png or svg
+              darkmode = false, -- Enable or disable darkmode
+              format = "svg", -- Choose between png or svg
               bg = "transparent",
       
               -- This is a default implementation of using nsxiv to open the resultant image
