@@ -30,6 +30,11 @@ return {
 
       -- Translate selection in visual mode
       vim.keymap.set("x", "<leader>tr", pantran.motion_translate, opts)
+
+      -- Quickly translate the current word
+      vim.keymap.set("n", "T", function()
+        return pantran.motion_translate() .. "iw"
+      end, { noremap = true, silent = true, expr = true, desc = "Translate current word" })
     end,
   },
 }
