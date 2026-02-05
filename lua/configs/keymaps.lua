@@ -109,6 +109,45 @@ vim.keymap.set("n", "<leader>cp", function()
     return
   end
 
+  -- 4. Open the image using the system open program 
+  vim.system({ "open", output_path })
+
+  vim.notify("Render complete: " .. vim.fn.expand("%:t:r") .. ".png", vim.log.levels.INFO)
+end)
+
+-- Set shortkeys for plantuml compiling using plantuml and open it
+vim.keymap.set("n", "<leader>cP", function()
+  local file_path = vim.fn.expand("%:p")
+  local extension = vim.fn.expand("%:e"):lower()
+  local output_path = vim.fn.expand("%:p:r") .. ".png"
+
+  -- 1. Validate File Format Extension
+  local valid_extensions = { puml = true, plantuml = true, uml = true, iat = true }
+  if not valid_extensions[extension] then
+    vim.notify("Not a PlantUML file (." .. extension .. ")", vim.log.levels.WARN)
+    return
+  end
+
+  -- 2. Validate File Existence
+  if file_path == "" or vim.fn.filereadable(file_path) == 0 then
+    vim.notify("File not found or unreadable", vim.log.levels.ERROR)
+    return
+  end
+
+  -- Ensure file is saved before compiling
+  vim.cmd("silent write")
+  vim.notify("Compiling " .. vim.fn.expand("%:t") .. "...", vim.log.levels.INFO)
+
+  -- 3. Execute PlantUML synchronously
+  local obj = vim.system({ "plantuml", file_path, "--format=svg" }):wait()
+
+  if obj.code ~= 0 then
+    -- Clean up error message from stderr
+    local err = obj.stderr ~= "" and obj.stderr or "Check PlantUML syntax"
+    vim.notify("PlantUML Error: " .. err, vim.log.levels.ERROR)
+    return
+  end
+
   vim.notify("Render complete: " .. vim.fn.expand("%:t:r") .. ".png", vim.log.levels.INFO)
 end)
 

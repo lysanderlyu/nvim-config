@@ -291,8 +291,8 @@ python3 -m compiledb -n make
 | `<leader>ac`, `<leader>ae`, `<leader>a{` | 对齐 N 行注释、等号、花括号 |
 | `<leader>cn` | 复制当前文件绝对路径 |
 | `<leader>sC` | 打开系统终端 |
-| `<leader>si` | 编译当前的Plantuml文件并打开生成的SVG |
-| `<leader>cp` | 编译当前的Plantuml文件到PNG图片 |
+| `<leader>cp` | 编译当前的Plantuml文件并打开生成的PNG |
+| `<leader>cP` | 编译当前的Plantuml文件到PNG但不打开 |
 | `<leader>v` | 进入ASCII画图模式 |
 
 > 以下快捷键是进入venn画图模式时所使用
@@ -321,7 +321,6 @@ python3 -m compiledb -n make
 ## 六、自定义命令
 
 - `:D2`：编译当前 D2 文件为 PNG 并打开
-- `:Soil`：将当前的plantuml图编译并打开
 - Git / DTB / 对齐命令均绑定快捷键
 
 ---
