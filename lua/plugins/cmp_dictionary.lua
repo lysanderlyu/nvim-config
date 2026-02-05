@@ -22,7 +22,7 @@ return {
       cmp_dict.setup({
         -- Use the 'dic' structure we discussed for better filetype support
         paths = dict["*"],
-        exact_length = 3,
+        exact_length = 4,
         first_case_insensitive = true,
         document = {
           -- Automatically enable if 'wn' exists, otherwise disable
