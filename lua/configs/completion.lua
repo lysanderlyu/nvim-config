@@ -41,6 +41,7 @@ cmp.setup({
     { name = "luasnip" },
     { name = "buffer" },
     { name = "path" },
+    { name = "dictionary", keyword_length = 3, max_item_count = 20 },
   }),
 })
 
