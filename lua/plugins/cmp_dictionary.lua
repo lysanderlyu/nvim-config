@@ -1,5 +1,5 @@
 local dict = {
-  ["*"] = { "/usr/share/dict/words" },
+  ["*"] = { vim.fn.stdpath("config") .. "/dicts/words" },
 
   ft = {
     plantuml = {
