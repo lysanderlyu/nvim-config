@@ -29,6 +29,13 @@ return {
       -- Keybindings
       vim.keymap.set({ "n", "v" }, "<leader>cg", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI Chat" })
       vim.keymap.set({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI Inline" })
+      -- For markdown render
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "codecompanion",
+        callback = function()
+          vim.bo.filetype = "markdown"
+        end,
+      })
     end,
   },
 }
