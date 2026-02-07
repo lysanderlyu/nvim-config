@@ -18,7 +18,7 @@ return {
               return require("codecompanion.adapters").extend("openai_compatible", {
                 env = {
                   api_key = "LMSTUDIO_API_KEY",
-                  url = "http://192.168.1.6:1234",
+                  url = "http://106.55.165.251:8810",
                 },
               })
             end,
