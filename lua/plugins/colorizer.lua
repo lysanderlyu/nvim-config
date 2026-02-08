@@ -3,7 +3,7 @@ return {
     "norcalli/nvim-colorizer.lua",
     -- Load on specific commands or when opening these file types
     cmd = { "ColorizerAttachToBuffer", "ColorizerToggle" },
-    ft = { "lua", "css", "html", "cs", "javascript", "qml", "java", "cpp", "python" }, 
+    ft = { "lua", "css", "html", "cs", "javascript", "qml", "java", "cpp", "python", "plantuml" }, 
     config = function()
       require("colorizer").setup({
         -- Filetype specific overrides
