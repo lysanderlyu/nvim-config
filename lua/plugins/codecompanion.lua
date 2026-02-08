@@ -20,7 +20,7 @@ return {
               title = "CodeCompanion actions", -- The title of the action palette
             },
             diff = {
-              -- enabled = true,
+              enabled = true,
               -- provider = inline.diff, -- inline|split|mini_diff
             },
           },
@@ -110,7 +110,9 @@ return {
                 },
                 schema = {
                   model = {
-                    default = "openai/gpt-oss-20b",
+                    default = "qwen/qwen3-coder-30b",
+                    -- default = "google/gemma-3-27b",
+                    -- default = "openai/gpt-oss-20b",
                   },
                 },
               })
