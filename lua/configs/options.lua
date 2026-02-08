@@ -14,6 +14,14 @@ vim.o.showmode = false
 vim.lsp.set_log_level("ERROR")
 vim.g.fzf_layout = { window = {width = 0.8, height = 0.9 } }
 
+-- Enable folding
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+-- start opened
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
+
 -- For git diff word based
 vim.opt.diffopt:append("internal")
 vim.opt.diffopt:append("algorithm:patience")
