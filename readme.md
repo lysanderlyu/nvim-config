@@ -363,7 +363,24 @@ python3 -m compiledb -n make
 
 ---
 
-## 九、备注
+## 九、AI 助手
+
+
+| 快捷键   | 功能    |
+| -------------- | --------------- |
+| `<leader>cg` | 打开AI聊天窗口 |
+| `<leader>ai` | 打开AI聊天输入框 |
+
+
+- 这个使用的是CodeCompanion插件的AI客户端，如果想要接入其他AI的API，可以在插件中设置
+
+![配置其他AI接口](http://106.55.165.251:9000/images/2026/02/767d0f44a233d1d745d3f473bd7503cb.png)
+
+- 这个插件的路径为：`lua/plugins/codecompanion.lua`
+
+----------
+
+## 十、备注
 
 
 - 本配置适合 macOS / Linux / Windows  
