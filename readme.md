@@ -199,42 +199,6 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 
 ### 6. LSP
-#### 6.1 环境准备
-要使用LSP功能，要准备好以下环境：
-
-| 程序                 | 目的              |
-| :------------------- | ----------------- |
-| clangd               | C/CPP 语法服务端  |
-| pyright              | python 语法服务端 |
-| bash-language-server | Bash 语法服务端   |
-| lua-language-server  | Lua 语法服务端    |
-
-
-
-Linux可以通过以下命令进行安装
-
-```bash
-
-# LSP Server 安装
-sudo apt install clangd bash-language-server lua-language-server npm rust-analyzer
-npm install pyright
-
-# 1. For clangd
-# 由于clangd不是绝对的智能，对于一些头文件的查找路径识别不是很准确，但是 clangd会通过读取一个文件
-# “compilation_commands.json” 来重新识别头文件路径， compilation_commands.json 可以通过编译
-# CMakefileList.txt (cmake 所使用) 或者 Makefile (make 所使用) 时自动生成，对于 cmake 和 make 有
-# 不同的生成方式，各对应两种不同的使用方法
-# 1.1 对于 cmkae项目(CMakefileList.txt), 添加CMAKE_EXPORT_COMPILE_COMMANDS=ON 变量即可
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ........
-# 1.2 对于 make项目(Makefile), 需要一些额外工具才能配合make 去生成 被clangd使用的 compilation_commands.json
-# 1.2.1 使用 Build EAR (bear), (通过追踪system calls，来记录实际编译的命令)
-sudo apt install bear
-bear -- make
-# 1.2.2 使用python的compiledb (不会追踪system calls，更兼容多平台)
-pip install --user compiledb
-python3 -m compiledb -n make
-
-```
 
 | 快捷键 | 功能 |
 |--------|------|
