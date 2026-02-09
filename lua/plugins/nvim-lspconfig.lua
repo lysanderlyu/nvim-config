@@ -64,22 +64,22 @@ return {
     lazy = false,
     config = function()
         local servers = { 
-            "clangd",      -- clang
-            "cmake",      -- cmake
-            "pyright",      -- Python
-            "bashls",       -- Bash
-            "jdtls",        -- Java
-            "lua_ls",       -- Lua
-            "jsonls",         -- JSON (fixed from "json-lsp")
-            "yamlls",      -- yaml
-            "html",         -- HTML (fixed from "html-lsp")
-            "rust_analyzer", -- Rust (fixed from "rust-analyzer")
-            "kotlin_language_server", -- Kotlin (fixed from "kotlin-language-server")
-            "arduino_language_server", -- Arduino (fixed from "arduino-language-server")
-            "dockerls",     -- Docker (fixed from "docker-language-server")
-            "sqlls",     -- Sql
-            "systemd_lsp",     -- Sql
-            }
+        "clangd",                   -- clang
+        "cmake",                    -- cmake
+        "pyright",                  -- Python
+        "bashls",                   -- Bash
+        "jdtls",                    -- Java
+        "lua_ls",                   -- Lua
+        "jsonls",                   -- JSON
+        "yamlls",                   -- yaml
+        "html",                     -- HTML
+        "rust_analyzer",            -- Rust
+        "kotlin_language_server",   -- Kotlin
+        "arduino_language_server",  -- Arduino
+        "dockerls",                 -- Docker
+        "sqlls",                    -- Sql
+        "systemd_lsp",              -- Systemd
+        }
 
         for _, server in ipairs(servers) do
             vim.lsp.config(server, {
