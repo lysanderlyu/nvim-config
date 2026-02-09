@@ -45,25 +45,57 @@ return {
         -- "csharp-language-server", -- csharp (commented out)
       }
 
-      -- Platform-specific logic
+      --------------------------------------------------
+      -- Platform filter (ARM)
+      --------------------------------------------------
       if jit and jit.os == "Linux" and jit.arch == "arm64" then
-        -- Remove unsupported servers on ARM64
-        local filtered = {}
-        for _, server in ipairs(ensure_installed) do
-          if server ~= "clangd" and server ~= "cmake" and server ~= "systemd_lsp" then
-            table.insert(filtered, server)
+        local arm_safe = {}
+        local allowed = {
+          clangd=false,
+          cmake=false,
+          bashls=true,
+          lua_ls=true,
+          pyright=true,
+          systemd_ls=true,
+        }
+
+        for _, s in ipairs(ensure_installed) do
+          if allowed[s] then
+            table.insert(arm_safe, s)
           end
         end
+
+        ensure_installed = arm_safe
+      end
+
+      --------------------------------------------------
+      -- npm check (only remove node-based servers)
+      --------------------------------------------------
+      if vim.fn.executable("npm") ~= 1 then
+        local node_servers = {
+          "clangd",
+          "cmake",
+          "bashls",
+          "pyright",
+          "html",
+          "jsonls",
+          "yamlls",
+          "dockerls",
+          "sqlls",
+        }
+
+        local filtered = {}
+        for _, s in ipairs(ensure_installed) do
+          local remove = false
+          for _, ns in ipairs(node_servers) do
+            if s == ns then remove = true end
+          end
+          if not remove then
+            table.insert(filtered, s)
+          end
+        end
+
         ensure_installed = filtered
-      elseif jit and jit.os == "Linux" and jit.arch == "x86_64" then
-        -- -- Optionally handle x86_64 differently if needed (e.g., remove cmake-language-server)
-        -- local filtered = {}
-        -- for _, server in ipairs(ensure_installed) do
-        --   if server ~= "cmake" then
-        --     table.insert(filtered, server)
-        --   end
-        -- end
-        -- ensure_installed = filtered
       end
 
       return {
