@@ -27,6 +27,7 @@ return {
     dependencies = { "mason.nvim" },
     opts = function()
       local ensure_installed = {
+        "clangd",      -- clang
         "cmake",      -- cmake
         "pyright",      -- Python
         "bashls",       -- Bash
@@ -44,7 +45,7 @@ return {
         -- "csharp-language-server", -- csharp
       }
 
-      -- Check if we're on Linux ARM64
+     -- Check if we're on Linux ARM64 
       if jit and jit.os == "Linux" and jit.arch == "arm64" then
         -- Remove clangd from the list for Linux ARM64
         for i, server in ipairs(ensure_installed) do
@@ -53,11 +54,25 @@ return {
             break
           end
         end
+        -- Remove cmake-language-server from the list for Linux ARM64
+        for i, server in ipairs(ensure_installed) do
+          if server == "cmake" then
+            table.remove(ensure_installed, i)
+            break
+          end
+        end
+        -- Remove systemd_lsp from the list for Linux ARM64
+        for i, server in ipairs(ensure_installed) do
+          if server == "systemd_lsp" then
+            table.remove(ensure_installed, i)
+            break
+          end
+        end
       else
-        -- Add clangd for other platforms
         table.insert(ensure_installed, "clangd")
+        table.insert(ensure_installed, "cmake")
+        table.insert(ensure_installed, "systemd_lsp")
       end
-
       return {
         ensure_installed = ensure_installed,
         automatic_installation = true,
