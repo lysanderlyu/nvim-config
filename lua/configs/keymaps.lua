@@ -2,8 +2,12 @@ local builtin = require("telescope.builtin")
 local opts = { noremap = true, silent = true }
 
 -- Custom command key
--- Quick select all the text
-vim.keymap.set("n", "<leader>;a", "ggVG$", { desc = "Select All" })
+-- Quick select all the text with a delay
+vim.keymap.set("n", "<leader>;a", function()
+    vim.defer_fn(function()
+        vim.cmd("normal! ggvG$")
+    end, 50)
+end, { desc = "Select All" })
 
 -- Quick copy current file to clipboard
 vim.keymap.set(
