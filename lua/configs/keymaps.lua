@@ -5,7 +5,7 @@ local opts = { noremap = true, silent = true }
 -- Quick select all the text with a delay
 vim.keymap.set("n", "<leader>;a", function()
     vim.defer_fn(function()
-        vim.cmd("normal! ggvG$")
+        vim.cmd("normal! gg0vG$")
     end, 50)
 end, { desc = "Select All" })
 
