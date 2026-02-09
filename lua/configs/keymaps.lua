@@ -3,7 +3,7 @@ local opts = { noremap = true, silent = true }
 
 -- Custom command key
 -- Quick select all the text
-vim.keymap.set("n", "<leader>;a", "ggVG", { desc = "Select All" })
+vim.keymap.set("n", "<leader>;a", "ggVG$", { desc = "Select All" })
 
 -- tab keymaps
 vim.keymap.set("n", "<leader>tq", ":tabclose<cr>", { desc = "Close tab" })
