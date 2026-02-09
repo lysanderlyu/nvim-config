@@ -27,52 +27,45 @@ return {
     dependencies = { "mason.nvim" },
     opts = function()
       local ensure_installed = {
-        "clangd",      -- clang
-        "cmake",      -- cmake
-        "pyright",      -- Python
-        "bashls",       -- Bash
-        "jdtls",        -- Java
-        "lua_ls",       -- Lua
-        "jsonls",         -- JSON (fixed from "json-lsp")
-        "yamlls",      -- yaml
-        "html",         -- HTML (fixed from "html-lsp")
-        "rust_analyzer", -- Rust (fixed from "rust-analyzer")
-        "kotlin_language_server", -- Kotlin (fixed from "kotlin-language-server")
-        "arduino_language_server", -- Arduino (fixed from "arduino-language-server")
-        "dockerls",     -- Docker (fixed from "docker-language-server")
-        "sqlls",     -- Sql
-        "systemd_lsp",     -- Systemd
-        -- "csharp-language-server", -- csharp
+        "clangd",                   -- clang
+        "cmake",                    -- cmake
+        "pyright",                  -- Python
+        "bashls",                   -- Bash
+        "jdtls",                    -- Java
+        "lua_ls",                   -- Lua
+        "jsonls",                   -- JSON
+        "yamlls",                   -- yaml
+        "html",                     -- HTML
+        "rust_analyzer",            -- Rust
+        "kotlin_language_server",   -- Kotlin
+        "arduino_language_server",  -- Arduino
+        "dockerls",                 -- Docker
+        "sqlls",                    -- Sql
+        "systemd_lsp",              -- Systemd
+        -- "csharp-language-server", -- csharp (commented out)
       }
 
-     -- Check if we're on Linux ARM64 
+      -- Platform-specific logic
       if jit and jit.os == "Linux" and jit.arch == "arm64" then
-        -- Remove clangd from the list for Linux ARM64
-        for i, server in ipairs(ensure_installed) do
-          if server == "clangd" then
-            table.remove(ensure_installed, i)
-            break
+        -- Remove unsupported servers on ARM64
+        local filtered = {}
+        for _, server in ipairs(ensure_installed) do
+          if server ~= "clangd" and server ~= "cmake" and server ~= "systemd_lsp" then
+            table.insert(filtered, server)
           end
         end
-        -- Remove cmake-language-server from the list for Linux ARM64
-        for i, server in ipairs(ensure_installed) do
-          if server == "cmake" then
-            table.remove(ensure_installed, i)
-            break
-          end
-        end
-        -- Remove systemd_lsp from the list for Linux ARM64
-        for i, server in ipairs(ensure_installed) do
-          if server == "systemd_lsp" then
-            table.remove(ensure_installed, i)
-            break
-          end
-        end
-      else
-        table.insert(ensure_installed, "clangd")
-        table.insert(ensure_installed, "cmake")
-        table.insert(ensure_installed, "systemd_lsp")
+        ensure_installed = filtered
+      elseif jit and jit.os == "Linux" and jit.arch == "x86_64" then
+        -- -- Optionally handle x86_64 differently if needed (e.g., remove cmake-language-server)
+        -- local filtered = {}
+        -- for _, server in ipairs(ensure_installed) do
+        --   if server ~= "cmake" then
+        --     table.insert(filtered, server)
+        --   end
+        -- end
+        -- ensure_installed = filtered
       end
+
       return {
         ensure_installed = ensure_installed,
         automatic_installation = true,
