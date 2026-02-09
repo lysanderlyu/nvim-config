@@ -3,7 +3,7 @@ local opts = { noremap = true, silent = true }
 
 -- Custom command key
 -- Quick select all the text
-vim.keymap.set("n", "<leader>;a", "ggVG", { desc = "Select All" })
+vim.keymap.set("n", "<leader>;a", "ggVG$", { desc = "Select All" })
 
 -- Quick copy current file to clipboard
 vim.keymap.set(
