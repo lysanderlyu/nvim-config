@@ -2,9 +2,6 @@
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = ''
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 4
-vim.opt.softtabstop = 4
 vim.o.wrap = false
 vim.g.mapleader = " "
 vim.o.cmdheight = 1
@@ -13,6 +10,34 @@ vim.opt.showcmdloc = 'statusline'
 vim.o.showmode = false
 vim.lsp.set_log_level("ERROR")
 vim.g.fzf_layout = { window = {width = 0.8, height = 0.9 } }
+
+-- Dynamic switch tab size
+-- Default: 4 spaces
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
+vim.opt.expandtab = true
+
+-- Function to detect Linux kernel style
+local function detect_kernel_style()
+    -- Search upward for Kconfig file
+    local kconfig = vim.fn.findfile("Kconfig", ".;")
+    if kconfig ~= "" then
+        vim.opt_local.tabstop = 8
+        vim.opt_local.shiftwidth = 8
+        vim.opt_local.softtabstop = 8
+        vim.opt_local.expandtab = false
+    end
+end
+
+-- Autocommand group
+local group = vim.api.nvim_create_augroup("KernelStyle", { clear = true })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    group = group,
+    pattern = { "*.c", "*.h" },
+    callback = detect_kernel_style,
+})
 
 -- Enable folding
 vim.opt.foldmethod = "expr"
