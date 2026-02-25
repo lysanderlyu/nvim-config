@@ -75,3 +75,27 @@ vim.api.nvim_create_autocmd("FileType", {
     end, { buffer = true, desc = "Open file in vsplit" })
   end,
 })
+
+-- Force Linux_Arch / kernel style inside Markdown
+local function detect_kernel_style()
+    local filepath = vim.fn.expand("%:p")
+    -- Convert to lowercase to ignore case
+    local filepath_lower = string.lower(filepath)
+    
+    -- Check for "linux_arch" anywhere in the path
+    -- 'plain = true' ensures brackets like [Chapter 1] don't break the search
+    local in_linux_arch = string.find(filepath_lower, "linux_arch", 1, true) ~= nil
+    local has_kconfig = vim.fn.findfile("Kconfig", ".;") ~= ""
+
+    if in_linux_arch or has_kconfig then
+        vim.opt_local.tabstop = 8
+        vim.opt_local.shiftwidth = 8
+        vim.opt_local.softtabstop = 8
+        vim.opt_local.expandtab = false -- Uses real tabs (\t), not spaces
+    end
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "markdown",
+    callback = detect_kernel_style,
+})
