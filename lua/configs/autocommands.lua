@@ -88,12 +88,12 @@ local function detect_kernel_style()
     local has_kconfig = vim.fn.findfile("Kconfig", ".;") ~= ""
 
     if in_linux_arch or has_kconfig then
-        vim.opt_local.wrap = true
         vim.opt_local.tabstop = 8
         vim.opt_local.shiftwidth = 8
         vim.opt_local.softtabstop = 8
         vim.opt_local.expandtab = false -- Uses real tabs (\t), not spaces
     end
+    vim.opt_local.wrap = true
 end
 
 vim.api.nvim_create_autocmd("FileType", {
