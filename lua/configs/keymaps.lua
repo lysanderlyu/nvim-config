@@ -12,6 +12,20 @@ end, { desc = "Select All" })
 -- Set Tab to toggle fold on normal mode
 vim.keymap.set("n", "<Tab>", "za", { noremap = true, silent = true })
 
+-- Toggle all folds
+vim.keymap.set('n', '<S-Tab>', function()
+    local current_line = vim.fn.line('.')
+
+    -- Check if the current line is in a closed fold
+    if vim.fn.foldlevel(current_line) > 0 and vim.fn.foldclosed(current_line) ~= -1 then
+        -- Open the fold at current line
+        vim.cmd('normal! zR')
+    else
+        -- Close folds
+        vim.cmd('normal! zM')
+    end
+end)
+
 -- tab keymaps
 vim.keymap.set("n", "<leader>tq", ":tabclose<cr>", { desc = "Close tab" })
 vim.keymap.set("n", "<leader>;0", ":tablast<cr>", { desc = "Last Tab" })
