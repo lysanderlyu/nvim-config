@@ -106,6 +106,8 @@ nvim
 | `<leader>sg` | 打开文本全局搜索框 |
 | `<leader>ss` | 将当前`"`寄存器的文本进行全局搜索 |
 | `<leader>sS` | 将当前`+`寄存器（也就是系统剪切板）的文本进行全局搜索 |
+| `tab` | Normal 模式下，按Tab会打开/折叠当前块 |
+| `shift-tab` | Normal 模式下，按Shift+Tab会打开/折叠所有块 |
 | `<leader>tl` | 使用谷歌翻译当前行 |
 | `T` | 使用谷歌翻译当前字 |
 | `<leader>n<leader>tr` | 使用谷歌翻译n行 |
