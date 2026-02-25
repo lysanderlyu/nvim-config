@@ -9,6 +9,9 @@ vim.keymap.set("n", "<leader>;a", function()
     end, 50)
 end, { desc = "Select All" })
 
+-- Set Tab to toggle fold on normal mode
+vim.keymap.set("n", "<Tab>", "za", { noremap = true, silent = true })
+
 -- Quick copy current file to clipboard
 vim.keymap.set(
   "n",
