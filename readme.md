@@ -263,6 +263,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>sC` | 打开系统终端 |
 | `<leader>cp` | 编译当前的Plantuml文件并打开生成的PNG |
 | `<leader>cP` | 编译当前的Plantuml文件到PNG但不打开 |
+| `<leader>pt` | 将当前的Puml文件用浏览器预览/停止预览 |
+| `<leader>ps` | 将当前的Puml文件保存为其它格式，默认是png |
 | `<leader>v` | 进入ASCII画图模式 |
 
 > 以下快捷键是进入venn画图模式时所使用
