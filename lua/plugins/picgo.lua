@@ -6,6 +6,6 @@ return {
       require("nvim-picgo").setup()
     end,
     -- For picgo
-    vim.keymap.set("n", "<leader>p", ":UploadClipboard<CR>")
+    vim.keymap.set("n", "<leader>pi", ":UploadClipboard<CR>")
   }
 }

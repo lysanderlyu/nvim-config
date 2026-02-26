@@ -24,7 +24,7 @@ return {
       },
     },
     keys = {
-      { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard and store it on assets dir" },
+      { "<leader>Pi", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard and store it on assets dir" },
     },
     config = function(_, opts)
       require("img-clip").setup(opts)
