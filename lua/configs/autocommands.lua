@@ -85,9 +85,33 @@ local function detect_kernel_style()
     -- Check for "linux_arch" anywhere in the path
     -- 'plain = true' ensures brackets like [Chapter 1] don't break the search
     local in_linux_arch = string.find(filepath_lower, "linux_arch", 1, true) ~= nil
-    local has_kconfig = vim.fn.findfile("Kconfig", ".;") ~= ""
-
-    if in_linux_arch or has_kconfig then
+    
+    -- Check if Kconfig exists in current directory or any parent directory
+    local kconfig_found = false
+    local current_dir = vim.fn.fnamemodify(filepath,":h")
+    local root_dir = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null || echo \"\""):gsub("\n$", "")
+    
+    -- Check in current directory and parent directories
+    while current_dir ~= "" and current_dir ~= "/" do
+        if vim.fn.filereadable(current_dir .. "/Kconfig") == 1 then
+            kconfig_found = true
+            break
+        end
+        
+        -- If we have a git repo, stop at the root
+        if root_dir ~= "" and current_dir == root_dir then
+            break
+        end
+        
+        -- Move to parent directory
+        local parent_dir = vim.fn.fnamemodify(current_dir,":h")
+        if parent_dir == current_dir then
+            break
+        end
+        current_dir = parent_dir
+    end
+    
+    if in_linux_arch or kconfig_found then
         vim.opt_local.tabstop = 8
         vim.opt_local.shiftwidth = 8
         vim.opt_local.softtabstop = 8
@@ -97,6 +121,6 @@ local function detect_kernel_style()
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "markdown",
+    pattern = {"markdown", "rst"},
     callback = detect_kernel_style,
 })
