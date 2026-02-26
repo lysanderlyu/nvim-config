@@ -83,6 +83,14 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "qml_filetype",
 })
 
+-- parse .drawio file as xml 
+vim.api.nvim_create_augroup("drawio_filetype", { clear = true })
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = "*.drawio",
+    command = "set filetype=xml",
+    group = "drawio_filetype",
+})
+
 -- DownLoad lazy if not exits
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
