@@ -10,6 +10,7 @@ return {
         "lua",
         "css",
         "html",
+        "plantuml",
         -- Global settings for everything else
         ["*"] = {
           RGB = true,         -- #RGB hex codes
