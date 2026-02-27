@@ -116,11 +116,15 @@ local function detect_kernel_style()
         vim.opt_local.shiftwidth = 8
         vim.opt_local.softtabstop = 8
         vim.opt_local.expandtab = false -- Uses real tabs (\t), not spaces
+        -- Special handling for .txt files: convert to rst filetype
+        if vim.bo.filetype == "text" then
+            vim.api.nvim_buf_set_option(vim.api.nvim_get_current_buf(), "filetype", "rst")
+        end
     end
     vim.opt_local.wrap = true
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = {"markdown", "rst"},
+    pattern = {"markdown", "rst", "text"},
     callback = detect_kernel_style,
 })
