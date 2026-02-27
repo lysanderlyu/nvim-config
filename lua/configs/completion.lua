@@ -42,6 +42,9 @@ cmp.setup({
     { name = "buffer" },
     { name = "path" },
     { name = "dictionary", keyword_length = 4, max_item_count = 15 },
+    per_filetype = {
+      codecompanion = { "codecompanion" },
+    }
   }),
 })
 

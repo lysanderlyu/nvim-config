@@ -18,6 +18,11 @@ return {
         markdown = {
           template = "![$LABEL]($FILE_PATH)",
         },
+        codecompanion = {
+          prompt_for_file_name = false,
+          template = "[Image]($FILE_PATH)",
+          use_absolute_path = true,
+        },
         tex = {
           template = "\\includegraphics{$FILE_PATH}",
         },

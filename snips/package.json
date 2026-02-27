@@ -201,7 +201,7 @@
                 "path": "./snippets/shell/shelldoc.json"
             },
             {
-                "language": ["markdown", "rmd"],
+                "language": ["markdown", "rmd", "codecompanion"],
                 "path": "./snippets/markdown.json"
             },
             {
