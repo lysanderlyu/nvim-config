@@ -84,7 +84,7 @@ local function detect_kernel_style()
     
     -- Check for "linux_arch" anywhere in the path
     -- 'plain = true' ensures brackets like [Chapter 1] don't break the search
-    local in_linux_arch = string.find(filepath_lower, "linux_arch", 1, true) ~= nil
+    local in_linux_arch = string.find(filepath_lower, "linux", 1, true) ~= nil
     
     -- Check if Kconfig exists in current directory or any parent directory
     local kconfig_found = false
