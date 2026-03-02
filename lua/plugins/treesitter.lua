@@ -11,7 +11,7 @@ return {
       require("nvim-treesitter.configs").setup {
         ensure_installed = {
           "c", "cpp", "java", "kotlin", "python", "bash",
-          "make", "cmake", "json", "yaml", "toml",
+          "make", "cmake","bitbake", "json", "yaml", "toml",
           "rust", "xml", "html", "css", "proto",
           "asm", "nasm", "markdown", "gitcommit",
           "lua", "c_sharp", "diff", "passwd",
