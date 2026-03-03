@@ -64,6 +64,10 @@ return {
           "pdf",
           "icns",
         },
+        doc = {
+          max_width = 120,
+          max_height = 40,
+        },
       } or {
         enabled = false,
       },
