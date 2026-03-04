@@ -77,11 +77,19 @@ return {
         "rust_analyzer",            -- Rust
         "kotlin_language_server",   -- Kotlin
         "arduino_language_server",  -- Arduino
-        -- "language-server-bitbake",  -- Bitbake
+        "bitbake_language_server",  -- Bitbake
         "dockerls",                 -- Docker
         "sqlls",                    -- Sql
         "systemd_lsp",              -- Systemd
         }
+        -- Register BitBake LSP
+        vim.lsp.config("bitbake_language_server", {
+            cmd = { 
+                    "node", 
+                    vim.env.HOME .. "/.local/share/nvim/mason/bin/language-server-bitbake", 
+                    "--stdio" 
+                },
+        })
 
         for _, server in ipairs(servers) do
             vim.lsp.config(server, {
