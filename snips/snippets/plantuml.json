@@ -212,6 +212,11 @@
         "body": "@startuml\n!theme mars\nskinparam ConditionEndStyle hline\nskinparam dpi 300\n\n$1\n@enduml",
         "description": "Inside $1 begin defining your diagram"
     },
+    "Start json Template": {
+        "prefix": "startjson",
+        "body": "@startjson\n{\n    $1\n}\n@endjson",
+        "description": "Inside $1 begin defining your json"
+    },
     "Use Arrow (left)": {
         "prefix": ">",
         "body": " --> $1",
