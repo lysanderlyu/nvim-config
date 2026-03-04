@@ -66,6 +66,7 @@ return {
         local servers = { 
         "clangd",                   -- clang
         "cmake",                    -- cmake
+        "vimls",                    -- vimls
         "pyright",                  -- Python
         "bashls",                   -- Bash
         "jdtls",                    -- Java
@@ -76,6 +77,7 @@ return {
         "rust_analyzer",            -- Rust
         "kotlin_language_server",   -- Kotlin
         "arduino_language_server",  -- Arduino
+        -- "language-server-bitbake",  -- Bitbake
         "dockerls",                 -- Docker
         "sqlls",                    -- Sql
         "systemd_lsp",              -- Systemd

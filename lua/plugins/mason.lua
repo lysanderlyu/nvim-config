@@ -28,6 +28,7 @@ return {
     opts = function()
       local ensure_installed = {
         "clangd",                   -- clang
+        "vimls",                    -- vimls
         "cmake",                    -- cmake
         "pyright",                  -- Python
         "bashls",                   -- Bash
@@ -39,6 +40,7 @@ return {
         "rust_analyzer",            -- Rust
         "kotlin_language_server",   -- Kotlin
         "arduino_language_server",  -- Arduino
+        -- "language-server-bitbake",  -- Bitbake
         "dockerls",                 -- Docker
         "sqlls",                    -- Sql
         "systemd_lsp",              -- Systemd
@@ -52,6 +54,7 @@ return {
         local arm_safe = {}
         local allowed = {
           clangd=false,
+          vimls=true,
           cmake=false,
           bashls=true,
           lua_ls=true,
@@ -74,6 +77,7 @@ return {
       if vim.fn.executable("npm") ~= 1 then
         local node_servers = {
           "clangd",
+          "vimls",
           "cmake",
           "bashls",
           "pyright",
