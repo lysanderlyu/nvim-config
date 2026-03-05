@@ -99,6 +99,14 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "gitsendemail_filetype",
 })
 
+-- parse .inc file as bitbake 
+vim.api.nvim_create_augroup("bitbake_filetype", { clear = true })
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = "*.inc",
+    command = "set filetype=bitbake",
+    group = "bitbake_filetype",
+})
+
 -- DownLoad lazy if not exits
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
