@@ -91,6 +91,14 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "drawio_filetype",
 })
 
+-- parse gitsendemail file as diff 
+vim.api.nvim_create_augroup("gitsendemail_filetype", { clear = true })
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = "*.patch",
+    command = "set filetype=diff",
+    group = "gitsendemail_filetype",
+})
+
 -- DownLoad lazy if not exits
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
