@@ -8,10 +8,10 @@ return {
       { "<leader>ao", "<cmd>AerialToggle<CR>", desc = "Aerial Outline" },
     },
     opts = {
-      backends = { "treesitter"},
+      backends = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
       lazy_load = true,
       layout = {
-        min_width = 30,
+        min_width = 10,
       },
       filter_kind = {
         "Class",
