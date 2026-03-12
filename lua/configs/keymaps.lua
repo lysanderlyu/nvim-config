@@ -262,8 +262,8 @@ local function view_dtb()
     return
   end
 
-  if not file:match("%.dtb$") then
-    print("Not a DTB file")
+  if not file:match("%.dtb$") and not file:match("%.dtbo$") then
+    print("Not a DTB or DTBO file")
     return
   end
 
