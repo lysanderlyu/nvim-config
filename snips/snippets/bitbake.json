@@ -33,7 +33,7 @@
             "EXTRA_OECONF += \"${16:--enable-feature --disable-option --with-libraries=${STAGING_DIR}}\"",
             "",
             "# Package configuration",
-            "PACKAGES =+ \"${17:${PN}-dev ${PN}-doc}\"",
+            "PACKAGES =+ \"${17:\\${PN\\}-dev \\${PN\\}-doc}\"",
             "",
             "# Files to include in packages",
             "FILES_${PN} = \"${18:${bindir}/* ${libdir}/lib*.so.*}\"",
