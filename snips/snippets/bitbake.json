@@ -54,7 +54,6 @@
             "}",
             "",
             "# Cleaning configuration",
-            "CLEANBB = \"yes\"",
             "",
             "# Additional metadata",
             "SECTION = \"${21:devel}\"",
@@ -140,7 +139,6 @@
             "}",
             "",
             "# Cleaning configuration",
-            "CLEANBB = \"yes\"",
             "",
             "# Additional metadata",
             "SECTION = \"${26:devel}\""
@@ -274,7 +272,6 @@
             "}",
             "",
             "# Cleaning configuration",
-            "CLEANBB = \"yes\"",
             "",
             "# Additional metadata",
             "SECTION = \"${20:devel}\""
