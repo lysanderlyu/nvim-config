@@ -60,7 +60,6 @@ return {
         },
 
         hijack_cursor = true,
-
         renderer = {
           indent_markers = { enable = true },
           highlight_opened_files = "icon",
@@ -86,7 +85,11 @@ return {
           ignore = false,     -- show ignored files
           timeout = 500,
         },
-
+        modified = {
+          enable = true,
+          show_on_dirs = true,
+          show_on_open_dirs = true,
+        },
         sync_root_with_cwd = true,
         respect_buf_cwd = true,
       }
@@ -99,11 +102,11 @@ return {
       -- Git-only toggle/open function
       -- ======================================
       local function toggle_tree_git_only()
-        local tree_view = require("nvim-tree.view")
         local api = require("nvim-tree.api")
+        local tree_view = api.tree
 
         if tree_view.is_visible() then
-          tree_view.close()
+          tree_view.close_in_this_tab()()
         else
           require("nvim-tree").setup({
             filters = {
@@ -157,13 +160,12 @@ return {
       )
 
       local function open_normal_tree()
-        local tree_view = require("nvim-tree.view")
         local api = require("nvim-tree.api")
+        local tree_view = api.tree
       
         if tree_view.is_visible() then
-          tree_view.close()
+          tree_view.close_in_this_tab()
         else
-
         require("nvim-tree").setup {
           disable_netrw = true,
           hijack_netrw = true,
