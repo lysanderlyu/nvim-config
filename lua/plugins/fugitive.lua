@@ -33,7 +33,7 @@ return {
         vim.keymap.set("n", "<leader>ga", ":Git add %<CR>")
         vim.keymap.set("n", "<leader>gA", ":Git add -A<CR>")
         vim.keymap.set("n", "<leader>gco", ":Git checkout %<CR>")
-        vim.keymap.set("n", "<leader>gd", ":Gdiffsplit<CR>")
+        vim.keymap.set("n", "<leader>gd", ":Gvdiffsplit<CR>")
         vim.keymap.set("n", "<leader>gr", ":Git reset --mixed -- %<CR>")
         vim.keymap.set("n", "<leader>gra", ":Git reset --mixed<CR>")
         vim.keymap.set("n", "<leader>grs", ":Git reset --soft HEAD~1<CR>")
