@@ -224,7 +224,8 @@
             "### 1. Hardware Verification",
             "### 2. Kernel Driver Development",
             "### 3. Device Tree Configuration",
-            "### 4. Debuging and Testing"
+            "### 4. Debuging and Testing",
+            "### 5. Related Concepts"
         ],
         "description": "Insert porting draft"
     },
