@@ -74,7 +74,7 @@ return {
               },
             },
             opts = {
-              system_prompt = "My personal AI, as my Second brain",
+              system_prompt = "My personal AI, As my Second brain",
             },
           },
           inline = { 
@@ -110,7 +110,8 @@ return {
                 },
                 schema = {
                   model = {
-                    default = "qwen/qwen3-coder-30b",
+                    -- default = "qwen/qwen3-coder-30b",
+                    default = "qwen/qwen3.5-35b-a3b",
                     -- default = "google/gemma-3-27b",
                     -- default = "openai/gpt-oss-20b",
                   },
