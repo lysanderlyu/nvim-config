@@ -25,7 +25,7 @@
                 "path": "./snippets/c/c.json"
             },
             {
-                "language": "c",
+                "language": ["c", "cpp"],
                 "path": "./snippets/c/mcu.json"
             },
             {
