@@ -26,6 +26,10 @@
             },
             {
                 "language": "c",
+                "path": "./snippets/c/mcu.json"
+            },
+            {
+                "language": "c",
                 "path": "./snippets/c/cdoc.json"
             },
             {
