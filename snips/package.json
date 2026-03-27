@@ -213,7 +213,7 @@
                 "path": "./snippets/latex.json"
             },
             {
-                "language": "plantuml",
+                "language": ["plantuml", "markdown"],
                 "path": "./snippets/plantuml.json"
             },
             {
