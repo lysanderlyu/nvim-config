@@ -214,7 +214,7 @@
     },
     "Start Uml Template": {
         "prefix": "startuml",
-        "body": "@startuml\n!theme mars\nskinparam ConditionEndStyle hline\nskinparam dpi 300\n\n$1\n@enduml",
+        "body": "@startuml\n!theme mars\nskinparam ConditionEndStyle hline\nskinparam dpi 100\n\n$1\n@enduml",
         "description": "Inside $1 begin defining your diagram"
     },
     "Start json Template": {
