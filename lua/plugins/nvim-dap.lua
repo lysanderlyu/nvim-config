@@ -61,7 +61,7 @@ return {
       { "<leader>dq", function() 
           require("dap").terminate()
           require("dapui").close()
-          run_sudo("sudo pkill -f openocd")
+          -- run_sudo("sudo pkill -f openocd")
         end, desc = "Stop Debugging" 
       }
     },
@@ -104,57 +104,56 @@ return {
       
           -- Ask OpenOCD interface
           vim.ui.input({
-            prompt = "OpenOCD interface file:",
-            default = "interface/stlink.cfg",
+            prompt = "Select the GDB program for the target program, leave it empty will select the arch default",
+            default = "",
           }, function(interface)
-            if not interface or interface == "" then return end
+          -- if not interface or interface == "" then return end
       
-            vim.ui.input({
-              prompt = "OpenOCD target file:",
-              default = "target/stm32f1x.cfg",
-            }, function(target)
-              if not target or target == "" then return end
+          -- vim.ui.input({
+          --   prompt = "Select the GDB program for the target program, leave it empty will select the arch default",
+          --   default = "",
+          -- }, function(target)
+          -- if not target or target == "" then return end
       
-              -- Launch OpenOCD if needed
-              if vim.fn.system("lsof -i :3333") == "" then
-                print("Launching OpenOCD...")
-                vim.fn.jobstart(
-                  string.format("sudo openocd -f %s -f %s", interface, target),
-                  { detach = true }
-                )
-                vim.wait(2000)
-              end
+          -- -- Launch OpenOCD if needed
+          -- if vim.fn.system("lsof -i :3333") == "" then
+          --   print("Launching OpenOCD...")
+          --   vim.fn.jobstart(
+          --     string.format("sudo openocd -f %s -f %s", interface, target),
+          --     { detach = true }
+          --   )
+          --   vim.wait(2000)
+          -- end
       
-              -- UI cleanup
-              vim.api.nvim_buf_delete(0, { force = true })
+          -- UI cleanup
+          vim.api.nvim_buf_delete(0, { force = true })
       
-              -- Adapter
-              dap.adapters.gdb = {
-                type = "executable",
-                command = gdb_path,
-                args = { "--interpreter=dap", "--quiet" },
-              }
+          -- Adapter
+          dap.adapters.gdb = {
+            type = "executable",
+            command = gdb_path,
+            args = { "--interpreter=dap", "--quiet" },
+          }
       
-              -- Run DAP
-              dap.run({
-                name = "Hardware: " .. file_name,
-                type = "gdb",
-                request = "attach",
-                target = "localhost:3333",
-                program = elf_path,
-                cwd = vim.fn.getcwd(),
-                stopOnEntry = true,
-                setupCommands = {
-                  { text = "target remote :3333" },
-                  { text = "monitor reset halt" },
-                  { text = "set breakpoint pending on" },
-                  { text = "load" },
-                  { text = "set print pretty on" },
-                },
-              })
-      
-              require("dapui").open()
-            end)
+          -- Run DAP
+          dap.run({
+            name = "Hardware: " .. file_name,
+            type = "gdb",
+            request = "attach",
+            -- target = "localhost:3333",
+            program = elf_path,
+            cwd = vim.fn.getcwd(),
+            stopOnEntry = true,
+            setupCommands = {
+              -- { text = "target remote :3333" },
+              -- { text = "monitor reset halt" },
+              -- { text = "set breakpoint pending on" },
+              -- { text = "load" },
+              -- { text = "set print pretty on" },
+            },
+          })
+         
+            require("dapui").open()
           end)
         end
       
@@ -168,7 +167,7 @@ return {
             default = vim.fn.getcwd() .. "/",
             completion = "file",
           }, function(path)
-            if path and detect_elf_arch(path) == "arm32" then
+            if path and detect_elf_arch(path) ~= "unkown" then
               start_debug(path)
             else
               print("Not a valid ARM ELF")
