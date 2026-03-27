@@ -4,6 +4,11 @@
         "body": "\"$1\"",
         "description": "Describe the activity being done"
     },
+    "Bold Text": {
+        "prefix": "b",
+        "body": "<b>$1</b>$0",
+        "description": "Bold the text for plantuml notes"
+    },
     "Actor": {
         "prefix": "act",
         "body": "actor $0",
