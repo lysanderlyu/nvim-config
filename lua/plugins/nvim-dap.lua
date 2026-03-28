@@ -17,24 +17,39 @@ return {
 
       -- 2. DAP UI Setup (Custom Layout for Registers)
       dapui.setup({
+        controls = {
+          element = "repl",
+          enabled = true,
+          icons = {
+            disconnect = "",
+            pause = "",
+            play = "",
+            run_last = "",
+            step_back = "",
+            step_into = "",
+            step_out = "",
+            step_over = "",
+            terminate = ""
+          }
+        },
         layouts = {
           {
             elements = {
-              { id = "scopes", size = 0.50 }, -- Increased size for registers/variables
-              { id = "breakpoints", size = 0.15 },
+              { id = "scopes", size = 0.75 }, -- Increased size for registers/variables
               { id = "stacks", size = 0.20 },
-              { id = "watches", size = 0.15 },
+              { id = "watches", size = 0.05 },
             },
             position = "left",
-            size = 45, -- Width of the sidebar in columns
+            size = 60, -- Width of the sidebar in columns
           },
           {
             elements = {
-              { id = "repl", size = 0.6 },
-              { id = "console", size = 0.4 },
+              { id = "breakpoints", size = 0.15 },
+              { id = "repl", size = 0.85 },
+              -- { id = "console", size = 0.3 },
             },
             position = "bottom",
-            size = 10, -- Height of the bottom tray
+            size = 15, -- Height of the bottom tray
           },
         },
       })
@@ -59,20 +74,9 @@ return {
           end,
           program = function()
             -- We store this in a variable so we can use it for the 'file' command
-            local path = vim.fn.input('Path to .elf: ', vim.fn.getcwd() .. '/', 'file')
+            local path = vim.fn.input('Path to .elf: ', vim.fn.getcwd() .. '/build/', 'file')
             return path
           end,
-          cwd = '${workspaceFolder}',
-          stopOnEntry = true,
-          setup_commands = {
-            -- 1. Load the symbols from the ELF file into GDB
-            { text = "file " .. vim.fn.getcwd() .. "/build/your_project.elf", description = "load symbols" },
-            -- 2. Optional: Flash the board (only if your server supports it)
-            { text = "load", description = "flash target" }, 
-            -- 3. Reset the hardware and halt at the reset vector
-            { text = "monitor reset halt", description = "Reset and halt the MCU", ignore_failures = true },
-            { text = "set breakpoint pending on", ignore_failures = true },
-          },
         },
       }
       dap.configurations.c = attach_config
@@ -90,9 +94,24 @@ return {
       vim.keymap.set('n', '<F11>', function() dap.step_into() end, { desc = "Debug: Step Into" })
       vim.keymap.set('n', '<F12>', function() dap.step_out() end, { desc = "Debug: Step Out" })
       vim.keymap.set('n', '<Leader>b', function() dap.toggle_breakpoint() end, { desc = "Debug: Toggle Breakpoint" })
-      vim.keymap.set('n', '<Leader>dr', function() dap.repl.open() end, { desc = "Debug: Open REPL" })
+      vim.keymap.set('n', '<Leader>B', function() require('dap').set_breakpoint() end)
+      vim.keymap.set('n', '<Leader>dap', function() dap.repl.open() end, { desc = "Debug: Open REPL" })
       vim.keymap.set('n', '<Leader>du', function() dapui.toggle() end, { desc = "Debug: Toggle UI" })
+      vim.keymap.set('n', '<Leader>dr', function()
+        local dap = require("dap")
+        -- 1. Check if a session is already active
+        if dap.session() then
+          dap.repl.execute("load")
+          dap.repl.execute("monitor reset")
+          dap.repl.execute("monitor halt")
+          dap.repl.execute("flushregs")
+          dap.continue()
+        else
+          -- 2. If no session then skip it
+        end
+      end, { desc = "Debug: Reset & Start/Continue" })
       vim.keymap.set('n', '<Leader>dc', function() require("dap").terminate() require("dapui").close() end, { desc = "Debug: Stop/Terminate Session" })
+
     end,
   },
 }
