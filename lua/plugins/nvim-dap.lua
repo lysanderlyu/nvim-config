@@ -49,7 +49,7 @@ return {
       -- 4. Configuration: Manual Attach Workflow
       -- Shared Configuration for both C and Assembly
       local attach_config = {
-        {
+      {
           name = "Attach to ARM GDB Server",
           type = "gdb",
           request = "attach",
@@ -58,18 +58,25 @@ return {
             return "localhost:" .. port
           end,
           program = function()
-            return vim.fn.input('Path to .elf: ', vim.fn.getcwd() .. '/', 'file')
+            -- We store this in a variable so we can use it for the 'file' command
+            local path = vim.fn.input('Path to .elf: ', vim.fn.getcwd() .. '/', 'file')
+            return path
           end,
           cwd = '${workspaceFolder}',
-          stopOnEntry = true, -- Stop immediately after attaching
+          stopOnEntry = true,
           setup_commands = {
+            -- 1. Load the symbols from the ELF file into GDB
+            { text = "file " .. vim.fn.getcwd() .. "/build/your_project.elf", description = "load symbols" },
+            -- 2. Optional: Flash the board (only if your server supports it)
+            { text = "load", description = "flash target" }, 
+            -- 3. Reset the hardware and halt at the reset vector
             { text = "monitor reset halt", description = "Reset and halt the MCU", ignore_failures = true },
             { text = "set breakpoint pending on", ignore_failures = true },
           },
         },
       }
       dap.configurations.c = attach_config
-      dap.configurations.asm = attach_config -- Fix for .s files
+      dap.configurations.asm = attach_config
 
       -- 5. Automation: Open/Close UI
       dap.listeners.before.attach.dapui_config = function() dapui.open() end
@@ -79,9 +86,9 @@ return {
 
       -- 6. Keybindings
       vim.keymap.set('n', '<Leader>5', function() dap.continue() end, { desc = "Debug: Start/Continue" })
-      vim.keymap.set('n', '<Leader>0', function() dap.step_over() end, { desc = "Debug: Step Over" })
-      vim.keymap.set('n', '<Leader>-', function() dap.step_into() end, { desc = "Debug: Step Into" })
-      vim.keymap.set('n', '<Leader>=', function() dap.step_out() end, { desc = "Debug: Step Out" })
+      vim.keymap.set('n', '<F10>', function() dap.step_over() end, { desc = "Debug: Step Over" })
+      vim.keymap.set('n', '<F11>', function() dap.step_into() end, { desc = "Debug: Step Into" })
+      vim.keymap.set('n', '<F12>', function() dap.step_out() end, { desc = "Debug: Step Out" })
       vim.keymap.set('n', '<Leader>b', function() dap.toggle_breakpoint() end, { desc = "Debug: Toggle Breakpoint" })
       vim.keymap.set('n', '<Leader>dr', function() dap.repl.open() end, { desc = "Debug: Open REPL" })
       vim.keymap.set('n', '<Leader>du', function() dapui.toggle() end, { desc = "Debug: Toggle UI" })
