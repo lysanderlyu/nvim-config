@@ -220,14 +220,16 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<F5>` | 开始 / 继续 |
+| `<leader>5` | 开始 / 继续 |
 | `<F10>` | 单步跳过 |
 | `<F11>` | 单步进入 |
 | `<F12>` | 单步跳出 |
 | `<leader>b` | 切换断点 |
 | `<leader>B` | 设置条件断点 |
-| `<leader>dr` | 打开 REPL |
-| `<leader>dl` | 运行上一次调试 |
+| `<leader>dap` | 打开 REPL |
+| `<leader>dr` | load, reset, halt 然后 continue 到第一个断点处 |
+| `<leader>du` | UI调试界面开/关 |
+| `<leader>dc` | 退出调试并关闭UI |
 
 ### 8. 文件Exploer侧边栏
 
