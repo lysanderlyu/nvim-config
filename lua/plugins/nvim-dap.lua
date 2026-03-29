@@ -57,7 +57,7 @@ return {
       -- 3. Adapter: ARM Embedded GDB
       dap.adapters.gdb = {
         type = "executable",
-        command = "arm-none-eabi-gdb",
+        command = "gdb",
         args = { "--interpreter=dap" }
       }
 
