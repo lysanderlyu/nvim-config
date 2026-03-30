@@ -306,7 +306,7 @@
         "!theme mars",
         "skinparam ConditionEndStyle hline",
         "skinparam conditionStyle insideDiamond",
-        "skinparam dpi 100",
+        "skinparam dpi 200",
         "",
         "$1",
         "@enduml"
@@ -379,9 +379,9 @@
             "       BackgroundColor PeachPuff",
             "   }",
             "   note {",
-            "       FontColor Blue",
-            "       LineColor Navy",
-            "       BackgroundColor #ccf",
+            "       FontColor #8b0000",
+            "       LineColor #040404",
+            "       BackgroundColor #ffffe0",
             "   }",
             "}"
         ],
