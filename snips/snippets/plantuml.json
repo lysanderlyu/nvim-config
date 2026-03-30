@@ -146,6 +146,28 @@
         ],
         "description": "The partition on activity"
     },
+    "parallel": {
+        "prefix": "fork",
+        "body": [
+            "fork",
+            ":$1;",
+            "fork again",
+            ":$2;",
+            "end fork"
+        ],
+        "description": "The fork on activity"
+    },
+    "split": {
+        "prefix": "split",
+        "body": [
+            "split",
+            ":$1;",
+            "split again",
+            ":$2;",
+            "end split"
+        ],
+        "description": "The split on activity"
+    },
     "switch": {
         "prefix": "switch",
         "body": [
