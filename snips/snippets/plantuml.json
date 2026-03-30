@@ -59,7 +59,12 @@
     },
     "Class": {
         "prefix": "cla",
-        "body": "class $1 {\n$2\n}\n",
+        "body": [
+            "class $1 {",
+            "$2",
+            "}",
+            ""
+        ],
         "description": "Class Object where fields are defined: \n  public (+)\n  private (-)\n  protected (#) \n  package (~).\n\nFunctions can also be named here ex:\n  +funcName()"
     },
     "Cloud": {
@@ -107,11 +112,6 @@
         "body": "entity $0",
         "description": "Models an entity of the system"
     },
-    "Example": {
-        "prefix": "example",
-        "body": ["@startuml\nAlice -> Bob\nBob -> Alice\n@enduml"],
-        "description": "Simple example to get started with PlantUML"
-    },
     "Extend Arrow (left)": {
         "prefix": "lext",
         "body": " ..> $1",
@@ -137,15 +137,69 @@
         "body": "frame $1",
         "description": "A frame of the components"
     },
+    "partition": {
+        "prefix": "partition",
+        "body": [
+            "partition #White \"$1\" {",
+            ":$2;",
+            "}"
+        ],
+        "description": "The partition on activity"
+    },
+    "switch": {
+        "prefix": "switch",
+        "body": [
+            "switch ($1)",
+            "case ( $2 )",
+            ":$3;",
+            "case ( $4 )",
+            ":$5;",
+            "endswitch"
+        ],
+        "description": "The switch on activity"
+    },
+    "while": {
+        "prefix": "while",
+        "body": [
+            "while ($1)",
+            ":$2;",
+            "endwhile"
+        ],
+        "description": "The while on activity"
+    },
+    "repeat": {
+        "prefix": "repeat",
+        "body": [
+            "repeat",
+            ":$0;",
+            "repeat while ($1) is ($2) not ($3)",
+            "end"
+        ],
+        "description": "The repeat on activity"
+    },
     "If-else": {
         "prefix": "if",
-        "body": ["if ($1) then ($2)\n    :$3;\nelse ($4)\n    :$5;\nendif\n"],
+        "body": [
+            "if ($1) then ($2)",
+            ":$3;",
+            "else ($4)",
+            ":$5;",
+            "endif"
+        ],
         "description": "The if else on activity"
     },
     "If-elseif": {
         "prefix": "ifei",
-        "body": ["if ($1) then ($2)\n    :$3;\nelseif ($4) then ($5)\n    :$6;\nelse ($7)\n:    $8;\nendif\n"],
-        "description": "The stop of the activity"
+        "body": [
+            "if ($1) then ($2)",
+            ":$3;",
+            "elseif ($5)",
+            ":$6;",
+            "else ($7)",
+            ":$8;",
+            "endif"
+        ],
+        "description": "The if elseif else on activity"
     },
     "Initial State activity": {
         "prefix": "init-state",
@@ -169,12 +223,24 @@
     },
     "Object": {
         "prefix": "ob",
-        "body": "object $1 {\n$2\n}\n",
+        "body": [
+            "object $1 {",
+            "",
+            "$2",
+            "",
+            "}",
+            ""
+        ],
         "description": "A default Object"
     },
     "Package": {
         "prefix": "pa",
-        "body": ["package $1 {\n$2\n}\n"],
+        "body": [
+            "package $1 {",
+            "$2",
+            "}",
+            ""
+        ],
         "description": "Package UML structure"
     },
     "Sequence Message": {
@@ -214,18 +280,90 @@
     },
     "Start Uml Template": {
         "prefix": "startuml",
-        "body": "@startuml\n!theme mars\nskinparam ConditionEndStyle hline\nskinparam dpi 100\n\n$1\n@enduml",
-        "description": "Inside $1 begin defining your diagram"
+        "body": ["@startuml",
+        "!theme mars",
+        "skinparam ConditionEndStyle hline",
+        "skinparam conditionStyle insideDiamond",
+        "skinparam dpi 100",
+        "",
+        "$1",
+        "@enduml"
+        ],
+        "description": "Inside begin defining your diagram"
     },
     "Start json Template": {
         "prefix": "startjson",
-        "body": "@startjson\n{\n    $1\n}\n@endjson",
-        "description": "Inside $1 begin defining your json"
+        "body": [
+        "@startjson",
+        "{",
+        "$1",
+        "}",
+        "@endjson"
+        ],
+        "description": "Inside begin defining your json"
     },
     "Use Arrow (left)": {
         "prefix": ">",
         "body": " --> $1",
         "description": "Object A uses -> () <That is our use case notation to the left>"
+    },
+    "goto": {
+        "prefix": "goto",
+        "body": [
+            "goto $1"
+        ],
+        "description": "goto"
+    },
+    "label": {
+        "prefix": "label",
+        "body": [
+            "label $1"
+        ],
+        "description": "label"
+    },
+    "style description": {
+        "prefix": "style",
+        "body": [
+            "<style>",
+            "$1",
+            "</style>"
+        ],
+        "description": "The style block for customize the diagram details"
+    },
+    "activity style description": {
+        "prefix": "astyle",
+        "body": [
+            "activityDiagram {",
+            "   BackgroundColor #White",
+            "   BorderColor #33668E",
+            "   FontColor #123123",
+            "   FontName arial",
+            "   diamond {",
+            "      BackgroundColor #ccf",
+            "      LineColor #F58142",
+            "      FontColor #638059",
+            "      FontName arial",
+            "      FontSize 15",
+            "   }",
+            "   arrow {",
+            "       FontColor #05a1a3",
+            "       FontName arial",
+            "       FontSize 15",
+            "   }",
+            "   partition {",
+            "       LineColor red",
+            "       FontColor green",
+            "       RoundCorner 10",
+            "       BackgroundColor PeachPuff",
+            "   }",
+            "   note {",
+            "       FontColor Blue",
+            "       LineColor Navy",
+            "       BackgroundColor #ccf",
+            "   }",
+            "}"
+        ],
+        "description": "The activity style block for customize the diagram details"
     },
     "Use Arrow (Right)": {
         "prefix": "<",
