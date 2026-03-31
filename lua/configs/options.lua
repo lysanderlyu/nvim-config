@@ -8,7 +8,7 @@ vim.o.cmdheight = 1
 vim.o.laststatus = 3
 vim.opt.showcmdloc = 'statusline'
 vim.o.showmode = false
-vim.lsp.set_log_level("ERROR")
+vim.lsp.log.set_level("ERROR")
 vim.g.fzf_layout = { window = {width = 0.8, height = 0.9 } }
 
 -- Dynamic switch tab size
