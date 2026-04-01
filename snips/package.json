@@ -17,7 +17,7 @@
                 "path": "./snippets/global.json"
             },
             {
-                "language": ["license"],
+                "language": ["license", "text"],
                 "path": "./snippets/license.json"
             },
             {
