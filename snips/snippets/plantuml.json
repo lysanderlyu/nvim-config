@@ -228,6 +228,11 @@
         "body": "(*) -> $1",
         "description": "Model an initial starting point for the activity diagram"
     },
+    "Floating Node": {
+        "prefix": "fno",
+        "body": "floating note: $1",
+        "description": "A floating cube modelling a node in the system"
+    },
     "Node": {
         "prefix": "no",
         "body": "node $1",
