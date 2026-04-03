@@ -322,7 +322,7 @@
       "/* Configuration Structure */",
       "typedef struct {",
       "    GPIO_TypeDef *port;             // The GPIO port e.g. GPIOA",
-      "    uint16_t pin;                    // pins",
+      "    uint16_t pin;                   // Pin",
       "    gpio_mode_t mode;               // INPUT, OUTPUT, AF, ANALOG",
       "    gpio_pull_t pull;               // PULL_UP, PULL_DOWN, NO_PULL",
       "    gpio_output_type_t output_type; // PP or OD or NP(No Pull)",
