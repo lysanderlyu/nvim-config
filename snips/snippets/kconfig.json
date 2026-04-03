@@ -3,7 +3,7 @@
         "prefix": "menu",
         "body": [
             "menu \"$1\"",
-            "\t depends on $2",
+            "\tdepends on $2",
             "",
             "endmenu"
         ],
@@ -13,11 +13,11 @@
         "prefix": "configd",
         "body": [
             "config $1",
-            "\t tristate \"$2\" if EXPERT",
-            "\t depends on $3",
-            "\t select $4",
-            "\t help",
-            "\t   $5"
+            "\ttristate \"$2\" if EXPERT",
+            "\tdepends on $3",
+            "\tselect $4",
+            "\thelp",
+            "\t  $5"
         ],
         "description": "the bool config snippets for kconfig with dependencies and selection"
     },
@@ -25,12 +25,12 @@
         "prefix": "configb",
         "body": [
             "config $1",
-            "\t def_bool y",
-            "\t bool \"$2\" if EXPERT",
-            "\t depends on $3",
-            "\t select $4",
-            "\t help",
-            "\t   $5"
+            "\tdef_bool y",
+            "\tbool \"$2\" if EXPERT",
+            "\tdepends on $3",
+            "\tselect $4",
+            "\thelp",
+            "\t  $5"
         ],
         "description": "the bool config snippets for kconfig with dependencies and selection"
     },
@@ -38,12 +38,12 @@
         "prefix": "configi",
         "body": [
             "config $1",
-            "\t int \"$2\"",
-            "\t depends on $3",
-            "\t range $4 $5",
-            "\t default $6",
-            "\t help",
-            "\t   $7"
+            "\tint \"$2\"",
+            "\tdepends on $3",
+            "\trange $4 $5",
+            "\tdefault $6",
+            "\thelp",
+            "\t  $7"
         ],
         "description": "the int config snippets for kconfig with range and defaults"
     },
@@ -51,11 +51,11 @@
         "prefix": "configs",
         "body": [
             "config $1",
-            "\t string \"$2\" if EXPERT",
-            "\t depends on $3",
-            "\t default \"$4\"",
-            "\t help",
-            "\t   $5"
+            "\tstring \"$2\" if EXPERT",
+            "\tdepends on $3",
+            "\tdefault \"$4\"",
+            "\thelp",
+            "\t  $5"
         ], 
         "description": "the string config snippets for kconfig with defaults and dependencies"
     },
@@ -63,11 +63,11 @@
         "prefix": "choicd",
         "body": [
             "choice",
-            "\t prompt \"$1\" if EXPERT",
-            "\t depends on $2",
-            "\t default $3",
-            "\t bool $4",
-            "\t bool $5",
+            "\tprompt \"$1\" if EXPERT",
+            "\tdepends on $2",
+            "\tdefault $3",
+            "\tbool $4",
+            "\tbool $5",
             "endchoice"
         ],
         "description": "the choice config snippets for kconfig with dependencies and defaults"
