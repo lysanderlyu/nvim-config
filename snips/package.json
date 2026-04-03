@@ -597,6 +597,10 @@
 		        "path": "./snippets/cmake.json"
 	        },
 	        {
+		        "language": "kconfig",
+		        "path": "./snippets/kconfig.json"
+	        },
+	        {
 		        "language": "bitbake",
 		        "path": "./snippets/bitbake.json"
 	        },
