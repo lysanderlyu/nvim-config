@@ -89,7 +89,11 @@
     },
     "Database": {
         "prefix": "db",
-        "body": "database $0",
+        "body": [
+            "database \"$1\" {",
+            "   $2",
+            "}"
+        ],
         "description": "Models a Database (depicted as a cylinder)"
     },
     "Dotted aggregation": {
@@ -129,13 +133,35 @@
     },
     "Folder": {
         "prefix": "fol",
-        "body": "folder $1",
+        "body": [
+            "folder \"$1\" {",
+            "$2",
+            "}"
+        ],
         "description": "A folder for project organization"
     },
     "Frame": {
         "prefix": "frame",
-        "body": "frame $1",
+        "body": [
+            "frame \"$1\" {",
+            "$2",
+            "}"
+        ],
         "description": "A frame of the components"
+    },
+    "Component": {
+        "prefix": "component",
+        "body": "component ",
+        "description": "A component"
+    },
+    "Rectangle": {
+        "prefix": "rect",
+        "body": [
+            "rectangle \"$1\" {",
+            "$2",
+            "}"
+        ],
+        "description": "The partition on activity"
     },
     "partition": {
         "prefix": "partition",
@@ -260,11 +286,52 @@
         ],
         "description": "A default Object"
     },
+    "Network Diagram": {
+        "prefix": "netdiag",
+        "body": [
+            "nwdiag {",
+            "    network I2C1_Bus {",
+            "        STK8321 [address = 0x0f];",
+            "    }",
+            "}"
+        ],
+        "description": "State on state diagram"
+    },
+    "Network": {
+        "prefix": "net",
+        "body": [
+            "network I2C1_Bus {",
+            "    STK8321 [address = 0x0f];",
+            "}"
+        ],
+        "description": "State on state diagram"
+    },
+    "State": {
+        "prefix": "sta",
+        "body": "state ",
+        "description": "State on state diagram"
+    },
+    "Port": {
+        "prefix": "po",
+        "body": "port ",
+        "description": "Port on component diagram"
+    },
+    "Json": {
+        "prefix": "ja",
+        "body": [
+            "json $1 {",
+            "   \"$2\":\"$3\",",
+            "   \"$4\":\"$5\"",
+            "}",
+            ""
+        ],
+        "description": "Package UML structure"
+    },
     "Package": {
         "prefix": "pa",
         "body": [
             "package $1 {",
-            "$2",
+            "   $2",
             "}",
             ""
         ],
@@ -318,6 +385,17 @@
         ],
         "description": "Inside begin defining your diagram"
     },
+    "Start mindmap Template": {
+        "prefix": "startmindmap",
+        "body": [
+        "@startmindmap",
+        "+[#White] $1",
+        "++[#White] $2",
+        "-[#White] $3",
+        "@endmindmap"
+        ],
+        "description": "Start mindmap diagram"
+    },
     "Start json Template": {
         "prefix": "startjson",
         "body": [
@@ -356,6 +434,23 @@
             "</style>"
         ],
         "description": "The style block for customize the diagram details"
+    },
+    "mindmap style description": {
+        "prefix": "mstyle",
+        "body": [
+            "mindmapDiagram {",
+            "    .green {",
+            "        BackgroundColor lightgreen",
+            "    }",
+            "    .rose {",
+            "        BackgroundColor #FFBBCC",
+            "    }",
+            "    .default {",
+            "        BackgroundColor white",
+            "    }",
+            "}"
+        ],
+        "description": "The mindmap style block for customize the diagram details"
     },
     "activity style description": {
         "prefix": "astyle",
