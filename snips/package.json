@@ -33,6 +33,10 @@
                 "path": "./snippets/c/cdoc.json"
             },
             {
+                "language": "c",
+                "path": "./snippets/c/linux-driver.json"
+            },
+            {
                 "language": "cpp",
                 "path": "./snippets/cpp/cpp.json"
             },
