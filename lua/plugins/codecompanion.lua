@@ -8,6 +8,26 @@ return {
     },
     config = function()
       require("codecompanion").setup({
+        rules = {
+          default = {
+            description = "Collection of common files for all projects",
+            files = {
+              ".clinerules",
+              ".cursorrules",
+              ".goosehints",
+              ".rules",
+              ".windsurfrules",
+              ".github/copilot-instructions.md",
+              "AGENT.md",
+              "AGENT.puml",
+              "AGENTS.md",
+              "CLAUDE.puml",
+              { path = "CLAUDE.md", parser = "claude" },
+              { path = "CLAUDE.local.md", parser = "claude" },
+              { path = "~/.claude/CLAUDE.md", parser = "claude" },
+            },
+          },
+        },
         display = {
           action_palette = {
             width = 95,
@@ -123,6 +143,7 @@ return {
       })
 
       -- Keybindings
+      vim.keymap.set({ "n", "v" }, "<leader>ca", "<cmd>CodeCompanionActions<cr>", { desc = "AI Action" })
       vim.keymap.set({ "n", "v" }, "<leader>cg", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI Chat" })
       vim.keymap.set({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI Inline" })
     end,
