@@ -381,11 +381,9 @@
         "skinparam dpi 200",
         "skinparam linetype polyline",
         "skinparam ArrowColor gray",
-        "top to bottom direction",
-        "allow_mixing",
         "",
         "$1",
-        "center footer \\nCopyright 2026 Lysander Lyu",
+        "center footer \\nCopyright © 2026 Lysander Lyu",
         "@enduml"
         ],
         "description": "Inside begin defining your diagram"
@@ -396,12 +394,10 @@
         "@startmindmap",
         "skinparam linetype polyline",
         "skinparam ArrowColor gray",
-        "top to bottom direction",
-        "allow_mixing",
         "+[#White] $1",
         "++[#White] $2",
         "-[#White] $3",
-        "center footer \\nCopyright 2026 Lysander Lyu",
+        "center footer \\nCopyright © 2026 Lysander Lyu",
         "@endmindmap"
         ],
         "description": "Start mindmap diagram"
@@ -413,6 +409,7 @@
         "{",
         "$1",
         "}",
+        "center footer \\nCopyright © 2026 Lysander Lyu",
         "@endjson"
         ],
         "description": "Inside begin defining your json"
