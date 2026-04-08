@@ -149,6 +149,16 @@
         ],
         "description": "A frame of the components"
     },
+    "Delay for sequence diagram": {
+        "prefix": "...",
+        "body": "...$1...",
+        "description": "The delay for sequence diagram"
+    },
+    "Divider for sequence diagram": {
+        "prefix": "==",
+        "body": "== $1 ==",
+        "description": "The Split separator for sequence diagram"
+    },
     "Component": {
         "prefix": "component",
         "body": "component ",
