@@ -16,6 +16,7 @@ return {
         -- Automatically leave snippet session if you move the cursor outside the region
         region_check_events = "CursorMoved",
         delete_check_events = "TextChanged",
+        enable_autosnippets = false,
         
         -- VISUAL FEEDBACK: The "Highlight" part
 
@@ -40,16 +41,13 @@ return {
       require("luasnip.loaders.from_vscode").lazy_load({ paths = "~/.config/nvim/snips" })
 
       -- Your existing Keymaps
-
       vim.keymap.set({"i", "s"}, "<C-k>", function() ls.expand_or_jump() end, {silent = true})
       vim.keymap.set({"i", "s"}, "<C-l>", function() ls.jump(1) end, {silent = true})
-
       vim.keymap.set({"i", "s"}, "<C-j>", function() ls.jump(-1) end, {silent = true})
-      vim.keymap.set({"i", "s"}, "<C-e>", function()
-        if ls.choice_active() then
-          ls.change_choice(1)
-        end
-      end, {silent = true})
+      -- exit snippet
+      vim.keymap.set({ "i", "s" }, "<C-e>", function()
+        ls.unlink_current()
+      end, { silent = true })
     end,
   },
 }
