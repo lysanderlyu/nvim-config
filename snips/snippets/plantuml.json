@@ -60,8 +60,8 @@
     "Class": {
         "prefix": "cla",
         "body": [
-            "class $1 {",
-            "$2",
+            "class {",
+            "",
             "}",
             ""
         ],
@@ -91,7 +91,7 @@
         "prefix": "db",
         "body": [
             "database \"$1\" {",
-            "   $2",
+            "   ",
             "}"
         ],
         "description": "Models a Database (depicted as a cylinder)"
@@ -135,7 +135,7 @@
         "prefix": "fol",
         "body": [
             "folder \"$1\" {",
-            "$2",
+            "",
             "}"
         ],
         "description": "A folder for project organization"
@@ -144,7 +144,7 @@
         "prefix": "frame",
         "body": [
             "frame \"$1\" {",
-            "$2",
+            "",
             "}"
         ],
         "description": "A frame of the components"
@@ -168,7 +168,7 @@
         "prefix": "rect",
         "body": [
             "rectangle \"$1\" {",
-            "$2",
+            "",
             "}"
         ],
         "description": "The partition on activity"
@@ -177,7 +177,7 @@
         "prefix": "partition",
         "body": [
             "partition #White \"$1\" {",
-            ":$2;",
+            ":;",
             "}"
         ],
         "description": "The partition on activity"
@@ -220,7 +220,7 @@
         "prefix": "while",
         "body": [
             "while ($1)",
-            ":$2;",
+            ":;",
             "endwhile"
         ],
         "description": "The while on activity"
@@ -392,7 +392,7 @@
         "skinparam linetype polyline",
         "skinparam ArrowColor gray",
         "",
-        "$1",
+        "",
         "center footer \\nCopyright © 2026 Lysander Lyu",
         "@enduml"
         ],
@@ -404,9 +404,9 @@
         "@startmindmap",
         "skinparam linetype polyline",
         "skinparam ArrowColor gray",
-        "+[#White] $1",
-        "++[#White] $2",
-        "-[#White] $3",
+        "+[#White] ",
+        "++[#White] ",
+        "-[#White] ",
         "center footer \\nCopyright © 2026 Lysander Lyu",
         "@endmindmap"
         ],
@@ -417,7 +417,7 @@
         "body": [
         "@startjson",
         "{",
-        "$1",
+        "",
         "}",
         "center footer \\nCopyright © 2026 Lysander Lyu",
         "@endjson"
@@ -442,6 +442,13 @@
             "label $1"
         ],
         "description": "label"
+    },
+    "comment": {
+        "prefix": "comment",
+        "body": [
+            "' ====================================  $1  ==================================="
+        ],
+        "description": "comment line"
     },
     "style description": {
         "prefix": "style",
