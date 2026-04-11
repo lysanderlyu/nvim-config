@@ -56,10 +56,12 @@ local mapping = cmp.mapping.preset.insert({
 local sources = cmp.config.sources({
   { name = "nvim_lsp" },
   { name = "luasnip" },
-}, {
   { name = "buffer" },
   { name = "path" },
   { name = "dictionary", keyword_length = 4, max_item_count = 15 },
+  per_filetype = {
+    codecompanion = { "codecompanion" },
+  }
 })
 
 -- =======================
@@ -74,8 +76,8 @@ cmp.setup({
 -- =======================
 -- Filetype-specific sources
 -- =======================
-cmp.setup.filetype("codecompanion", {
-  sources = cmp.config.sources({
-    { name = "codecompanion" },
-  }),
-})
+-- cmp.setup.filetype("codecompanion", {
+--   sources = cmp.config.sources({
+--     { name = "codecompanion" },
+--   }),
+-- })
