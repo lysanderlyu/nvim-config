@@ -483,6 +483,7 @@
             "   BackgroundColor #White",
             "   BorderColor #33668E",
             "   FontColor #123123",
+            "   FontSize 15",
             "   FontName arial",
             "   diamond {",
             "      BackgroundColor #ccf",
