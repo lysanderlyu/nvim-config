@@ -245,7 +245,8 @@
                     "javascriptreact",
                     "htmldjango",
                     "astro",
-                    "blade"
+                    "blade",
+                    "markdown"
                 ],
                 "path": "./snippets/html.json"
             },
