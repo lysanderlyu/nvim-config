@@ -4,10 +4,15 @@
         "body": "\"$1\"",
         "description": "Describe the activity being done"
     },
+    "Font setting for Text": {
+        "prefix": "f",
+        "body": "<font color=$1>$2</font>$0",
+        "description": "text font setting for plantuml text"
+    },
     "Bold Text": {
         "prefix": "b",
         "body": "<b>$1</b>$0",
-        "description": "Bold the text for plantuml notes"
+        "description": "Bold the text for plantuml text"
     },
     "Actor": {
         "prefix": "act",
