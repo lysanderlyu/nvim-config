@@ -61,6 +61,29 @@ return {
         args = { "--interpreter=dap" }
       }
 
+      -- -- Rust CodeLLDB (installed via Mason)
+      -- dap.adapters.codelldb = {
+      --   type = 'server',
+      --   port = 16237,
+      --   executable = {
+      --     command = 'codelldb', -- Ensure this is in your PATH or provide absolute path
+      --     args = { '--port', '16237' },
+      --   }
+      -- }
+
+      -- Helper function to determine the default search path
+      local function get_default_elf_path()
+        local cwd = vim.fn.getcwd()
+        
+        -- 1. Check if 'target/' directory exists first
+        if vim.fn.isdirectory(cwd .. '/target') == 1 then
+          return cwd .. '/target/'
+        end
+        
+        -- 2. Otherwise, default to 'build/'
+        return cwd .. '/build/'
+      end
+
       -- 4. Configuration: Manual Attach Workflow
       -- Shared Configuration for both C and Assembly
       local attach_config = {
@@ -73,14 +96,15 @@ return {
             return "localhost:" .. port
           end,
           program = function()
-            -- We store this in a variable so we can use it for the 'file' command
-            local path = vim.fn.input('Path to .elf: ', vim.fn.getcwd() .. '/build/', 'file')
-            return path
+            -- Call the helper to decide whether target/ or build/ should be the default prompt
+            local default_dir = get_default_elf_path()
+            return vim.fn.input('Path to .elf: ', default_dir, 'file')
           end,
         },
       }
       dap.configurations.c = attach_config
       dap.configurations.asm = attach_config
+      dap.configurations.rust = attach_config
 
       -- 5. Automation: Open/Close UI
       dap.listeners.before.attach.dapui_config = function() dapui.open() end
@@ -106,8 +130,6 @@ return {
           dap.repl.execute("monitor halt")
           dap.repl.execute("flushregs")
           dap.continue()
-        else
-          -- 2. If no session then skip it
         end
       end, { desc = "Debug: Reset & Start/Continue" })
       vim.keymap.set('n', '<Leader>dc', function() require("dap").terminate() require("dapui").close() end, { desc = "Debug: Stop/Terminate Session" })
