@@ -133,7 +133,10 @@ return {
                 schema = {
                   model = {
                     -- default = "qwen/qwen3-coder-30b",
-                    default = "qwen/qwen3.5-35b-a3b",
+                    default = "qwen/qwen3.6-35b-a3b",
+                    -- default = "qwen/qwen3.5-35b-a3b",
+                    -- default = "google/gemma-4-31b",
+                    -- default = "google/gemma-4-26b-a4b",
                     -- default = "google/gemma-3-27b",
                     -- default = "openai/gpt-oss-20b",
                   },
