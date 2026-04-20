@@ -23,7 +23,6 @@ return {
               "AGENTS.md",
               "CLAUDE.puml",
               "arch.puml",
-              "ARCH.puml",
               { path = "CLAUDE.md", parser = "claude" },
               { path = "CLAUDE.local.md", parser = "claude" },
               { path = "~/.claude/CLAUDE.md", parser = "claude" },
