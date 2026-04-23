@@ -29,6 +29,24 @@ return {
             },
           },
         },
+        groups = {
+          ["agent"] = {
+            description = "My custom agent",
+            system_prompt = function(group, ctx)
+              return string.format(
+                "You are a coding agent. The date is %s. The user is on %s.",
+                ctx.date,
+                ctx.os
+              )
+            end,
+            tools = { "read_file", "insert_edit_into_file", "run_command" },
+            opts = {
+              collapse_tools = true,
+              ignore_system_prompt = true, -- Remove the chat's default system prompt
+              ignore_tool_system_prompt = true, -- Remove the default tool system prompt
+            },
+          },
+        },
         display = {
           action_palette = {
             width = 95,
@@ -117,6 +135,13 @@ return {
         },
         adapters = {
           http = {
+            anthropic = function()
+              return require("codecompanion.adapters").extend("anthropic", {
+                env = {
+                  api_key = "MY_ANTHROPIC_KEY",
+                },
+              })
+            end,
             openai_compatible = function()
               return require("codecompanion.adapters").extend("openai_compatible", {
                 name = "personal_ai_station",
@@ -132,7 +157,8 @@ return {
                 schema = {
                   model = {
                     -- default = "qwen/qwen3-coder-30b",
-                    default = "qwen/qwen3.6-35b-a3b",
+                    -- default = "qwen/qwen3.6-35b-a3b",
+                    default = "qwen/qwen3.6-27b",
                     -- default = "qwen/qwen3.5-35b-a3b",
                     -- default = "google/gemma-4-31b",
                     -- default = "google/gemma-4-26b-a4b",
