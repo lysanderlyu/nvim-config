@@ -149,7 +149,7 @@ return {
                 },
                 schema = {
                   model = {
-                    -- default = "deepseek-v4-flash",
+                    default = "deepseek-chat",
                   },
                 },
               })
