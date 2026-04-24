@@ -135,10 +135,22 @@ return {
         },
         adapters = {
           http = {
-            anthropic = function()
-              return require("codecompanion.adapters").extend("anthropic", {
+            deepseek = function()
+              return require("codecompanion.adapters").extend("deepseek", {
+                name = "Agent (DeepSeek)",
+                formatted_name = "Personal AI Station (DeepSeek)",
+                roles = {
+                  llm = "assistant",
+                  user = "user",
+                },
                 env = {
-                  api_key = "MY_ANTHROPIC_KEY",
+                  api_key = "MY_DEEPSEEK_KEY",
+                  url = "https://api.deepseek.com",
+                },
+                schema = {
+                  model = {
+                    -- default = "deepseek-v4-flash",
+                  },
                 },
               })
             end,
@@ -175,6 +187,7 @@ return {
       -- Keybindings
       vim.keymap.set({ "n", "v" }, "<leader>ca", "<cmd>CodeCompanionActions<cr>", { desc = "AI Action" })
       vim.keymap.set({ "n", "v" }, "<leader>cg", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI Chat" })
+      vim.keymap.set({ "n", "v" }, "<leader>cG", "<cmd>CodeCompanionChat adapter=deepseek<cr>", { desc = "AI Chat (DeepSeek)" })
       vim.keymap.set({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI Inline" })
     end,
   },
