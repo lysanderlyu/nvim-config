@@ -91,7 +91,7 @@ return {
         },
         interactions = {
           chat = { 
-            adapter = "openai_compatible",
+            adapter = "lm_studio",
             roles = {
               ---The header name for the LLM's messages
               ---@type string|fun(adapter: CodeCompanion.Adapter): string
@@ -117,7 +117,7 @@ return {
             },
           },
           inline = { 
-            adapter = "openai_compatible",
+            adapter = "lm_studio",
             layout = "vertical", -- vertical|horizontal|buffer
             keymaps = {
               accept_change = {
@@ -131,14 +131,16 @@ return {
               },
             },
           },
-          cmd = { adapter = "openai_compatible", }
+          cmd = {
+                adapter = "lm_studio", 
+            }
         },
         adapters = {
           http = {
             deepseek = function()
               return require("codecompanion.adapters").extend("deepseek", {
-                name = "Agent (DeepSeek)",
-                formatted_name = "Personal AI Station (DeepSeek)",
+                name = "assistant (DeepSeek)",
+                formatted_name = "DeepSeek",
                 roles = {
                   llm = "assistant",
                   user = "user",
@@ -150,11 +152,13 @@ return {
                 schema = {
                   model = {
                     default = "deepseek-chat",
+                    -- default = "deepseek-v4-flash",
+                    -- default = "deepseek-v4-pro",
                   },
                 },
               })
             end,
-            openai_compatible = function()
+            lm_studio = function()
               return require("codecompanion.adapters").extend("openai_compatible", {
                 name = "personal_ai_station",
                 formatted_name = "Personal AI Station",
