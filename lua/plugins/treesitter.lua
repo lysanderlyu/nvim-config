@@ -13,7 +13,7 @@ return {
           "c", "cpp", "java", "kotlin", "python", "bash",
           "make", "cmake","bitbake", "json", "yaml", "toml",
           "rust", "xml", "html", "css", "proto",
-          "asm", "nasm", "markdown", "gitcommit",
+          "asm", "nasm", "markdown", "markdown_inline", "gitcommit",
           "lua", "c_sharp", "diff", "passwd",
           "ninja", "smali", "ssh_config", "ruby",
           "sql", "go", "bp", "php", "vue", "awk",
