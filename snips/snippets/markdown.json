@@ -212,6 +212,17 @@
         "body": ["${1}<sup>${0}</sup>"],
         "description": "Create a superscript."
     },
+    "Insert STAR outline": {
+        "prefix": ["star", "s"],
+        "body": [
+            "# ${0}",
+            "## Situation",
+            "## Task",
+            "## Action",
+            "## Result"
+        ],
+        "description": "Insert Note draft"
+    },
     "Insert Notes outline": {
         "prefix": ["no", "n"],
         "body": "# What is ${0}?\n# What does ${0} do?\n# Why need ${0}?\n# How to use ${0}?\n# When to apply ${0}?\n# Related Concepts\n# Personal Reflection",
