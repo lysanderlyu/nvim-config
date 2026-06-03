@@ -29,7 +29,6 @@ return {
       local ensure_installed = {
         "clangd",                   -- clang
         "vimls",                    -- vimls
-        "cmake",                    -- cmake
         "pyright",                  -- Python
         "bashls",                   -- Bash
         "jdtls",                    -- Java
