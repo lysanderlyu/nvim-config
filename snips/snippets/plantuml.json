@@ -394,7 +394,6 @@
         "skinparam ConditionEndStyle hline",
         "skinparam conditionStyle insideDiamond",
         "skinparam dpi 200",
-        "skinparam linetype polyline",
         "skinparam ArrowColor gray",
         "",
         "",
@@ -407,7 +406,6 @@
         "prefix": "startmindmap",
         "body": [
         "@startmindmap",
-        "skinparam linetype polyline",
         "skinparam ArrowColor gray",
         "+[#White] ",
         "++[#White] ",
