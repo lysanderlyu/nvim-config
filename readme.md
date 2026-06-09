@@ -88,7 +88,7 @@ nvim
 ---
 
 ## 五、快捷键说明
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neovim支持用户自定义快捷键，但这些快捷都是基础快捷键之外的快捷键，比如j，k，l，h这些快捷键依然是原生的Neovim快捷键这里不会覆盖。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neovim支持用户自定义快捷键，但这些快捷键都是基础快捷键之外的快捷键，比如j，k，l，h这些快捷键依然是原生的Neovim快捷键这里不会覆盖。
 > 需要注意的是，以下的快捷键是我自定义的快捷键，如果快捷键含有`<leader>`字眼，说明这个快捷键是空格开头的，需要先按空格再按后面的才会生效
 
 ### 1. 文本操作（搜索查询复制粘贴）
@@ -143,10 +143,15 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>;D` | 如果当前窗口打开了两个文件，执行这个快捷键就会取消比较这两个文件 |
 | `<leader>mt` | 使用Typora打开此markdown文件 |
 | `<leader>mc` | 使用playwright渲染此markdown文件到PNG文件并打开 |
+| `<leader>mi` | 在Markdown文件中插入目录(TOC) |
+| `<leader>mu` | 更新Markdown目录(TOC) |
+| `<leader>mr` | 移除Markdown目录(TOC) |
 | `<leader>so` | 打开大纲/函数/结构体/类/标题查询跳转窗口 |
 | `<leader>ao` | 打开函数/结构体/类/标题浏览窗口 |
-| `]f` | 定位到上一个函数 |
-| `[f` | 定位到下一个函数 |
+| `<leader>ms` | 打开符号搜索(Namu) |
+| `<leader>mp` | 打开工作区搜索(Namu) |
+| `]f` | 定位到下一个函数 |
+| `[f` | 定位到上一个函数 |
 
 ### 4. Telescope / Fzf 文件搜索
 
@@ -157,7 +162,14 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
 | `<leader>ff` | 全局文件搜索 |
+| `<leader>fr` | 搜索最近打开的文件 |
+| `<leader>fF` | 根据剪贴板内容过滤搜索文件 |
 | `<leader>fb` | 查看已打开的Buffer |
+| `<leader>fG` | Git 文件搜索 |
+| `<leader>gf` | Git 文件搜索 |
+| `<leader>:` | 查看命令历史 |
+| `<leader>s"` | 搜索寄存器内容 |
+| `<leader>sw` | 搜索光标下单词 |
 
 ### 5. Git 快捷键
 
@@ -183,8 +195,22 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>gra` | 执行 Git reset --mixed |
 | `<leader>grs` | 执行 Git reset --soft HEAD~1 |
 | `<leader>grd` | 执行 Git reset --hard HEAD~1 |
+| `<leader>gLa` | Git log 查看所有分支 |
+| `<leader>gr` | Git reset --mixed 当前文件 |
+| `<leader>grb` | 执行 Git rebase -i --fork-point |
 
-以下是在按下<leader>gs 打开Git Status的交互界面时的快捷键
+#### Gitsigns 代码块操作
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>hs` | Stage 当前代码块 |
+| `<leader>hr` | Reset 当前代码块 |
+| `<leader>hS` | Stage 整个文件 |
+| `<leader>hu` | Undo stage 代码块 |
+| `<leader>hp` | 预览当前代码块 |
+| `<leader>hb` | Blame 当前行 |
+
+在 Git Status 界面时：<leader>gs 打开Git Status的交互界面时的快捷键
 
 | 快捷键 | 功能 |
 | -------------- | --------------- |
@@ -205,12 +231,12 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | 快捷键 | 功能 |
 |--------|------|
 | `<leader>ld` | 显示当前光标下的诊断信息 |
-| `[d` | 下一个诊断信息 |
-| `]d` | 上一个诊断信息 |
+| `[d` | 上一个诊断信息 |
+| `]d` | 下一个诊断信息 |
 | `<leader>ll` | 已列表显示所以的ERROR和WARN |
 | `<leader>li` | 显示Implementation |
 | `<leader>la` | 显示当前符号的可用操作 |
-| `<leader>lD` | 查找定义 |
+| `<leader>ls` | 查找定义 |
 | `<leader>lS` | 自定义输入查找符号定义 |
 | `<leader>lr` | 查找引用 |
 | `<leader>ln` | 重命名 |
@@ -253,8 +279,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | 快捷键 | 功能 |
 |--------|------|
 | `<leader>dt` | 查看 DTB 文件的 DTS 展开 |
-| `<leader>ds` | 使用本地编译器将ELF文件展开查看Symbol |
-| `<leader>da` | 使用本地编译器将ELF文件展开查看Assemble |
+| `<leader>ds` | 使用本地反汇编器将ELF文件展开查看Symbol |
+| `<leader>da` | 使用本地反汇编器将ELF文件展开查看Assemble |
 | `<leader>di` | 编译 D2 图并打开 |
 | `<leader>ac`, `<leader>ae`, `<leader>a{` | 对齐 N 行注释、等号、花括号 |
 | `<leader>cn` | 复制当前文件绝对路径 |
@@ -264,6 +290,36 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>pt` | 将当前的Puml文件用浏览器预览/停止预览 |
 | `<leader>ps` | 将当前的Puml文件保存为其它格式，默认是png |
 | `<leader>v` | 进入ASCII画图模式 |
+| `<leader>op` | 使用系统应用打开当前文件 |
+| `<leader>cd` | 切换工作目录 |
+| `<leader>dg` | diffget 获取修改 |
+| `<leader>dp` | diffput 推送修改 |
+
+#### UI 开关 (Snacks Toggle)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>us` | 拼写检查开关 |
+| `<leader>uw` | 自动换行开关 |
+| `<leader>uL` | 相对行号开关 |
+| `<leader>ud` | 诊断信息开关 |
+| `<leader>ul` | 行号显示开关 |
+| `<leader>uc` | Conceal 等级开关 |
+| `<leader>uT` | Treesitter 高亮开关 |
+| `<leader>ub` | 深色/浅色背景切换 |
+| `<leader>uh` | Inlay hints 开关 |
+| `<leader>ui` | 缩进线开关 |
+| `<leader>uD` | Dim 开关 |
+
+#### Rust 开发
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>rb` | Cargo build |
+| `<leader>rr` | Cargo run |
+| `<leader>rt` | Cargo test |
+| `<leader>rc` | Cargo clean |
+| `<leader>rf` | RustFmt 格式化 |
 
 > 以下快捷键是进入venn画图模式时所使用
 
@@ -335,6 +391,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | 快捷键   | 功能    |
 | -------------- | --------------- |
 | `<leader>cg` | 打开AI聊天窗口 |
+| `<leader>cG` | 打开AI聊天窗口 (DeepSeek) |
+| `<leader>ca` | 打开AI操作菜单 |
 | `<leader>ai` | 打开AI聊天输入框 |
 
 
