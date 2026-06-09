@@ -493,19 +493,6 @@ vim.api.nvim_create_user_command("Mc", function()
 end, {})
 vim.keymap.set("n", "<leader>mc", ":Mc<CR>", { noremap = true, silent = true, desc = "View Markdown on image" })
 
--- For display with typora
-vim.api.nvim_create_user_command("Mt", function()
-  local file = vim.fn.expand("%:p")
-  -- Open PNG
-  local sys = vim.loop.os_uname().sysname
-  if sys == "Darwin" then
-    vim.fn.system({ "open","-a","typora", file })
-  else
-    vim.fn.system({ "typora", file })
-  end
-end, {})
-vim.keymap.set("n", "<leader>mt", ":Mt<CR>", { noremap = true, silent = true, desc = "View Markdown on typora" })
-
 -- Delete buffer quickly
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "delete current buffer" })
 -- reload current buffer
