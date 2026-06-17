@@ -91,7 +91,7 @@ return {
         },
         interactions = {
           chat = { 
-            adapter = "lm_studio",
+            adapter = "deepseek",
             roles = {
               ---The header name for the LLM's messages
               ---@type string|fun(adapter: CodeCompanion.Adapter): string
@@ -117,7 +117,7 @@ return {
             },
           },
           inline = { 
-            adapter = "lm_studio",
+            adapter = "deepseek",
             layout = "vertical", -- vertical|horizontal|buffer
             keymaps = {
               accept_change = {
@@ -146,7 +146,7 @@ return {
                   user = "user",
                 },
                 env = {
-                  api_key = "MY_DEEPSEEK_KEY",
+                  api_key = "DEEPSEEK_API_KEY",
                   url = "https://api.deepseek.com",
                 },
                 schema = {
@@ -190,8 +190,8 @@ return {
 
       -- Keybindings
       vim.keymap.set({ "n", "v" }, "<leader>ca", "<cmd>CodeCompanionActions<cr>", { desc = "AI Action" })
+      vim.keymap.set({ "n", "v" }, "<leader>cG", "<cmd>CodeCompanionChat adapter=lm_studio<cr>", { desc = "AI Chat" })
       vim.keymap.set({ "n", "v" }, "<leader>cg", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI Chat" })
-      vim.keymap.set({ "n", "v" }, "<leader>cG", "<cmd>CodeCompanionChat adapter=deepseek<cr>", { desc = "AI Chat (DeepSeek)" })
       vim.keymap.set({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI Inline" })
     end,
   },
