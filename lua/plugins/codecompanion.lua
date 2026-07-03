@@ -1,7 +1,7 @@
 return {
   {
     "olimorris/codecompanion.nvim",
-    version = "^18.0.0",
+    version = "^19.0.0",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
@@ -66,6 +66,8 @@ return {
           chat = {
             intro_message = "Welcome to Code Assistent ✨! Press ? for options",
             separator = "─", -- The separator between the different messages in the chat buffer
+            fold_reasoning = false,
+            show_reasoning = false,
             show_context = true, -- Show context (from slash commands and variables) in the chat buffer?
             show_header_separator = false, -- Show header separators in the chat buffer? Set this to false if you're using an external markdown formatting plugin
             show_settings = false, -- Show LLM settings at the top of the chat buffer?
@@ -132,8 +134,8 @@ return {
             },
           },
           cmd = {
-                adapter = "lm_studio", 
-            }
+                adapter = "deepseek", 
+          }
         },
         adapters = {
           http = {
@@ -190,7 +192,7 @@ return {
 
       -- Keybindings
       vim.keymap.set({ "n", "v" }, "<leader>ca", "<cmd>CodeCompanionActions<cr>", { desc = "AI Action" })
-      vim.keymap.set({ "n", "v" }, "<leader>cG", "<cmd>CodeCompanionChat adapter=lm_studio<cr>", { desc = "AI Chat" })
+      vim.keymap.set({ "n", "v" }, "<leader>cG", "<cmd>CodeCompanionChat adapter=cursor_cli<cr>", { desc = "AI Chat" })
       vim.keymap.set({ "n", "v" }, "<leader>cg", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI Chat" })
       vim.keymap.set({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI Inline" })
     end,
