@@ -99,6 +99,14 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "bitbake_filetype",
 })
 
+-- parse *Config*.in file as kconfig 
+vim.api.nvim_create_augroup("kconfig_filetype", { clear = true })
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = "*Config*.in",
+    command = "set filetype=kconfig",
+    group = "kconfig_filetype",
+})
+
 -- DownLoad lazy if not exits
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
