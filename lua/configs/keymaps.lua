@@ -543,9 +543,11 @@ local function open_current_file()
   local cmd
   local sys = vim.loop.os_uname().sysname
   if sys == "Darwin" then
-    cmd = { "open", path }
+    cmd = 'open "' .. path .. '"'
+  elseif vim.fn.executable("wslview") == 1 then
+    cmd = 'wslview "' .. path .. '"'
   else
-    cmd = { "xdg-open", path }
+    cmd = 'xdg-open "' .. path .. '"'
   end
 
   vim.fn.jobstart(cmd, { detach = true })
