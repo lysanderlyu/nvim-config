@@ -12,10 +12,6 @@ end, { desc = "Select All" })
 -- Set Tab to toggle fold on normal mode
 vim.keymap.set("n", "<Tab>", "za", { noremap = true, silent = true })
 
--- Insert literal tab character (expandtab is on, so plain Tab inserts spaces)
-vim.keymap.set("n", "<leader><Tab>", "i\t<Esc>", { noremap = true, silent = true, desc = "Insert tab" })
-vim.keymap.set("i", "<leader><Tab>", "\t", { noremap = true, silent = true, desc = "Insert tab" })
-
 -- Toggle all folds
 vim.keymap.set('n', '<S-Tab>', function()
     local current_line = vim.fn.line('.')
