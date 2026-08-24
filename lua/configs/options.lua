@@ -122,14 +122,22 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- For sharing the clipboard between remote
+-- Paste reads the unnamed register instead of querying the terminal: an OSC 52
+-- read is a request the terminal must answer, and most refuse it for security,
+-- which blocks Neovim for 10s on every access to "+ / "*.
+local osc52 = require("vim.ui.clipboard.osc52")
+local function paste_from_unnamed()
+   return vim.fn.getreg('"', 1, true)
+end
+
 vim.g.clipboard = {
    name = "OSC 52",
    copy = {
-      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+      ["+"] = osc52.copy("+"),
+      ["*"] = osc52.copy("*"),
    },
    paste = {
-      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+      ["+"] = paste_from_unnamed,
+      ["*"] = paste_from_unnamed,
    },
 }
