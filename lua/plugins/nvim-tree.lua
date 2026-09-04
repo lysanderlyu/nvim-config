@@ -4,6 +4,91 @@ return {
     "kyazdani42/nvim-tree.lua",
     config = function()
       local nvim_tree_api = require("nvim-tree.api")
+      -- gD: git log (file/dir) for node under cursor — mirrors <leader>gD
+      local function git_log_node()
+        local api = require("nvim-tree.api")
+        local node = api.tree.get_node_under_cursor()
+        local path = node and node.absolute_path
+        if not path then
+          return
+        end
+
+        local is_dir = node.type == "directory" or vim.fn.isdirectory(path) == 1
+        local base = is_dir and path or vim.fn.fnamemodify(path, ":h")
+        local root = vim.fn.systemlist(
+          "git -C " .. vim.fn.shellescape(base) .. " rev-parse --show-toplevel"
+        )[1]
+        if not root or root == "" then
+          vim.notify("Not in git repo", vim.log.levels.ERROR)
+          return
+        end
+
+        local rel
+        if is_dir then
+          local root_p = vim.fn.fnamemodify(root, ":p")
+          local path_p = vim.fn.fnamemodify(path, ":p")
+          if path_p:sub(1, #root_p) == root_p then
+            rel = path_p:sub(#root_p + 1):gsub("/$", "")
+          end
+          if not rel or rel == "" then
+            rel = "."
+          end
+        else
+          rel = vim.fn.systemlist(
+            "git -C " .. vim.fn.shellescape(root)
+              .. " ls-files --full-name -- "
+              .. vim.fn.shellescape(path)
+          )[1]
+          if not rel or rel == "" then
+            vim.notify("File is not tracked by Git", vim.log.levels.ERROR)
+            return
+          end
+        end
+
+        local cmd_args = { "--", rel }
+        if not is_dir then
+          table.insert(cmd_args, 1, "--follow")
+        end
+
+        Snacks.picker.git_log({
+          cwd = root,
+          cmd_args = cmd_args,
+          confirm = function(picker, item)
+            picker:close()
+            local hash = item.oid or item.commit
+            if not hash then
+              return
+            end
+            vim.schedule(function()
+              -- New tab keeps the original tab (and nvim-tree) untouched
+              if is_dir then
+                -- Gtabedit: commit + full diff, no :Git hit-enter prompt
+                vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash))
+              else
+                -- tabedit + only: avoid leftover blank window from tabnew/picker
+                vim.cmd("tabedit " .. vim.fn.fnameescape(path))
+                vim.cmd("only")
+                vim.cmd("Gvdiffsplit " .. vim.fn.fnameescape(hash))
+              end
+            end)
+          end,
+        })
+      end
+
+      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets gD
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "NvimTree",
+        callback = function(args)
+          vim.keymap.set("n", "gD", git_log_node, {
+            buffer = args.buf,
+            desc = "nvim-tree: Git Log: File/Dir",
+            noremap = true,
+            silent = true,
+            nowait = true,
+          })
+        end,
+      })
+
       require("nvim-tree").setup {
         disable_netrw = true,
         hijack_netrw = true,
@@ -43,6 +128,8 @@ return {
           vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
+          vim.keymap.set('n', 'gD', git_log_node, opts('Git Log: File/Dir'))
+          -- Copy the file using cb copy
         end,
 
         view = {
@@ -205,6 +292,8 @@ return {
             vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
             vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
+            vim.keymap.set('n', 'gD', git_log_node, opts('Git Log: File/Dir'))
+            -- Copy the file using cb copy
           end,
 
           view = {
