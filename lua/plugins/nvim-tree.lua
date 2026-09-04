@@ -4,7 +4,7 @@ return {
     "kyazdani42/nvim-tree.lua",
     config = function()
       local nvim_tree_api = require("nvim-tree.api")
-      -- gD: git log (file/dir) for node under cursor — mirrors <leader>gD
+      -- gd: git log (file/dir) for node under cursor — mirrors <leader>gd
       local function git_log_node()
         local api = require("nvim-tree.api")
         local node = api.tree.get_node_under_cursor()
@@ -75,11 +75,11 @@ return {
         })
       end
 
-      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets gD
+      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets gd
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "NvimTree",
         callback = function(args)
-          vim.keymap.set("n", "gD", git_log_node, {
+          vim.keymap.set("n", "gd", git_log_node, {
             buffer = args.buf,
             desc = "nvim-tree: Git Log: File/Dir",
             noremap = true,
@@ -128,7 +128,7 @@ return {
           vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
-          vim.keymap.set('n', 'gD', git_log_node, opts('Git Log: File/Dir'))
+          vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
           -- Copy the file using cb copy
           vim.keymap.set(
             "n",
@@ -293,7 +293,7 @@ return {
             vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
             vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
-            vim.keymap.set('n', 'gD', git_log_node, opts('Git Log: File/Dir'))
+            vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
             -- Copy the file using cb copy
             vim.keymap.set(
               "n",
