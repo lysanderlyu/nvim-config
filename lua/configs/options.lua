@@ -58,6 +58,9 @@ vim.opt.diffopt:append("closeoff")
 vim.opt.diffopt:append("linematch:50")
 vim.opt.diffopt:append("iwhite")
 
+-- gf on diff paths: strip a/ and b/ prefixes (e.g. a/device/... -> device/...)
+vim.opt.includeexpr = "substitute(v:fname, '^[ab]/', '', '')"
+
 
 -- parse .pro file as shell
 vim.api.nvim_create_augroup("tshark_filetype", { clear = true })
