@@ -22,6 +22,60 @@ local function is_graphical_terminal()
   return false
 end
 
+-- Git-log preview: full `git show` when ≤300 lines changed, otherwise `--stat`
+local function git_log_stat_preview(ctx)
+  local commit = ctx.item.commit
+  if not commit then
+    return
+  end
+
+  local cwd = ctx.item.cwd or ctx.picker.opts.cwd
+  local pathspec = ctx.item.files or ctx.item.file
+  pathspec = type(pathspec) == "table" and pathspec or (pathspec and { pathspec } or {})
+
+  -- numstat: "<added>\t<deleted>\t<path>" — sum added+deleted for line budget
+  local count_cmd = { "git", "--no-pager", "diff-tree", "--no-commit-id", "--numstat", "-r", commit }
+  if #pathspec > 0 then
+    count_cmd[#count_cmd + 1] = "--"
+    vim.list_extend(count_cmd, pathspec)
+  end
+
+  local line_count = math.huge
+  local ok, result = pcall(function()
+    return vim.system(count_cmd, { cwd = cwd, text = true }):wait()
+  end)
+  if ok and result and result.code == 0 then
+    line_count = 0
+    for line in vim.gsplit(result.stdout or "", "\n", { trimempty = true }) do
+      local added, deleted = line:match("^(%S+)\t(%S+)\t")
+      if added and deleted then
+        -- binary files show "-" for both
+        local a = tonumber(added) or 0
+        local d = tonumber(deleted) or 0
+        line_count = line_count + a + d
+      end
+    end
+  end
+
+  local cmd = { "git", "--no-pager", "show", "--format=medium" }
+  if line_count > 300 then
+    cmd[#cmd + 1] = "--stat"
+  end
+  cmd[#cmd + 1] = commit
+  if #pathspec > 0 then
+    cmd[#cmd + 1] = "--"
+    vim.list_extend(cmd, pathspec)
+  end
+
+  Snacks.picker.preview.cmd(cmd, ctx, { ft = "git" })
+end
+
+local git_log_light_preview = {
+  preview = git_log_stat_preview,
+  -- fancy is fine for small full diffs / --stat; huge patches are avoided above
+  previewers = { diff = { style = "syntax" } },
+}
+
 return {
   {
     "folke/snacks.nvim",
@@ -38,7 +92,36 @@ return {
         enabled = true,
         timeout = 3000,
       },
-      picker = { enabled = true },
+      picker = {
+        enabled = true,
+        layouts = {
+          default = {
+            layout = {
+              box = "horizontal",
+              width = 0.95,
+              height = 0.95,
+              {
+                box = "vertical",
+                border = true,
+                title = "{title} {live} {flags}",
+                width = 0.45,
+                { win = "input", height = 1, border = "bottom" },
+                { win = "list", border = "none" },
+              },
+              { win = "preview", title = "{preview}", border = true, width = 0.55 },
+            },
+          },
+          vertical = {
+            layout = { width = 0.95, height = 0.95 },
+          },
+        },
+        sources = {
+          -- Full git show + fancy diff freezes the UI on large commits
+          git_log = vim.deepcopy(git_log_light_preview),
+          git_log_file = vim.deepcopy(git_log_light_preview),
+          git_log_line = vim.deepcopy(git_log_light_preview),
+        },
+      },
       quickfile = { enabled = true },
       scope = { 
           enabled = true,
@@ -109,8 +192,24 @@ return {
       -- find
       { "<leader>fc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
       -- git
-      { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
-      { "<leader>gL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line" },
+      { "<leader>gl", function()
+        local opts = vim.deepcopy(git_log_light_preview)
+        opts.confirm = function(picker, item)
+          picker:close()
+          local hash = item and (item.oid or item.commit)
+          if not hash then
+            return
+          end
+          -- Gtabedit: open commit object with full diff (no :Git job → no hit-enter)
+          vim.schedule(function()
+            vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash))
+          end)
+        end
+        Snacks.picker.git_log(opts)
+      end, desc = "Git Log → Show Diff" },
+      { "<leader>gL", function()
+        Snacks.picker.git_log_line(vim.deepcopy(git_log_light_preview))
+      end, desc = "Git Log Line" },
       -- Grep
       { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
 
