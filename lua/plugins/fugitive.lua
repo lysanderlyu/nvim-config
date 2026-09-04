@@ -4,6 +4,12 @@ return {
     lazy = false,  -- load immediately
 
     config = function()
+        -- Swap <CR> and O: Enter opens in a new tab, O edits in-place
+        vim.g.nremap = {
+          ["<CR>"] = "O",
+          ["O"] = "<CR>",
+        }
+
         -- fugitive
         local function current_branch()
           -- Get current branch name using git

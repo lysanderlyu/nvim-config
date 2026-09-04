@@ -176,7 +176,16 @@ return {
           end,
       },
       statuscolumn = { enabled = true },
-      words = { enabled = true },
+      words = {
+        enabled = true,
+        -- clangd rejects non-file URIs (fugitive://, etc.)
+        filter = function(buf)
+          local name = vim.api.nvim_buf_get_name(buf)
+          return vim.g.snacks_words ~= false
+            and vim.b[buf].snacks_words ~= false
+            and not name:match("^%a+://")
+        end,
+      },
       styles = {
         notification = {
           -- wo = { wrap = true } -- Wrap notifications

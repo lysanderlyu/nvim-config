@@ -91,9 +91,22 @@ return {
                 },
         })
 
+        -- Skip fugitive:// (and other non-file URIs): clangd only accepts file://
+        local function root_dir_skip_special_uri(markers)
+          return function(bufnr, on_dir)
+            local name = vim.api.nvim_buf_get_name(bufnr)
+            if name:match("^%a+://") then
+              return
+            end
+            on_dir(vim.fs.root(bufnr, markers or { ".git" }))
+          end
+        end
+
         for _, server in ipairs(servers) do
+            local markers = vim.lsp.config[server].root_markers
             vim.lsp.config(server, {
                 on_attach = on_attach_common,
+                root_dir = root_dir_skip_special_uri(markers),
             })
             vim.lsp.enable(server)
         end
