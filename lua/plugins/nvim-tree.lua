@@ -65,10 +65,10 @@ return {
                 -- Gtabedit: commit + full diff, no :Git hit-enter prompt
                 vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash))
               else
-                -- tabedit + only: avoid leftover blank window from tabnew/picker
-                vim.cmd("tabedit " .. vim.fn.fnameescape(path))
-                vim.cmd("only")
-                vim.cmd("Gvdiffsplit " .. vim.fn.fnameescape(hash))
+                -- file@commit vs parent(s) — same as picker `git show`
+                -- (Gvdiffsplit <hash> would diff worktree vs commit instead)
+                vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash .. ":" .. rel))
+                vim.cmd("Gvdiffsplit!")
               end
             end)
           end,

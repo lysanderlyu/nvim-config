@@ -235,7 +235,7 @@ vim.keymap.set("n", "<leader>gD", function()
       end
 
       ---------------------------------------------------
-      -- 5. Use Gvdiffsplit to show diff
+      -- 5. Diff worktree file vs selected commit
       ---------------------------------------------------
       vim.schedule(function()
         local target = hash .. ":" .. rel_file
