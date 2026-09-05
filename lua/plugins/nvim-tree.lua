@@ -71,6 +71,31 @@ return {
               end
             end)
           end,
+          -- Ctrl-Enter: open the whole commit (not just this file's diff)
+          actions = {
+            open_commit = function(picker, item)
+              picker:close()
+              local hash = item and (item.oid or item.commit)
+              if not hash then
+                return
+              end
+              vim.schedule(function()
+                vim.cmd("tabedit " .. vim.fn.fnameescape(vim.fn.FugitiveFind(hash, gitdir)))
+              end)
+            end,
+          },
+          win = {
+            input = {
+              keys = {
+                ["<C-CR>"] = { "open_commit", mode = { "n", "i" } },
+              },
+            },
+            list = {
+              keys = {
+                ["<C-CR>"] = "open_commit",
+              },
+            },
+          },
         })
       end
 
