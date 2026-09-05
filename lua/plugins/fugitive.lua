@@ -36,6 +36,78 @@ return {
         vim.keymap.set("n", "<leader>gL", ":Git log --graph -1000<CR>")       -- log
         vim.keymap.set("n", "<leader>gLa", ":Git log --graph --all -1000<CR>")       -- log
         vim.keymap.set("n", "<leader>gbl", ":Git blame<CR>")     -- blame
+
+        -- Ctrl-Enter: open the commit that last changed the current line (extends :Git blame <CR>)
+        -- Never attach on fugitive buffers — keep original fugitive <CR>/O shortcuts.
+        local fugitive_fts = {
+          fugitive = true,
+          fugitiveblame = true,
+          git = true,
+          gitcommit = true,
+          gitrebase = true,
+        }
+
+        local function is_fugitive_buf(bufnr)
+          bufnr = bufnr or 0
+          if not vim.api.nvim_buf_is_valid(bufnr) then
+            return true
+          end
+          local name = vim.api.nvim_buf_get_name(bufnr)
+          if name:match("^fugitive://") or name:match("^%a+://") then
+            return true
+          end
+          if fugitive_fts[vim.bo[bufnr].filetype] then
+            return true
+          end
+          if vim.b[bufnr].fugitive_type ~= nil then
+            return true
+          end
+          return false
+        end
+
+        local function open_line_commit()
+          -- Fugitive views must keep native maps; this map should not be active there.
+          if is_fugitive_buf(0) then
+            return
+          end
+          local file = vim.api.nvim_buf_get_name(0)
+          if file == "" or vim.fn.filereadable(file) ~= 1 then
+            return
+          end
+          local lnum = vim.fn.line(".")
+          local out = vim.fn.systemlist({
+            "git", "-C", vim.fn.fnamemodify(file, ":h"),
+            "blame", "-L", string.format("%d,%d", lnum, lnum),
+            "--porcelain", "--", file,
+          })
+          if vim.v.shell_error ~= 0 or not out[1] then
+            vim.notify("No blame info for this line", vim.log.levels.WARN)
+            return
+          end
+          local hash = out[1]:match("^(%x+)")
+          if not hash or hash:match("^0+$") then
+            vim.notify("Line not committed yet", vim.log.levels.INFO)
+            return
+          end
+          vim.cmd.Gtabedit(hash)
+        end
+
+        vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+          group = vim.api.nvim_create_augroup("FugitiveLineCommitCR", { clear = true }),
+          callback = function(ev)
+            -- Defer until fugitive finishes setting filetype / b:fugitive_type
+            vim.schedule(function()
+              if vim.bo[ev.buf].buftype ~= "" or is_fugitive_buf(ev.buf) then
+                return
+              end
+              vim.keymap.set("n", "<C-CR>", open_line_commit, {
+                buffer = ev.buf,
+                silent = true,
+                desc = "Open commit for current line",
+              })
+            end)
+          end,
+        })
         vim.keymap.set("n", "<leader>ga", ":Git add %<CR>")
         vim.keymap.set("n", "<leader>gA", ":Git add -A<CR>")
         vim.keymap.set("n", "<leader>gco", ":Git checkout %<CR>")

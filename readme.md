@@ -187,6 +187,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>gl` | Git log 列表浏览模式查看Git log |
 | `<leader>gL` | Git log 这个模式进入看详情Git log |
 | `<leader>gbl` | Git blame 在文件侧边显示当前文件的Git blame信息 |
+| `<C-CR>` | 普通文件中：打开当前行最近一次变更对应的 commit（新标签页）；Fugitive 界面内仍使用原生回车跳转 |
 | `<leader>ga` | Git add Git添加当前文件 |
 | `<leader>gA` | Git add Git添加所有修改 |
 | `<leader>gco` | Git checkout Git恢复当前文件 |
