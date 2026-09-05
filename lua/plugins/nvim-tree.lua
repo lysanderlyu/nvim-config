@@ -15,31 +15,29 @@ return {
 
         local is_dir = node.type == "directory" or vim.fn.isdirectory(path) == 1
         local base = is_dir and path or vim.fn.fnamemodify(path, ":h")
-        local root = vim.fn.systemlist(
-          "git -C " .. vim.fn.shellescape(base) .. " rev-parse --show-toplevel"
-        )[1]
-        if not root or root == "" then
+
+        -- Let git report the repo-relative location: --show-toplevel is
+        -- symlink-resolved, so comparing it against the tree path fails
+        -- whenever any component is a symlink.
+        local info = vim.fn.systemlist({
+          "git", "-C", base, "rev-parse",
+          "--show-toplevel", "--absolute-git-dir", "--show-prefix",
+        })
+        if vim.v.shell_error ~= 0 or #info < 2 then
           vim.notify("Not in git repo", vim.log.levels.ERROR)
           return
         end
+        local root, gitdir, prefix = info[1], info[2], info[3] or ""
 
         local rel
         if is_dir then
-          local root_p = vim.fn.fnamemodify(root, ":p")
-          local path_p = vim.fn.fnamemodify(path, ":p")
-          if path_p:sub(1, #root_p) == root_p then
-            rel = path_p:sub(#root_p + 1):gsub("/$", "")
-          end
-          if not rel or rel == "" then
-            rel = "."
-          end
+          rel = prefix ~= "" and (prefix:gsub("/$", "")) or "."
         else
-          rel = vim.fn.systemlist(
-            "git -C " .. vim.fn.shellescape(root)
-              .. " ls-files --full-name -- "
-              .. vim.fn.shellescape(path)
-          )[1]
-          if not rel or rel == "" then
+          rel = vim.fn.systemlist({
+            "git", "-c", "core.quotepath=false", "-C", base,
+            "ls-files", "--full-name", "--", vim.fn.fnamemodify(path, ":t"),
+          })[1]
+          if vim.v.shell_error ~= 0 or not rel or rel == "" then
             vim.notify("File is not tracked by Git", vim.log.levels.ERROR)
             return
           end
@@ -53,6 +51,7 @@ return {
         Snacks.picker.git_log({
           cwd = root,
           cmd_args = cmd_args,
+          title = "Git Log: " .. (rel == "." and vim.fn.fnamemodify(root, ":t") or rel),
           confirm = function(picker, item)
             picker:close()
             local hash = item.oid or item.commit
@@ -60,14 +59,14 @@ return {
               return
             end
             vim.schedule(function()
-              -- New tab keeps the original tab (and nvim-tree) untouched
-              if is_dir then
-                -- Gtabedit: commit + full diff, no :Git hit-enter prompt
-                vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash))
-              else
+              -- New tab keeps the original tab (and nvim-tree) untouched.
+              -- FugitiveFind pins the object to this repo; :Gtabedit would
+              -- resolve against whatever repo the current buffer belongs to.
+              local object = is_dir and hash or (hash .. ":" .. rel)
+              vim.cmd("tabedit " .. vim.fn.fnameescape(vim.fn.FugitiveFind(object, gitdir)))
+              if not is_dir then
                 -- file@commit vs parent(s) — same as picker `git show`
                 -- (Gvdiffsplit <hash> would diff worktree vs commit instead)
-                vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash .. ":" .. rel))
                 vim.cmd("Gvdiffsplit!")
               end
             end)
