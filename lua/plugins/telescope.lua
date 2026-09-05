@@ -13,6 +13,14 @@ return {
 
       telescope.setup({
         pickers = {
+          git_status = {
+            layout_strategy = "horizontal",
+            layout_config = {
+              width = 0.95,
+              height = 0.95,
+              preview_width = 0.55,
+            },
+          },
           git_branches = {
             previewer = previewers.new_termopen_previewer({
               get_command = function(entry)
