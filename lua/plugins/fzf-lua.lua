@@ -129,8 +129,8 @@ return {
         fzf.files({
           prompt = "Files> ",
           winopts = {
-            width = 0.9,
-            height = 0.9,
+            width = 0.95,
+            height = 0.95,
             layout = "horizontal",
             preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
           },
