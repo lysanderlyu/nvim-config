@@ -44,26 +44,73 @@ return {
         end
 
         local cmd_args = { "--", rel }
-        -- Historical names so preview can show this file's diff across renames
-        -- (same idea as Snacks git_log_file / <leader>gD).
+        -- Historical names so the log lists — and the preview diffs — this file
+        -- across renames (same idea as Snacks git_log_file / <leader>gD).
         local pathspec = { rel }
-        if not is_dir then
-          table.insert(cmd_args, 1, "--follow")
-          local rename = vim.system({
-            "git", "-c", "core.quotepath=false", "-C", root,
-            "log", "-z", "--follow", "--name-status",
-            "--pretty=format:", "--diff-filter=R", "--", rel,
-          }, { text = true }):wait()
-          if rename.code == 0 and rename.stdout and rename.stdout ~= "" then
-            local is_rename = false
-            for _, text in ipairs(vim.split(rename.stdout, "\0")) do
-              if text:find("^R%d%d%d$") then
-                is_rename = true
-              elseif is_rename and text ~= "" then
-                is_rename = false
-                pathspec[#pathspec + 1] = text
+
+        local function git(args)
+          local cmd = { "git", "-c", "core.quotepath=false", "-C", root }
+          vim.list_extend(cmd, args)
+          local out = vim.system(cmd, { text = true }):wait()
+          return out.code == 0 and out.stdout or nil
+        end
+
+        -- Renames, without --follow. --follow re-runs rename detection against
+        -- whatever tree the name disappears in, so a boilerplate file chains
+        -- through bogus 100%-similarity matches back to an import-style root
+        -- commit and detection runs over its whole tree: measured 125s / 2.5GB
+        -- on one .mk file here. Instead walk name by name, asking only the
+        -- single commit that added each name where it came from; that diff
+        -- covers just that commit's files, so it stays in the milliseconds.
+        local function old_names()
+          local names, name = {}, rel
+          -- Depth cap: a rename chain this long is not worth more git calls.
+          for _ = 1, 10 do
+            local log = git({ "log", "--format=%H", "--", name })
+            local added
+            for _, sha in ipairs(vim.split(log or "", "\n", { trimempty = true })) do
+              added = sha
+            end
+            if not added then
+              return names
+            end
+
+            -- Parents from an unfiltered rev-list: under a pathspec, history
+            -- simplification rewrites them away and every commit that adds a
+            -- name looks parentless. A root commit ends the chain — nothing to
+            -- rename from, and asking is what costs those 2.5GB.
+            local parents = git({ "rev-list", "--parents", "-n", "1", added })
+            if not parents or #vim.split(vim.trim(parents), "%s+") < 2 then
+              return names
+            end
+
+            local renames = git({
+              "show", "-M", "-z", "--name-status", "--diff-filter=R",
+              "--format=", added,
+            })
+            -- -z record: "R<similarity>", old, new
+            local fields = vim.split(renames or "", "\0", { trimempty = true })
+            local from
+            for i = 1, #fields - 2 do
+              if fields[i]:find("^R%d+$") and fields[i + 2] == name then
+                from = fields[i + 1]
+                break
               end
             end
+            if not from then
+              return names
+            end
+
+            names[#names + 1] = from
+            name = from
+          end
+          return names
+        end
+
+        if not is_dir then
+          for _, name in ipairs(old_names()) do
+            pathspec[#pathspec + 1] = name
+            cmd_args[#cmd_args + 1] = name
           end
         end
 
