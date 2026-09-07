@@ -43,6 +43,15 @@ return {
         status_formatter = nil, -- Use default
         max_file_length = 40000, -- Disable if file is longer than this (in lines)
         on_attach = function(bufnr)
+          -- Fugitive/gitsigns revision buffers use buftype '' and a commit rev.
+          -- current_line_blame then runs: git blame --contents - <rev> -- path
+          -- which fatals on git < 2.41 ("cannot use --contents with final commit
+          -- object name"). Diff is already shown by Gvdiffsplit; skip attach.
+          local name = vim.api.nvim_buf_get_name(bufnr)
+          if vim.startswith(name, "fugitive://") or vim.startswith(name, "gitsigns://") then
+            return false
+          end
+
           local gs = package.loaded.gitsigns
           local map = function(mode, lhs, rhs)
             vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true })
