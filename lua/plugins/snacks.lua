@@ -22,7 +22,47 @@ local function is_graphical_terminal()
   return false
 end
 
--- Git-log preview: full `git show` when ≤300 lines changed, otherwise `--stat`
+-- Pathspecs for git-log preview: prefer item.files (renames from git_log_file),
+-- then opts.pathspec / cmd_args after `--` (nvim-tree gd scopes a file/dir).
+local function git_log_pathspec(ctx)
+  local function clean(list)
+    local out = {}
+    for _, p in ipairs(list or {}) do
+      if type(p) == "string" and p ~= "" then
+        out[#out + 1] = p
+      end
+    end
+    return out
+  end
+
+  local from_item = ctx.item.files or ctx.item.file
+  if type(from_item) ~= "table" then
+    from_item = from_item and { from_item } or {}
+  end
+  from_item = clean(from_item)
+  if #from_item > 0 then
+    return from_item
+  end
+
+  local opts = ctx.picker.opts or {}
+  if opts.pathspec then
+    local ps = opts.pathspec
+    return clean(type(ps) == "table" and ps or { ps })
+  end
+
+  local out, after = {}, false
+  for _, arg in ipairs(opts.cmd_args or {}) do
+    if after then
+      out[#out + 1] = arg
+    elseif arg == "--" then
+      after = true
+    end
+  end
+  return clean(out)
+end
+
+-- Git-log preview: full message always; full `git show` when ≤300 lines changed,
+-- otherwise `--stat`. Pathspec keeps previews file/dir-scoped (like <leader>gD).
 local function git_log_stat_preview(ctx)
   local commit = ctx.item.commit
   if not commit then
@@ -30,8 +70,7 @@ local function git_log_stat_preview(ctx)
   end
 
   local cwd = ctx.item.cwd or ctx.picker.opts.cwd
-  local pathspec = ctx.item.files or ctx.item.file
-  pathspec = type(pathspec) == "table" and pathspec or (pathspec and { pathspec } or {})
+  local pathspec = git_log_pathspec(ctx)
 
   -- numstat: "<added>\t<deleted>\t<path>" — sum added+deleted for line budget
   local count_cmd = { "git", "--no-pager", "diff-tree", "--no-commit-id", "--numstat", "-r", commit }
@@ -57,6 +96,7 @@ local function git_log_stat_preview(ctx)
     end
   end
 
+  -- medium = full commit message body; never truncate the message for large diffs
   local cmd = { "git", "--no-pager", "show", "--format=medium" }
   if line_count > 300 then
     cmd[#cmd + 1] = "--stat"

@@ -4,7 +4,7 @@ return {
     "kyazdani42/nvim-tree.lua",
     config = function()
       local nvim_tree_api = require("nvim-tree.api")
-      -- gd: git log (file/dir) for node under cursor — mirrors <leader>gd
+      -- gd: git log (file/dir) for node under cursor — mirrors <leader>gD for files
       local function git_log_node()
         local api = require("nvim-tree.api")
         local node = api.tree.get_node_under_cursor()
@@ -44,13 +44,34 @@ return {
         end
 
         local cmd_args = { "--", rel }
+        -- Historical names so preview can show this file's diff across renames
+        -- (same idea as Snacks git_log_file / <leader>gD).
+        local pathspec = { rel }
         if not is_dir then
           table.insert(cmd_args, 1, "--follow")
+          local rename = vim.system({
+            "git", "-c", "core.quotepath=false", "-C", root,
+            "log", "-z", "--follow", "--name-status",
+            "--pretty=format:", "--diff-filter=R", "--", rel,
+          }, { text = true }):wait()
+          if rename.code == 0 and rename.stdout and rename.stdout ~= "" then
+            local is_rename = false
+            for _, text in ipairs(vim.split(rename.stdout, "\0")) do
+              if text:find("^R%d%d%d$") then
+                is_rename = true
+              elseif is_rename and text ~= "" then
+                is_rename = false
+                pathspec[#pathspec + 1] = text
+              end
+            end
+          end
         end
 
         Snacks.picker.git_log({
           cwd = root,
           cmd_args = cmd_args,
+          -- Preview scopes to this file/dir (not the whole commit), like <leader>gD
+          pathspec = pathspec,
           title = "Git Log: " .. (rel == "." and vim.fn.fnamemodify(root, ":t") or rel),
           confirm = function(picker, item)
             picker:close()
