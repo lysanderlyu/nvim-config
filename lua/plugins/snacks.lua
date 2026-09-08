@@ -110,6 +110,19 @@ local function git_log_stat_preview(ctx)
   Snacks.picker.preview.cmd(cmd, ctx, { ft = "git" })
 end
 
+-- Scroll the picker preview a fixed number of lines instead of half a page
+local function preview_scroll_lines(count, up)
+  return function(picker)
+    local win = picker.preview.win
+    if not win:valid() then
+      return
+    end
+    vim.api.nvim_win_call(win.win, function()
+      vim.cmd(("normal! %d%s"):format(count, Snacks.util.keycode(up and "<c-y>" or "<c-e>")))
+    end)
+  end
+end
+
 local git_log_light_preview = {
   preview = git_log_stat_preview,
   -- fancy is fine for small full diffs / --stat; huge patches are avoided above
@@ -134,6 +147,25 @@ return {
       },
       picker = {
         enabled = true,
+        -- <c-j>/<c-k> scroll the preview in every picker; list nav stays on <c-n>/<c-p>
+        actions = {
+          preview_lines_down = preview_scroll_lines(1, false),
+          preview_lines_up = preview_scroll_lines(1, true),
+        },
+        win = {
+          input = {
+            keys = {
+              ["<c-j>"] = { "preview_lines_down", mode = { "i", "n" } },
+              ["<c-k>"] = { "preview_lines_up", mode = { "i", "n" } },
+            },
+          },
+          list = {
+            keys = {
+              ["<c-j>"] = "preview_lines_down",
+              ["<c-k>"] = "preview_lines_up",
+            },
+          },
+        },
         layouts = {
           default = {
             layout = {

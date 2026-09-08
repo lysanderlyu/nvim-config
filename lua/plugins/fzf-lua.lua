@@ -13,6 +13,8 @@ return {
         },
         builtin = {
           -- true,        -- uncomment to inherit all the below in your custom config
+          ["<C-j>"]       = "preview-down",
+          ["<C-k>"]       = "preview-up",
           ["<M-Esc>"]     = "hide",     -- hide fzf-lua, `:FzfLua resume` to continue
           ["<F1>"]        = "toggle-help",
           ["<F2>"]        = "toggle-fullscreen",
@@ -32,6 +34,11 @@ return {
           ["<S-up>"]      = "preview-page-up",
           ["<M-S-down>"]  = "preview-down",
           ["<M-S-up>"]    = "preview-up",
+        },
+        fzf = {
+          true, -- inherit fzf-lua's default fzf binds
+          ["ctrl-j"] = "preview-down",
+          ["ctrl-k"] = "preview-up",
         },
       },
     },
