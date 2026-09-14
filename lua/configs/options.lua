@@ -116,6 +116,20 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "kconfig_filetype",
 })
 
+-- Same rules for vim.filetype.match() (sd file preview, etc.)
+vim.filetype.add({
+  extension = {
+    tshark = "tshark",
+    pro = "sh",
+    qml = "qmljs",
+    drawio = "xml",
+    inc = "bitbake",
+  },
+  pattern = {
+    [".*Config.*%.in"] = "kconfig",
+  },
+})
+
 -- DownLoad lazy if not exits
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
