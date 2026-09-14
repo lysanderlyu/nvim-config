@@ -190,32 +190,27 @@ vim.keymap.set("n", "<leader>gD", function()
   -- 1. Validate buffer
   -------------------------------------------------------
   local file = vim.fn.expand("%:p")
-  if file == "" or vim.fn.getftype(file) ~= "file" then
+  -- fs_stat follows symlinks; getftype() would reject a soft link as "link"
+  local stat = file ~= "" and vim.uv.fs_stat(file)
+  if not stat or stat.type ~= "file" then
     vim.notify("Not a valid file", vim.log.levels.ERROR)
     return
   end
 
   -------------------------------------------------------
-  -- 2. Get repo root
+  -- 2. Nearest git repo (realpath, walk up, then search down)
   -------------------------------------------------------
-  local dirname = vim.fn.expand("%:h")
-  local repo_path = vim.fn.systemlist(
-    "git -C " .. vim.fn.shellescape(dirname) .. " rev-parse --show-toplevel"
-  )[1]
-
-  if repo_path == nil or repo_path == "" then
-    vim.notify("Not inside a Git repository", vim.log.levels.ERROR)
+  local git = require("utils.git")
+  local info = git.nearest({ start = file })
+  if not info then
     return
   end
+  git.detect(info)
 
   -------------------------------------------------------
-  -- 3. Get repo-relative path (correct way)
+  -- 3. Get repo-relative path (via realpath so links match)
   -------------------------------------------------------
-  local rel_file = vim.fn.systemlist(
-    "git -C " .. vim.fn.shellescape(repo_path)
-    .. " ls-files --full-name "
-    .. vim.fn.shellescape(file)
-  )[1]
+  local rel_file = git.relpath(info, file)
 
   if rel_file == nil or rel_file == "" then
     vim.notify("File is not tracked by Git", vim.log.levels.ERROR)
@@ -225,7 +220,13 @@ vim.keymap.set("n", "<leader>gD", function()
   -------------------------------------------------------
   -- 4. Show Git Log for this file
   -------------------------------------------------------
-  Snacks.picker.git_log_file({
+  -- git_log + pathspec, not git_log_file: the latter passes the buffer
+  -- name (the symlink) to `git log --`, which misses the real file.
+  Snacks.picker.git_log({
+    cwd = info.root,
+    cmd_args = { "--follow", "--", rel_file },
+    pathspec = { rel_file },
+    title = "Git Log: " .. rel_file .. " (" .. vim.fn.fnamemodify(info.root, ":t") .. ")",
     confirm = function(picker, item)
       picker:close()
       local hash = item.oid or item.commit
@@ -238,6 +239,7 @@ vim.keymap.set("n", "<leader>gD", function()
       -- 5. Diff worktree file vs selected commit
       ---------------------------------------------------
       vim.schedule(function()
+        git.detect(info)
         local target = hash .. ":" .. rel_file
         vim.cmd("Gvdiffsplit " .. vim.fn.fnameescape(target))
       end)

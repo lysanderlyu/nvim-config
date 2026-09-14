@@ -67,7 +67,7 @@ nvim
 ├── lua
 │   ├── configs        # 各插件及 LSP 配置
 │   ├── plugins        # 插件列表
-│   └── utils          # 共享工具（目录搜索、剪贴板等）
+│   └── utils          # 共享工具（目录搜索、剪贴板、Git 仓库定位等）
 ├── snips              # 代码片段
 └── syntax             # 自定义语法文件
 ```
@@ -187,21 +187,23 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>gcm` | Git commit 弹出提交窗口|
 | `<leader>gp` | Git pull 拉取当前分支最新提交|
 | `<leader>gP` | Git push 推送当前分支到Origin仓库 |
-| `<leader>gl` | Git log 列表浏览模式查看Git log |
-| `<leader>gL` | Git log 这个模式进入看详情Git log |
+| `<leader>gl` | Git log 列表浏览模式查看 Git log（自动定位最近仓库） |
+| `<leader>gL` | Git log 查看当前行的提交历史（自动定位最近仓库） |
 | `<leader>gbl` | Git blame 在文件侧边显示当前文件的Git blame信息 |
 | `<C-CR>` | 普通文件中：打开当前行最近一次变更对应的 commit（新标签页）；Fugitive 界面内仍使用原生回车跳转 |
 | `<leader>ga` | Git add Git添加当前文件 |
 | `<leader>gA` | Git add Git添加所有修改 |
 | `<leader>gco` | Git checkout Git恢复当前文件 |
-| `<leader>gd` | Git diff split Git diff 当前文件，与最近一次提交进行比较 |
-| `<leader>gD` | 弹出窗口，选择当前文件与特定提交点进行差异比较 |
+| `<leader>gd` | Git diff：当前文件与 HEAD 比较（自动定位最近仓库） |
+| `<leader>gD` | 弹出当前文件的提交历史，选择某次提交后与工作区 diff（自动定位最近仓库） |
 | `<leader>gra` | 执行 Git reset --mixed |
 | `<leader>grs` | 执行 Git reset --soft HEAD~1 |
 | `<leader>grd` | 执行 Git reset --hard HEAD~1 |
 | `<leader>gLa` | Git log 查看所有分支 |
 | `<leader>gr` | Git reset --mixed 当前文件 |
 | `<leader>grb` | 执行 Git rebase -i --fork-point |
+
+> **Git 仓库定位**：`<leader>gd` / `<leader>gl` / `<leader>gL` / `<leader>gD` 以及 nvim-tree 的 `gd` 不会只使用 Neovim 当前工作目录。会先从当前文件（或光标下节点）向上查找最近的 `.git`，找不到再向下搜索子目录；如果文件或路径是软链接，会先解析 `realpath` 再查找目标文件所在的真实仓库。当找到的仓库不是当前工作目录时，会提示 `Git repo: ...`。
 
 #### Gitsigns 代码块操作
 
@@ -277,7 +279,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `y` | 复制当前文件名 |
 | `Y` | 复制当前文件相对路径 |
 | `gy` | 复制当前文件绝对路径 |
-| `gd` | Git log 查看光标下文件或目录的提交历史；Enter 打开该文件 diff，Ctrl+Enter 打开整个 commit |
+| `gd` | Git log 查看光标下文件或目录的提交历史（自动定位最近仓库 / 软链接真实路径）；Enter 打开该文件 diff，Ctrl+Enter 打开整个 commit |
 | `sd` | 在光标下的文件夹中搜索子目录，选中后跳转并展开（不切换工作目录） |
 
 ### 9. 其他功能

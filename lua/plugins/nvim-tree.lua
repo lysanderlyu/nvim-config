@@ -13,31 +13,35 @@ return {
           return
         end
 
-        local is_dir = node.type == "directory" or vim.fn.isdirectory(path) == 1
-        local base = is_dir and path or vim.fn.fnamemodify(path, ":h")
+        local git_util = require("utils.git")
+        -- Follow soft links so a linked file/dir uses the target's git repo.
+        local real = git_util.realpath(path) or path
+        local is_dir = node.type == "directory" or vim.fn.isdirectory(real) == 1
+        local base = is_dir and real or vim.fn.fnamemodify(real, ":h")
+
+        -- Walk up from this node, then search down for a nested .git
+        -- (cwd may not be a repo; a child folder might be).
+        local repo = git_util.nearest({ start = real })
+        if not repo then
+          return
+        end
+        local root, gitdir = repo.root, repo.gitdir
 
         -- Let git report the repo-relative location: --show-toplevel is
         -- symlink-resolved, so comparing it against the tree path fails
-        -- whenever any component is a symlink.
-        local info = vim.fn.systemlist({
-          "git", "-C", base, "rev-parse",
-          "--show-toplevel", "--absolute-git-dir", "--show-prefix",
+        -- whenever any component is a symlink. Empty when `base` is a
+        -- parent of the repo (we just found a nested .git below it).
+        local prefix_out = vim.fn.systemlist({
+          "git", "-C", base, "rev-parse", "--show-prefix",
         })
-        if vim.v.shell_error ~= 0 or #info < 2 then
-          vim.notify("Not in git repo", vim.log.levels.ERROR)
-          return
-        end
-        local root, gitdir, prefix = info[1], info[2], info[3] or ""
+        local prefix = (vim.v.shell_error == 0 and prefix_out[1]) or ""
 
         local rel
         if is_dir then
           rel = prefix ~= "" and (prefix:gsub("/$", "")) or "."
         else
-          rel = vim.fn.systemlist({
-            "git", "-c", "core.quotepath=false", "-C", base,
-            "ls-files", "--full-name", "--", vim.fn.fnamemodify(path, ":t"),
-          })[1]
-          if vim.v.shell_error ~= 0 or not rel or rel == "" then
+          rel = git_util.relpath(repo, real)
+          if not rel or rel == "" then
             vim.notify("File is not tracked by Git", vim.log.levels.ERROR)
             return
           end
