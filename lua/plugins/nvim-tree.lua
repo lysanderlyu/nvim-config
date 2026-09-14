@@ -167,36 +167,99 @@ return {
         })
       end
 
-      -- sd: directory picker scoped to the node under cursor
-      local function find_dir_node()
+      -- Directory of the node under cursor (folder itself, or the file's parent).
+      local function node_dir()
         local api = require("nvim-tree.api")
         local node = api.tree.get_node_under_cursor()
         local path = node and node.absolute_path
         if not path or path == "" then
-          return
+          return nil
         end
         local is_dir = node.type == "directory" or vim.fn.isdirectory(path) == 1
-        require("utils.directory_picker").open(is_dir and path or vim.fn.fnamemodify(path, ":h"))
+        return is_dir and path or vim.fn.fnamemodify(path, ":h")
       end
 
-      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets gd/sd
+      -- sd: directory picker scoped to the node under cursor
+      local function find_dir_node()
+        local cwd = node_dir()
+        if not cwd then
+          return
+        end
+        require("utils.directory_picker").open(cwd)
+      end
+
+      -- ff: file picker scoped to the node under cursor
+      local function find_files_node()
+        local cwd = node_dir()
+        if not cwd then
+          return
+        end
+        require("fzf-lua").files({
+          cwd = cwd,
+          prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
+          winopts = {
+            width = 0.95,
+            height = 0.95,
+            layout = "horizontal",
+            preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
+          },
+        })
+      end
+
+      -- fF: same picker, pre-filled from the unnamed register
+      local function find_files_node_from_yank()
+        local yank = vim.fn.getreg('"')
+        if yank == "" then
+          vim.notify("Clipboard is empty", vim.log.levels.INFO)
+          return
+        end
+        yank = yank:gsub("[\r\n]+$", "")
+        yank = yank:gsub("^%s*(.-)%s*$", "%1")
+
+        local cwd = node_dir()
+        if not cwd then
+          return
+        end
+        require("fzf-lua").files({
+          cwd = cwd,
+          prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
+          no_ignore = false,
+          fzf_opts = {
+            ["--query"] = yank,
+            ["--ansi"] = "",
+            ["--layout"] = "reverse",
+            ["--info"] = "default",
+          },
+          winopts = {
+            width = 0.9,
+            height = 0.9,
+            layout = "horizontal",
+            preview = {
+              layout = "vertical",
+              vertical = "right:55%",
+              scrollbar = "float",
+            },
+          },
+        })
+      end
+
+      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets these
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "NvimTree",
         callback = function(args)
-          vim.keymap.set("n", "gd", git_log_node, {
-            buffer = args.buf,
-            desc = "nvim-tree: Git Log: File/Dir",
-            noremap = true,
-            silent = true,
-            nowait = true,
-          })
-          vim.keymap.set("n", "sd", find_dir_node, {
-            buffer = args.buf,
-            desc = "nvim-tree: Find Directory",
-            noremap = true,
-            silent = true,
-            nowait = true,
-          })
+          local function tree_map(lhs, rhs, desc)
+            vim.keymap.set("n", lhs, rhs, {
+              buffer = args.buf,
+              desc = "nvim-tree: " .. desc,
+              noremap = true,
+              silent = true,
+              nowait = true,
+            })
+          end
+          tree_map("gd", git_log_node, "Git Log: File/Dir")
+          tree_map("sd", find_dir_node, "Find Directory")
+          tree_map("ff", find_files_node, "Find Files")
+          tree_map("fF", find_files_node_from_yank, "Find Files (yank)")
         end,
       })
 
@@ -241,6 +304,8 @@ return {
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
           vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
           vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
+          vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
+          vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
           -- Copy the file using cb copy
         end,
 
@@ -406,6 +471,8 @@ return {
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
             vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
             vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
+            vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
+            vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
             -- Copy the file using cb copy
           end,
 
