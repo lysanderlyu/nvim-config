@@ -66,7 +66,8 @@ nvim
 ├── lazy-lock.json     # Lazy.nvim 锁定文件
 ├── lua
 │   ├── configs        # 各插件及 LSP 配置
-│   └── plugins        # 插件列表
+│   ├── plugins        # 插件列表
+│   └── utils          # 共享工具（目录搜索、剪贴板等）
 ├── snips              # 代码片段
 └── syntax             # 自定义语法文件
 ```
@@ -165,6 +166,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
 | `<leader>ff` | 全局文件搜索 |
+| `<leader>sd` | Snacks 目录搜索：从当前工作区查找目录，选中后在 nvim-tree 中打开（不切换工作目录） |
+| `<leader>sD` | 搜索当前 Buffer 的诊断信息 |
 | `<leader>fr` | 搜索最近打开的文件 |
 | `<leader>fF` | 根据剪贴板内容过滤搜索文件 |
 | `<leader>fb` | 查看已打开的Buffer |
@@ -279,6 +282,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `Y` | 复制当前文件相对路径 |
 | `gy` | 复制当前文件绝对路径 |
 | `gd` | Git log 查看光标下文件或目录的提交历史；Enter 打开该文件 diff，Ctrl+Enter 打开整个 commit |
+| `sd` | 在光标下的文件夹中搜索子目录，选中后跳转并展开（不切换工作目录） |
 
 ### 9. 其他功能
 
