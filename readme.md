@@ -166,7 +166,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
 | `<leader>ff` | 全局文件搜索 |
-| `<leader>sd` | Snacks 目录搜索：从当前工作区查找目录，选中后在 nvim-tree 中打开（不切换工作目录） |
+| `<leader>sd` | Snacks 目录搜索：左栏 30% 搜目录，中栏 20% 目录树，右栏 45% 文件内容。Ctrl+j/k 在树中选文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开该文件，Ctrl+h/l 折叠/展开目录；Enter 仍在 nvim-tree 中打开选中目录（不切换工作目录） |
 | `<leader>sD` | 搜索当前 Buffer 的诊断信息 |
 | `<leader>fr` | 搜索最近打开的文件 |
 | `<leader>fF` | 根据剪贴板内容过滤搜索文件 |
@@ -284,7 +284,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `Y` | 复制当前文件相对路径 |
 | `gy` | 复制当前文件绝对路径 |
 | `gd` | Git log 查看光标下文件或目录的提交历史（自动定位最近仓库 / 软链接真实路径）；Enter 打开该文件 diff，Ctrl+Enter 打开整个 commit |
-| `sd` | 在光标下的文件夹中搜索子目录，选中后跳转并展开（不切换工作目录） |
+| `sd` | 在光标下的文件夹中搜索子目录；左 30% / 中 20% 目录树 / 右 45% 文件预览。Ctrl+j/k 选择文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开文件，Ctrl+h/l 折叠/展开目录；Enter 跳转并展开（不切换工作目录） |
 
 ### 9. 其他功能
 
