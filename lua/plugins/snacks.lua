@@ -296,7 +296,7 @@ return {
 
       -- search
       -- { "<leader>sC", function() Snacks.terminal() end, desc = "System command line" },
-      { "<leader>sd", function() Snacks.picker.diagnostics() end, desc = "Diagnostics" },
+      { "<leader>sd", function() require("utils.directory_picker").open() end, desc = "Find Directory" },
       { "<leader>sD", function() Snacks.picker.diagnostics_buffer() end, desc = "Buffer Diagnostics" },
       { "<leader>sI", function() Snacks.picker.icons() end, desc = "Icons" },
       { "<leader>sk", function() Snacks.picker.keymaps() end, desc = "Keymaps" },

@@ -167,13 +167,32 @@ return {
         })
       end
 
-      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets gd
+      -- sd: directory picker scoped to the node under cursor
+      local function find_dir_node()
+        local api = require("nvim-tree.api")
+        local node = api.tree.get_node_under_cursor()
+        local path = node and node.absolute_path
+        if not path or path == "" then
+          return
+        end
+        local is_dir = node.type == "directory" or vim.fn.isdirectory(path) == 1
+        require("utils.directory_picker").open(is_dir and path or vim.fn.fnamemodify(path, ":h"))
+      end
+
+      -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets gd/sd
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "NvimTree",
         callback = function(args)
           vim.keymap.set("n", "gd", git_log_node, {
             buffer = args.buf,
             desc = "nvim-tree: Git Log: File/Dir",
+            noremap = true,
+            silent = true,
+            nowait = true,
+          })
+          vim.keymap.set("n", "sd", find_dir_node, {
+            buffer = args.buf,
+            desc = "nvim-tree: Find Directory",
             noremap = true,
             silent = true,
             nowait = true,
@@ -221,6 +240,7 @@ return {
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
           vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
+          vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
           -- Copy the file using cb copy
         end,
 
@@ -385,6 +405,7 @@ return {
             vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
             vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
+            vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
             -- Copy the file using cb copy
           end,
 
