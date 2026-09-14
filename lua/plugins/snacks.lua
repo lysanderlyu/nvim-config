@@ -274,22 +274,47 @@ return {
       { "<leader>fc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
       -- git
       { "<leader>gl", function()
+        local git = require("utils.git")
+        local info = git.nearest()
+        if not info then
+          return
+        end
+        git.detect(info)
         local opts = vim.deepcopy(git_log_light_preview)
+        opts.cwd = info.root
+        opts.title = "Git Log: " .. vim.fn.fnamemodify(info.root, ":t")
         opts.confirm = function(picker, item)
           picker:close()
           local hash = item and (item.oid or item.commit)
           if not hash then
             return
           end
-          -- Gtabedit: open commit object with full diff (no :Git job → no hit-enter)
+          -- FugitiveFind pins the object to this repo (cwd may not be a git root)
           vim.schedule(function()
-            vim.cmd("Gtabedit " .. vim.fn.fnameescape(hash))
+            vim.cmd("tabedit " .. vim.fn.fnameescape(vim.fn.FugitiveFind(hash, info.gitdir)))
           end)
         end
         Snacks.picker.git_log(opts)
       end, desc = "Git Log → Show Diff" },
       { "<leader>gL", function()
-        Snacks.picker.git_log_line(vim.deepcopy(git_log_light_preview))
+        local git = require("utils.git")
+        local file = vim.api.nvim_buf_get_name(0)
+        local info = git.nearest({ start = file })
+        if not info then
+          return
+        end
+        git.detect(info)
+        local opts = vim.deepcopy(git_log_light_preview)
+        opts.cwd = info.root
+        opts.title = "Git Log Line: " .. vim.fn.fnamemodify(info.root, ":t")
+        -- git_log_line passes the buffer name (symlink) to `-L`; use realpath.
+        local rel = git.relpath(info, file)
+        if rel then
+          opts.cmd_args = { "-L", string.format("%d,+1:%s", vim.fn.line("."), rel) }
+          Snacks.picker.git_log(opts)
+        else
+          Snacks.picker.git_log_line(opts)
+        end
       end, desc = "Git Log Line" },
       -- Grep
       { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
