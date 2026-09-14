@@ -1,3 +1,9 @@
+-- Neovim 0.11 deprecates vim.tbl_islist; keep a silent alias for plugins
+-- (old telescope, etc.) that still call it from pickers and layout resolve.
+if vim.islist then
+  vim.tbl_islist = vim.islist
+end
+
 -- Set options
 vim.opt.number = true
 vim.opt.relativenumber = true
