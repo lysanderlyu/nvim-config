@@ -6,16 +6,17 @@ return {
 
       -- Treesitter-based function/class context
       local function current_code_context()
-        local ok, ts_utils = pcall(require, "nvim-treesitter.ts_utils")
-        if not ok then return "" end
+        local ok, node = pcall(vim.treesitter.get_node)
+        if not ok or not node then return "" end
 
-        local node = ts_utils.get_node_at_cursor()
+        local bufnr = vim.api.nvim_get_current_buf()
         local context = {}
 
         while node do
           local type = node:type()
           if type:match("function") or type:match("method") or type:match("class") or type:match("module") then
-            local name = ts_utils.get_node_text(node)[1]
+            local text_ok, text = pcall(vim.treesitter.get_node_text, node, bufnr)
+            local name = text_ok and text and text:match("^[^\n]*") or nil
             if name and name ~= "" then
               table.insert(context, 1, name)  -- insert at front for top-down order
             end
@@ -24,10 +25,9 @@ return {
         end
 
         if #context > 0 then
-          return "" .. table.concat(context, " → ")
-        else
-          return ""
+          return table.concat(context, " → ")
         end
+        return ""
       end
 
       local function get_smart_path()
