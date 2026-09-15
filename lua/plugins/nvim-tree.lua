@@ -183,6 +183,60 @@ return {
         return is_dir and path or vim.fn.fnamemodify(path, ":h")
       end
 
+      -- go: git status for dir under cursor — mirrors <leader>go
+      local function git_status_node()
+        local path = node_dir()
+        if not path then
+          return
+        end
+
+        local git_util = require("utils.git")
+        local real = git_util.realpath(path) or path
+        local repo = git_util.nearest({ start = real })
+        if not repo then
+          return
+        end
+
+        -- Same prefix trick as gd: --show-toplevel is symlink-resolved, so
+        -- comparing it against the tree path fails when any component is a link.
+        local prefix_out = vim.fn.systemlist({
+          "git", "-C", real, "rev-parse", "--show-prefix",
+        })
+        local prefix = (vim.v.shell_error == 0 and prefix_out[1]) or ""
+        local rel = prefix ~= "" and prefix:gsub("/$", "") or "."
+
+        -- Telescope git_status always pathspecs `.` from the repo root, so
+        -- filter entries to this dir. Porcelain paths are repo-relative.
+        local make_entry = require("telescope.make_entry")
+        local base_maker = make_entry.gen_from_git_status({ cwd = repo.root })
+        local function entry_maker(entry)
+          local result = base_maker(entry)
+          if not result or rel == "." then
+            return result
+          end
+          local file = result.value
+          if file ~= rel and not vim.startswith(file, rel .. "/") then
+            return nil
+          end
+          return result
+        end
+
+        local check = vim.fn.systemlist({
+          "git", "-c", "core.quotepath=false", "-C", repo.root,
+          "status", "--porcelain", "--", rel,
+        })
+        if vim.v.shell_error ~= 0 or #check == 0 then
+          vim.notify("No changes found", vim.log.levels.WARN)
+          return
+        end
+
+        require("telescope.builtin").git_status({
+          cwd = repo.root,
+          prompt_title = "Git Status: " .. (rel == "." and vim.fn.fnamemodify(repo.root, ":t") or rel),
+          entry_maker = entry_maker,
+        })
+      end
+
       -- sd: directory picker scoped to the node under cursor
       local function find_dir_node()
         local cwd = node_dir()
@@ -261,6 +315,7 @@ return {
             })
           end
           tree_map("gd", git_log_node, "Git Log: File/Dir")
+          tree_map("go", git_status_node, "Git Status: Dir")
           tree_map("sd", find_dir_node, "Find Directory")
           tree_map("ff", find_files_node, "Find Files")
           tree_map("fF", find_files_node_from_yank, "Find Files (yank)")
@@ -307,6 +362,7 @@ return {
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
           vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
+          vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
           vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
           vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
           vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
@@ -475,6 +531,7 @@ return {
             vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
             vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
+            vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
             vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
             vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
             vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
