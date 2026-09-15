@@ -203,7 +203,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>gr` | Git reset --mixed 当前文件 |
 | `<leader>grb` | 执行 Git rebase -i --fork-point |
 
-> **Git 仓库定位**：`<leader>gd` / `<leader>gl` / `<leader>gL` / `<leader>gD` 以及 nvim-tree 的 `gd` 不会只使用 Neovim 当前工作目录。会先从当前文件（或光标下节点）向上查找最近的 `.git`，找不到再向下搜索子目录；如果文件或路径是软链接，会先解析 `realpath` 再查找目标文件所在的真实仓库。当找到的仓库不是当前工作目录时，会提示 `Git repo: ...`。
+> **Git 仓库定位**：`<leader>gd` / `<leader>gl` / `<leader>gL` / `<leader>gD` 以及 nvim-tree 的 `gd` / `go` 不会只使用 Neovim 当前工作目录。会先从当前文件（或光标下节点）向上查找最近的 `.git`，找不到再向下搜索子目录；如果文件或路径是软链接，会先解析 `realpath` 再查找目标文件所在的真实仓库。当找到的仓库不是当前工作目录时，会提示 `Git repo: ...`。
 
 #### Gitsigns 代码块操作
 
@@ -280,6 +280,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `Y` | 复制当前文件相对路径 |
 | `gy` | 复制当前文件绝对路径 |
 | `gd` | Git log 查看光标下文件或目录的提交历史（自动定位最近仓库 / 软链接真实路径）；Enter 打开该文件 diff，Ctrl+Enter 打开整个 commit |
+| `go` | Git status 查看光标下目录（文件则取其父目录）的变更，与 `<leader>go` 同一窗口；仅列出该目录下的文件（自动定位最近仓库 / 软链接真实路径） |
 | `sd` | 在光标下的文件夹中搜索子目录；左 30% / 中 20% 目录树 / 右 45% 文件预览。Ctrl+j/k 选择文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开文件，Ctrl+h/l 折叠/展开目录；Enter 跳转并展开（不切换工作目录） |
 
 ### 9. 其他功能
