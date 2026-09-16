@@ -64,6 +64,7 @@ nvim
 ~/.config/nvim
 ├── init.lua           # 主配置文件
 ├── lazy-lock.json     # Lazy.nvim 锁定文件
+├── after/queries      # Treesitter 高亮补充（如 Device Tree 的 /delete-property/）
 ├── lua
 │   ├── configs        # 各插件及 LSP 配置
 │   ├── plugins        # 插件列表
@@ -107,6 +108,8 @@ nvim
 | `<leader>sg` | 打开文本全局搜索框 |
 | `<leader>ss` | 将当前`"`寄存器的文本进行全局搜索 |
 | `<leader>sS` | 将当前`+`寄存器（也就是系统剪切板）的文本进行全局搜索 |
+| `<leader>sn` | 列出当前文件类型可用的代码片段（无需先输入关键字，选中后插入） |
+| `<C-Space>` | Insert 模式下列出当前文件类型的代码片段（无需先输入关键字） |
 | `tab` | Normal 模式下，按Tab会打开/折叠当前块 |
 | `shift-tab` | Normal 模式下，按Shift+Tab会打开/折叠所有块 |
 | `<leader>tl` | 使用谷歌翻译当前行 |
@@ -369,9 +372,15 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 这个是用来配合补全功能来使用的片段快捷插入功能
 
-放在 `snips/` 目录中，支持不同语言：
+放在 `snips/` 目录中，支持不同语言。不想先输入关键字时，可在 Insert 模式按 `<C-Space>`，或在 Normal 模式按 `<leader>sn`，会列出当前文件类型全部可用片段。
 
 - `snippets/c.json`：vs-code 样式的代码片段  
+- `snippets/dts.json`：Device Tree 片段。打开 `.dts` / `.dtsi` / `.dtso` 后可用：
+    - `delprop` / `delete-property` → `/delete-property/ property-name;`
+    - `delnode` / `delete-node` → `/delete-node/ node-name;`
+    - `omit` → `/omit-if-no-ref/ node-name;`
+    - `dtso` → overlay 头（`/dts-v1/;` + `/plugin/;` + `&label { }`）
+    - `node` → 带 `compatible` / `reg` / `status` 的节点
 - `all.lua`：通用片段  
 - `c.lua`：C 语言片段  
     当你打开的是C语言文件，并输入`fn1` 或者 `fn2` 然后回车，就会自动插入预定好的片段：
@@ -396,6 +405,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 ## 八、自定义语法
 
 - 放在 `syntax/` 目录，例如 `tshark.vim` 这个是我用来高亮一些NVIM不支持高亮的特殊文件类型
+- Device Tree（`.dts` / `.dtsi` / `.dtso`）的 dtc 指令高亮放在 `after/queries/devicetree/highlights.scm`，会把 `/delete-property/`、`/delete-node/`、`/omit-if-no-ref/`、`/plugin/`、`/bits/`、`/incbin/` 等显示为关键字
 
 ---
 

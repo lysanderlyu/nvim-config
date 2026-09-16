@@ -609,6 +609,10 @@
 		        "language": "bitbake",
 		        "path": "./snippets/bitbake.json"
 	        },
+	        {
+		        "language": ["dts", "devicetree"],
+		        "path": "./snippets/dts.json"
+	        },
             {
                  "language": "zig",
                  "path": "./snippets/zig.json"

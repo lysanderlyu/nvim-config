@@ -26,7 +26,14 @@ local snippet = {
 local mapping = cmp.mapping.preset.insert({
   ["<C-b>"] = cmp.mapping.scroll_docs(-4),
   ["<C-f>"] = cmp.mapping.scroll_docs(4),
-  ["<C-Space>"] = cmp.mapping.complete(),
+  -- Show this filetype's snippets even with no typed prefix
+  ["<C-Space>"] = cmp.mapping.complete({
+    config = {
+      sources = {
+        { name = "luasnip" },
+      },
+    },
+  }),
   ["<C-e>"] = cmp.mapping.abort(),
 
   ["<CR>"] = cmp.mapping.confirm({
