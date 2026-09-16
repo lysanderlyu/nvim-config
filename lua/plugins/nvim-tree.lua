@@ -301,6 +301,73 @@ return {
         })
       end
 
+      -- ss / sS / sg: grep scoped to the node under cursor (mirrors <leader>ss / sS / sg)
+      local grep_winopts = {
+        width = 0.95,
+        height = 0.95,
+        layout = "horizontal",
+        preview = { layout = "vertical", vertical = "right:55%" },
+      }
+
+      local function grep_in_node(search, extra)
+        local cwd = node_dir()
+        if not cwd then
+          return
+        end
+        local opts = {
+          cwd = cwd,
+          search = search,
+          prompt = "Search (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
+          fzf_opts = {
+            ["--ansi"] = "",
+            ["--layout"] = "reverse",
+            ["--info"] = "default",
+          },
+          winopts = grep_winopts,
+        }
+        if extra then
+          for k, v in pairs(extra) do
+            opts[k] = v
+          end
+        end
+        require("fzf-lua").grep(opts)
+      end
+
+      local function yank_for_grep(reg)
+        local yank = vim.fn.getreg(reg)
+        if yank == "" then
+          vim.notify("No yanked text", vim.log.levels.INFO)
+          return nil
+        end
+        yank = yank:gsub("[\r\n]+$", "")
+        yank = yank:gsub([[\]], [[\\]]):gsub([["]], [[\"]])
+        return yank
+      end
+
+      local function search_unnamed_node()
+        local yank = yank_for_grep('"')
+        if yank then
+          grep_in_node(yank)
+        end
+      end
+
+      local function search_clipboard_node()
+        local yank = yank_for_grep("+")
+        if yank then
+          grep_in_node(yank)
+        end
+      end
+
+      local function search_grep_node()
+        local actions = require("fzf-lua").actions
+        grep_in_node("", {
+          actions = {
+            ["ctrl-g"] = { actions.grep_lgrep },
+            ["ctrl-r"] = { actions.toggle_ignore },
+          },
+        })
+      end
+
       -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets these
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "NvimTree",
@@ -317,6 +384,9 @@ return {
           tree_map("gd", git_log_node, "Git Log: File/Dir")
           tree_map("go", git_status_node, "Git Status: Dir")
           tree_map("sd", find_dir_node, "Find Directory")
+          tree_map("ss", search_unnamed_node, "Search yank")
+          tree_map("sS", search_clipboard_node, "Search clipboard")
+          tree_map("sg", search_grep_node, "Search")
           tree_map("ff", find_files_node, "Find Files")
           tree_map("fF", find_files_node_from_yank, "Find Files (yank)")
         end,
@@ -364,6 +434,9 @@ return {
           vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
           vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
           vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
+          vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank'))
+          vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard'))
+          vim.keymap.set('n', 'sg', search_grep_node, opts('Search'))
           vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
           vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
           -- Copy the file using cb copy
@@ -532,6 +605,9 @@ return {
             vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
             vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
             vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
+            vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank'))
+            vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard'))
+            vim.keymap.set('n', 'sg', search_grep_node, opts('Search'))
             vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
             vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
             -- Copy the file using cb copy
