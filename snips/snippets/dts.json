@@ -1,0 +1,75 @@
+{
+    "dts-v1": {
+        "prefix": ["dts-v1", "dtsv1"],
+        "body": "/dts-v1/;",
+        "description": "Device tree version header"
+    },
+    "overlay header": {
+        "prefix": ["dtso", "plugin"],
+        "body": [
+            "/dts-v1/;",
+            "/plugin/;",
+            "",
+            "&${1:label} {",
+            "\t${0}",
+            "};"
+        ],
+        "description": "Device tree overlay header with fragment"
+    },
+    "delete-property": {
+        "prefix": ["delete-property", "delprop"],
+        "body": "/delete-property/ ${1:property-name};",
+        "description": "Delete a property from the current node"
+    },
+    "delete-node": {
+        "prefix": ["delete-node", "delnode"],
+        "body": "/delete-node/ ${1:node-name};",
+        "description": "Delete a child node"
+    },
+    "omit-if-no-ref": {
+        "prefix": ["omit-if-no-ref", "omit"],
+        "body": "/omit-if-no-ref/ ${1:node-name};",
+        "description": "Drop a node if nothing references it"
+    },
+    "include": {
+        "prefix": ["dtsinclude", "/include/"],
+        "body": "/include/ \"${1:file.dtsi}\"",
+        "description": "Include a dtsi file (dtc /include/)"
+    },
+    "incbin": {
+        "prefix": "incbin",
+        "body": "/incbin/ (\"${1:file.bin}\")",
+        "description": "Include a binary blob"
+    },
+    "bits": {
+        "prefix": ["bits", "/bits/"],
+        "body": "/bits/ ${1:32} <${2:value}>",
+        "description": "Specify cell width for a property value"
+    },
+    "memreserve": {
+        "prefix": "memreserve",
+        "body": "/memreserve/ ${1:0x00000000} ${2:0x00000000};",
+        "description": "Reserve a physical memory region"
+    },
+    "overlay fragment": {
+        "prefix": ["fragment", "overlay"],
+        "body": [
+            "&${1:label} {",
+            "\t${0}",
+            "};"
+        ],
+        "description": "Overlay fragment targeting a labeled node"
+    },
+    "node": {
+        "prefix": "node",
+        "body": [
+            "${1:node-name}@${2:0} {",
+            "\tcompatible = \"${3:vendor,device}\";",
+            "\treg = <${4:0x0} ${5:0x0}>;",
+            "\tstatus = \"${6:okay}\";",
+            "\t${0}",
+            "};"
+        ],
+        "description": "Device tree node"
+    }
+}
