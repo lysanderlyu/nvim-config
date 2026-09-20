@@ -25,7 +25,10 @@ return {
         if not repo then
           return
         end
-        local root, gitdir = repo.root, repo.gitdir
+        local root = repo.root
+        -- fugitive_dir, not repo.gitdir: an external git dir (--separate-git-dir)
+        -- has no core.worktree, so a URL built from it makes fugitive bail.
+        local gitdir = git_util.fugitive_dir(repo)
 
         -- Let git report the repo-relative location: --show-toplevel is
         -- symlink-resolved, so comparing it against the tree path fails
