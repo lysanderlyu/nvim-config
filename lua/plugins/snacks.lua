@@ -289,9 +289,12 @@ return {
           if not hash then
             return
           end
-          -- FugitiveFind pins the object to this repo (cwd may not be a git root)
+          -- FugitiveFind pins the object to this repo (cwd may not be a git root).
+          -- fugitive_dir, not info.gitdir: the URL must carry a dir fugitive can
+          -- derive the work tree from (an external git dir has no core.worktree).
+          local gitdir = git.fugitive_dir(info)
           vim.schedule(function()
-            vim.cmd("tabedit " .. vim.fn.fnameescape(vim.fn.FugitiveFind(hash, info.gitdir)))
+            vim.cmd("tabedit " .. vim.fn.fnameescape(vim.fn.FugitiveFind(hash, gitdir)))
           end)
         end
         Snacks.picker.git_log(opts)

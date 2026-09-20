@@ -319,10 +319,35 @@ function M.nearest(opts)
   return nil
 end
 
+---Git dir to hand to fugitive for this repo.
+---
+---Fugitive derives the work tree from the git dir's `core.worktree`, or, for a
+---gitfile, from the gitfile's own location. Under `--separate-git-dir` the
+---absolute git dir is external and carries no `core.worktree`, so fugitive
+---rejects it with "core.worktree is required when using an external Git dir".
+---`<root>/.git` is a gitfile there that points back at the work tree, so both
+---`b:git_dir` and the `fugitive://` URLs built from it resolve correctly.
+---Submodule and linked-worktree git dirs do set `core.worktree`, so either form
+---works for those — but the gitfile is correct in every layout.
+---@param info { root: string, gitdir: string }
+---@return string
+function M.fugitive_dir(info)
+  local root = norm(info.root)
+  local gitfile = root and (root .. "/.git")
+  if gitfile and vim.uv.fs_stat(gitfile) then
+    return gitfile
+  end
+  return info.gitdir
+end
+
 ---Point fugitive at this repo for the current buffer (`:Gtabedit`, `:Gvdiffsplit`).
+---
+---This only pins the buffer it runs in. `:Gtabedit` / `FugitiveFind` open *new*
+---buffers that re-derive the repo from the URL, so those callers must build
+---their URLs from `M.fugitive_dir(info)` too, not from `info.gitdir`.
 ---@param info { root: string, gitdir: string }
 function M.detect(info)
-  vim.b.git_dir = info.gitdir
+  vim.b.git_dir = M.fugitive_dir(info)
 end
 
 return M
