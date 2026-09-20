@@ -206,6 +206,81 @@ function M.relpath(info, file)
   return nil
 end
 
+---Run git in a repo and return stdout, or nil on failure.
+---@param root string
+---@param args string[]
+---@return string|nil
+local function capture(root, args)
+  local cmd = { "git", "-c", "core.quotepath=false", "-C", root }
+  vim.list_extend(cmd, args)
+  local out = vim.system(cmd, { text = true }):wait()
+  if out.code ~= 0 then
+    return nil
+  end
+  return out.stdout
+end
+
+---Repo-relative paths whose history belongs to `rel`: the path itself followed
+---by every name it was renamed from, newest first. Feed this to plain `git log`
+---as a pathspec instead of using `--follow`.
+---
+---Why not `--follow`: it re-runs rename detection against whatever tree the name
+---disappears in, so a boilerplate file chains through bogus 100%-similarity
+---matches back to an import-style root commit and detection then runs over that
+---whole tree. Measured 125s / 2.5GB on one .mk file. It also disables
+---path-limiting, so changed-path Bloom filters cannot be used. Instead walk name
+---by name, asking only the single commit that added each name where it came
+---from; that diff covers just that commit's files, so it stays in the
+---milliseconds.
+---@param info { root: string }
+---@param rel string repo-relative path
+---@return string[] pathspec: at least `rel`
+function M.history_pathspec(info, rel)
+  local names = {}
+  local name = rel
+
+  -- Depth cap: a rename chain this long is not worth more git calls.
+  for _ = 1, 10 do
+    names[#names + 1] = name
+
+    local log = capture(info.root, { "log", "--format=%H", "--", name })
+    local added
+    for _, sha in ipairs(vim.split(log or "", "\n", { trimempty = true })) do
+      added = sha
+    end
+    if not added then
+      break
+    end
+
+    -- Parents from an unfiltered rev-list: under a pathspec, history
+    -- simplification rewrites them away and every commit that adds a name
+    -- looks parentless. A root commit ends the chain — nothing to rename from.
+    local parents = capture(info.root, { "rev-list", "--parents", "-n", "1", added })
+    if not parents or #vim.split(vim.trim(parents), "%s+") < 2 then
+      break
+    end
+
+    local renames = capture(info.root, {
+      "show", "-M", "-z", "--name-status", "--diff-filter=R", "--format=", added,
+    })
+    -- -z record: "R<similarity>", old, new
+    local fields = vim.split(renames or "", "\0", { trimempty = true })
+    local from
+    for i = 1, #fields - 2 do
+      if fields[i]:find("^R%d+$") and fields[i + 2] == name then
+        from = fields[i + 1]
+        break
+      end
+    end
+    if not from then
+      break
+    end
+    name = from
+  end
+
+  return names
+end
+
 ---Nearest git work tree for a path (or the current file, then cwd).
 ---Walks up first (normal git), then searches downward for a nested `.git`.
 ---Start paths are realpath-resolved so a symlink file/dir still finds its repo.

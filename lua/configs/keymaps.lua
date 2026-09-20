@@ -220,14 +220,22 @@ vim.keymap.set("n", "<leader>gD", function()
   end
 
   -------------------------------------------------------
-  -- 4. Show Git Log for this file
+  -- 4. Pathspec covering this file and the names it was renamed from
+  -------------------------------------------------------
+  -- Not `--follow`: follow re-runs rename detection over whole trees and
+  -- disables path-limiting, so changed-path Bloom filters go unused — minutes
+  -- instead of seconds on a kernel-sized repo. utils.git walks renames instead.
+  local pathspec = git.history_pathspec(info, rel_file)
+
+  -------------------------------------------------------
+  -- 5. Show Git Log for this file
   -------------------------------------------------------
   -- git_log + pathspec, not git_log_file: the latter passes the buffer
   -- name (the symlink) to `git log --`, which misses the real file.
   Snacks.picker.git_log({
     cwd = info.root,
-    cmd_args = { "--follow", "--", rel_file },
-    pathspec = { rel_file },
+    cmd_args = vim.list_extend({ "--" }, pathspec),
+    pathspec = pathspec,
     title = "Git Log: " .. rel_file .. " (" .. vim.fn.fnamemodify(info.root, ":t") .. ")",
     confirm = function(picker, item)
       picker:close()
@@ -238,7 +246,7 @@ vim.keymap.set("n", "<leader>gD", function()
       end
 
       ---------------------------------------------------
-      -- 5. Diff worktree file vs selected commit
+      -- 6. Diff worktree file vs selected commit
       ---------------------------------------------------
       vim.schedule(function()
         git.detect(info)
