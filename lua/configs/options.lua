@@ -9,6 +9,10 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = ''
 vim.o.wrap = false
+-- New vertical splits open to the right of the current window. Without this,
+-- <C-v> in a picker (or nvim-tree) launched from the tree sidebar splits to
+-- the left of the sidebar itself.
+vim.opt.splitright = true
 vim.g.mapleader = " "
 vim.o.cmdheight = 1
 vim.o.laststatus = 3
