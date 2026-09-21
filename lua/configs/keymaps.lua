@@ -87,8 +87,34 @@ vim.keymap.set("n", "vl", '^vg_', { desc = "Select whole line" })
 vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
 
 -- telescope Git
-vim.keymap.set("n", "<leader>go", builtin.git_status, opts)
-vim.keymap.set("n", "<leader>gb", builtin.git_branches, opts)
+-- Every telescope git builtin is wrapped in apply_checks(), which calls
+-- set_opts_cwd() first: with no `cwd` it shells out to `git rev-parse` in
+-- vim.loop.cwd() and hard-errors ("<cwd> is not a git directory") when that
+-- directory is not a repo — e.g. an editor opened at /data/sansan while the
+-- buffer lives in a nested repo underneath it. Resolve the repo the way the
+-- rest of the config does instead (realpath, walk up, then search down), and
+-- hand it to telescope as `cwd`.
+local function repo_cwd()
+  local file = vim.fn.expand("%:p")
+  local info = require("utils.git").nearest({ start = file ~= "" and file or nil })
+  return info and info.root or nil
+end
+
+vim.keymap.set("n", "<leader>go", function()
+  local cwd = repo_cwd()
+  if not cwd then
+    return
+  end
+  builtin.git_status({ cwd = cwd })
+end, vim.tbl_extend("force", opts, { desc = "Git status (nearest repo)" }))
+
+vim.keymap.set("n", "<leader>gb", function()
+  local cwd = repo_cwd()
+  if not cwd then
+    return
+  end
+  builtin.git_branches({ cwd = cwd })
+end, vim.tbl_extend("force", opts, { desc = "Git branches (nearest repo)" }))
 
 -- Others
 vim.keymap.set("n", "<leader>km", builtin.keymaps, opts)
