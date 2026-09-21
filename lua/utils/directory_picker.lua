@@ -439,6 +439,25 @@ local function reveal_in_nvim_tree(path)
   end)
 end
 
+---Open the row under the tree-preview cursor with `cmd`, mirroring <CR>/<C-CR>.
+---Directories are handed to nvim-tree instead, since :edit-ing one is meaningless.
+---@param picker snacks.Picker
+---@param cmd "edit"|"split"|"vsplit"|"tabedit"
+local function open_row(picker, cmd)
+  local row = current_row(picker)
+  if not row then
+    return
+  end
+  picker:close()
+  if row.dir then
+    reveal_in_nvim_tree(row.path)
+    return
+  end
+  vim.schedule(function()
+    vim.cmd(cmd .. " " .. vim.fn.fnameescape(row.path))
+  end)
+end
+
 ---@param cwd? string
 function M.open(cwd)
   cwd = cwd or vim.uv.cwd() or vim.fn.getcwd()
@@ -459,6 +478,9 @@ function M.open(cwd)
     ["<c-d>"] = { "dir_file_scroll_down", mode = { "i", "n" } },
     ["<c-u>"] = { "dir_file_scroll_up", mode = { "i", "n" } },
     ["<C-CR>"] = { "dir_preview_edit", mode = { "i", "n" } },
+    ["<c-s>"] = { "dir_preview_split", mode = { "i", "n" } },
+    ["<c-v>"] = { "dir_preview_vsplit", mode = { "i", "n" } },
+    ["<c-t>"] = { "dir_preview_tabedit", mode = { "i", "n" } },
   }
 
   -- 30% + 20% + 45% of the editor; picker width is that 95% total.
@@ -520,6 +542,21 @@ function M.open(cwd)
       ["<C-CR>"] = function()
         if picker_ref then
           picker_ref:action("dir_preview_edit")
+        end
+      end,
+      ["<c-s>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_preview_split")
+        end
+      end,
+      ["<c-v>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_preview_vsplit")
+        end
+      end,
+      ["<c-t>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_preview_tabedit")
         end
       end,
       ["<Esc>"] = function()
@@ -643,18 +680,16 @@ function M.open(cwd)
         render(picker, picker.preview)
       end,
       dir_preview_edit = function(picker)
-        local row = current_row(picker)
-        if not row then
-          return
-        end
-        picker:close()
-        if row.dir then
-          reveal_in_nvim_tree(row.path)
-          return
-        end
-        vim.schedule(function()
-          vim.cmd.edit(vim.fn.fnameescape(row.path))
-        end)
+        open_row(picker, "edit")
+      end,
+      dir_preview_split = function(picker)
+        open_row(picker, "split")
+      end,
+      dir_preview_vsplit = function(picker)
+        open_row(picker, "vsplit")
+      end,
+      dir_preview_tabedit = function(picker)
+        open_row(picker, "tabedit")
       end,
     },
     win = {
@@ -668,6 +703,9 @@ function M.open(cwd)
           ["<c-d>"] = "dir_file_scroll_down",
           ["<c-u>"] = "dir_file_scroll_up",
           ["<C-CR>"] = "dir_preview_edit",
+          ["<c-s>"] = "dir_preview_split",
+          ["<c-v>"] = "dir_preview_vsplit",
+          ["<c-t>"] = "dir_preview_tabedit",
         },
       },
       preview = {
@@ -679,6 +717,9 @@ function M.open(cwd)
           ["<c-d>"] = "dir_file_scroll_down",
           ["<c-u>"] = "dir_file_scroll_up",
           ["<C-CR>"] = "dir_preview_edit",
+          ["<c-s>"] = "dir_preview_split",
+          ["<c-v>"] = "dir_preview_vsplit",
+          ["<c-t>"] = "dir_preview_tabedit",
         },
       },
     },
