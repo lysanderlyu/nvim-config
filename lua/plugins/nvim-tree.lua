@@ -109,16 +109,89 @@ return {
         })
       end
 
-      -- Directory of the node under cursor (folder itself, or the file's parent).
-      local function node_dir()
-        local api = require("nvim-tree.api")
-        local node = api.tree.get_node_under_cursor()
+      -- Directory of a tree node (folder itself, or the file's parent).
+      local function dir_of_node(node)
         local path = node and node.absolute_path
         if not path or path == "" then
           return nil
         end
         local is_dir = node.type == "directory" or vim.fn.isdirectory(path) == 1
         return is_dir and path or vim.fn.fnamemodify(path, ":h")
+      end
+
+      -- Directory of the node under cursor (folder itself, or the file's parent).
+      local function node_dir()
+        local api = require("nvim-tree.api")
+        return dir_of_node(api.tree.get_node_under_cursor())
+      end
+
+      -- Directory at hierarchy depth `level` from the tree/project root, along the
+      -- path to the cursor node. level 1 = first folder under the project, 2 = next, …
+      -- level 0 (plain ss) → current node.
+      local function node_dir_at_hierarchy_level(level)
+        level = level or 0
+        if level == 0 then
+          return node_dir()
+        end
+
+        local api = require("nvim-tree.api")
+        local node = api.tree.get_node_under_cursor()
+        if not node then
+          return nil
+        end
+
+        -- Walk parents → [root, …, cursor]
+        local chain = {}
+        local n = node
+        while n do
+          table.insert(chain, 1, n)
+          n = n.parent
+        end
+
+        -- chain[1] is the project/tree root; level 1 → chain[2], level 2 → chain[3], …
+        local target = chain[level + 1]
+        if not target then
+          vim.notify(
+            string.format("No directory at hierarchy level %d (path depth is %d)", level, math.max(#chain - 1, 0)),
+            vim.log.levels.WARN
+          )
+          return nil
+        end
+        return dir_of_node(target)
+      end
+
+      -- Reverse of hierarchy level: N directories up from the current file/dir
+      -- toward the project root. -1 = parent of current scope, -2 = grandparent, …
+      -- (For a file, current scope is its parent — same baseline as plain ss.)
+      local function node_dir_n_levels_up(n)
+        n = n or 0
+        if n == 0 then
+          return node_dir()
+        end
+
+        local api = require("nvim-tree.api")
+        local node = api.tree.get_node_under_cursor()
+        if not node then
+          return nil
+        end
+
+        local is_dir = node.type == "directory" or vim.fn.isdirectory(node.absolute_path) == 1
+        local cur = is_dir and node or node.parent
+        if not cur then
+          return nil
+        end
+
+        for _ = 1, n do
+          if not cur.parent then
+            vim.notify(
+              string.format("Cannot go %d level(s) up (reached project root)", n),
+              vim.log.levels.WARN
+            )
+            return nil
+          end
+          cur = cur.parent
+        end
+        return dir_of_node(cur)
       end
 
       -- go: git status for dir under cursor — mirrors <leader>go
@@ -176,8 +249,9 @@ return {
       end
 
       -- sd: directory picker scoped to the node under cursor
-      local function find_dir_node()
-        local cwd = node_dir()
+      -- [count]sd: same, but at hierarchy depth `count` from the project root
+      local function find_dir_node(cwd)
+        cwd = cwd or node_dir_at_hierarchy_level(vim.v.count)
         if not cwd then
           return
         end
@@ -185,8 +259,9 @@ return {
       end
 
       -- ff: file picker scoped to the node under cursor
-      local function find_files_node()
-        local cwd = node_dir()
+      -- [count]ff: same, but at hierarchy depth `count` from the project root
+      local function find_files_node(cwd)
+        cwd = cwd or node_dir_at_hierarchy_level(vim.v.count)
         if not cwd then
           return
         end
@@ -204,7 +279,7 @@ return {
       end
 
       -- fF: same picker, pre-filled from the unnamed register
-      local function find_files_node_from_yank()
+      local function find_files_node_from_yank(cwd)
         local yank = vim.fn.getreg('"')
         if yank == "" then
           vim.notify("Clipboard is empty", vim.log.levels.INFO)
@@ -213,7 +288,7 @@ return {
         yank = yank:gsub("[\r\n]+$", "")
         yank = yank:gsub("^%s*(.-)%s*$", "%1")
 
-        local cwd = node_dir()
+        cwd = cwd or node_dir_at_hierarchy_level(vim.v.count)
         if not cwd then
           return
         end
@@ -249,8 +324,8 @@ return {
         preview = { layout = "vertical", vertical = "right:55%" },
       }
 
-      local function grep_in_node(search, extra)
-        local cwd = node_dir()
+      local function grep_in_node(search, extra, cwd)
+        cwd = cwd or node_dir()
         if not cwd then
           return
         end
@@ -284,17 +359,20 @@ return {
         return yank
       end
 
+      -- [count]ss: search yank under the directory at hierarchy depth `count`
+      -- from the project/tree root (along the path to the cursor).
+      -- Plain ss still searches the node under the cursor.
       local function search_unnamed_node()
         local yank = yank_for_grep('"')
         if yank then
-          grep_in_node(yank)
+          grep_in_node(yank, nil, node_dir_at_hierarchy_level(vim.v.count))
         end
       end
 
       local function search_clipboard_node()
         local yank = yank_for_grep("+")
         if yank then
-          grep_in_node(yank)
+          grep_in_node(yank, nil, node_dir_at_hierarchy_level(vim.v.count))
         end
       end
 
@@ -305,7 +383,45 @@ return {
             ["ctrl-g"] = { actions.grep_lgrep },
             ["ctrl-r"] = { actions.toggle_ignore },
           },
-        })
+        }, node_dir_at_hierarchy_level(vim.v.count))
+      end
+
+      -- -[1-9]{ss,sS,sg,sd,ff,fF}: N levels up from current file/dir toward project root.
+      -- Literal sequences (vim has no negative count). Requires `-` without nowait.
+      local function bind_hierarchy_up_maps(map_fn)
+        for i = 1, 9 do
+          local level = i
+          map_fn("-" .. i .. "ss", function()
+            local yank = yank_for_grep('"')
+            if yank then
+              grep_in_node(yank, nil, node_dir_n_levels_up(level))
+            end
+          end, string.format("Search yank (%d levels up)", i))
+          map_fn("-" .. i .. "sS", function()
+            local yank = yank_for_grep("+")
+            if yank then
+              grep_in_node(yank, nil, node_dir_n_levels_up(level))
+            end
+          end, string.format("Search clipboard (%d levels up)", i))
+          map_fn("-" .. i .. "sg", function()
+            local actions = require("fzf-lua").actions
+            grep_in_node("", {
+              actions = {
+                ["ctrl-g"] = { actions.grep_lgrep },
+                ["ctrl-r"] = { actions.toggle_ignore },
+              },
+            }, node_dir_n_levels_up(level))
+          end, string.format("Search (%d levels up)", i))
+          map_fn("-" .. i .. "sd", function()
+            find_dir_node(node_dir_n_levels_up(level))
+          end, string.format("Find Directory (%d levels up)", i))
+          map_fn("-" .. i .. "ff", function()
+            find_files_node(node_dir_n_levels_up(level))
+          end, string.format("Find Files (%d levels up)", i))
+          map_fn("-" .. i .. "fF", function()
+            find_files_node_from_yank(node_dir_n_levels_up(level))
+          end, string.format("Find Files yank (%d levels up)", i))
+        end
       end
 
       -- Also bind via FileType so <leader>ge (re-setup without on_attach) still gets these
@@ -323,12 +439,21 @@ return {
           end
           tree_map("gd", git_log_node, "Git Log: File/Dir")
           tree_map("go", git_status_node, "Git Status: Dir")
-          tree_map("sd", find_dir_node, "Find Directory")
-          tree_map("ss", search_unnamed_node, "Search yank")
-          tree_map("sS", search_clipboard_node, "Search clipboard")
-          tree_map("sg", search_grep_node, "Search")
-          tree_map("ff", find_files_node, "Find Files")
-          tree_map("fF", find_files_node_from_yank, "Find Files (yank)")
+          tree_map("sd", find_dir_node, "Find Directory ([count]sd = hierarchy level)")
+          tree_map("ss", search_unnamed_node, "Search yank ([count]ss = hierarchy level)")
+          tree_map("sS", search_clipboard_node, "Search clipboard ([count]sS)")
+          tree_map("sg", search_grep_node, "Search ([count]sg)")
+          tree_map("ff", find_files_node, "Find Files ([count]ff = hierarchy level)")
+          tree_map("fF", find_files_node_from_yank, "Find Files (yank) ([count]fF)")
+          bind_hierarchy_up_maps(tree_map)
+          -- Allow -[1-9]… sequences: plain `-` must wait (no nowait)
+          vim.keymap.set("n", "-", require("nvim-tree.api").tree.change_root_to_parent, {
+            buffer = args.buf,
+            desc = "nvim-tree: Up",
+            noremap = true,
+            silent = true,
+            nowait = false,
+          })
         end,
       })
 
@@ -357,7 +482,10 @@ return {
           vim.keymap.set('n', '>', api.node.navigate.sibling.next, opts('Next Sibling'))
           vim.keymap.set('n', '<', api.node.navigate.sibling.prev, opts('Previous Sibling'))
           vim.keymap.set('n', '.', api.node.run.cmd, opts('Run Command'))
-          vim.keymap.set('n', '-', api.tree.change_root_to_parent, opts('Up'))
+          -- no nowait: must wait so -[1-9]ss / -[1-9]ff / … can complete
+          vim.keymap.set('n', '-', api.tree.change_root_to_parent, {
+            desc = 'nvim-tree: Up', buffer = bufnr, noremap = true, silent = true, nowait = false,
+          })
           vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
           vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
           vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
@@ -373,12 +501,15 @@ return {
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
           vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
           vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
-          vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
-          vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank'))
-          vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard'))
-          vim.keymap.set('n', 'sg', search_grep_node, opts('Search'))
-          vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
-          vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
+          vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory ([count]sd = hierarchy level)'))
+          vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank ([count]ss = hierarchy level)'))
+          vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard ([count]sS)'))
+          vim.keymap.set('n', 'sg', search_grep_node, opts('Search ([count]sg)'))
+          vim.keymap.set('n', 'ff', find_files_node, opts('Find Files ([count]ff = hierarchy level)'))
+          vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank) ([count]fF)'))
+          bind_hierarchy_up_maps(function(lhs, rhs, desc)
+            vim.keymap.set('n', lhs, rhs, opts(desc))
+          end)
           -- Copy the file using cb copy
         end,
 
@@ -528,7 +659,10 @@ return {
             vim.keymap.set('n', '>', api.node.navigate.sibling.next, opts('Next Sibling'))
             vim.keymap.set('n', '<', api.node.navigate.sibling.prev, opts('Previous Sibling'))
             vim.keymap.set('n', '.', api.node.run.cmd, opts('Run Command'))
-            vim.keymap.set('n', '-', api.tree.change_root_to_parent, opts('Up'))
+            -- no nowait: must wait so -[1-9]ss / -[1-9]ff / … can complete
+            vim.keymap.set('n', '-', api.tree.change_root_to_parent, {
+              desc = 'nvim-tree: Up', buffer = bufnr, noremap = true, silent = true, nowait = false,
+            })
             vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
             vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
             vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
@@ -544,12 +678,15 @@ return {
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
             vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
             vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
-            vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory'))
-            vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank'))
-            vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard'))
-            vim.keymap.set('n', 'sg', search_grep_node, opts('Search'))
-            vim.keymap.set('n', 'ff', find_files_node, opts('Find Files'))
-            vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank)'))
+            vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory ([count]sd = hierarchy level)'))
+            vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank ([count]ss = hierarchy level)'))
+            vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard ([count]sS)'))
+            vim.keymap.set('n', 'sg', search_grep_node, opts('Search ([count]sg)'))
+            vim.keymap.set('n', 'ff', find_files_node, opts('Find Files ([count]ff = hierarchy level)'))
+            vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank) ([count]fF)'))
+            bind_hierarchy_up_maps(function(lhs, rhs, desc)
+              vim.keymap.set('n', lhs, rhs, opts(desc))
+            end)
             -- Copy the file using cb copy
           end,
 
