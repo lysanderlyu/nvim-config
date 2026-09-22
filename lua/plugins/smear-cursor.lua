@@ -26,11 +26,14 @@ return {
       cursor_color = "#C6C8C5",
       keep_smear_on_idle = false,
       hide_builtin_cursor = true,
-      
+
       -- Disable smear while typing
       smear_insert_mode = false,
       enabled_in_insert_mode = false,
       enabled_in_terminal_mode = false,
+      -- Don't replace the Noice cmdline cursor with a block smear;
+      -- leave the real cursor so guicursor `c:ver25` can show an insert bar.
+      smear_to_cmd = false,
 
       smear_between_buffers = true,
       smear_between_neighbor_lines = true,

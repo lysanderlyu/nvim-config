@@ -29,6 +29,10 @@ return {
         },
       })
 
+      -- Noice (Neovim 0.11+) draws a real cursor in the cmdline popup.
+      -- Default guicursor maps mode `c` to block; prefer an insert-style bar.
+      vim.opt.guicursor:append("c:ver25")
+
       -- Keymap to show notification history
       -- Option A: Noice built-in (Opens in a split as per your config)
       -- vim.keymap.set("n", "<leader>n", "<cmd>Noice history<CR>", { desc = "Show Notification History" })
