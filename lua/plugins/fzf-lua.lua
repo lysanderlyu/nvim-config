@@ -133,7 +133,8 @@ return {
 
       -- Map <leader>ff to find files
       vim.keymap.set("n", "<leader>ff", function()
-        fzf.files({
+        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        fzf.files(require("utils.clipboard").picker_opts({
           prompt = "Files> ",
           winopts = {
             width = 0.95,
@@ -141,7 +142,7 @@ return {
             layout = "horizontal",
             preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
           },
-        })
+        }))
       end, { desc = "Find files with fzf-lua" })
 
       vim.keymap.set("n", "<leader>fr", function()
@@ -170,7 +171,8 @@ return {
         yank = yank:gsub("[\r\n]+$", "")  -- trim newlines
         yank = yank:gsub("^%s*(.-)%s*$", "%1")  -- trim spaces
       
-        require("fzf-lua").files({
+        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        require("fzf-lua").files(require("utils.clipboard").picker_opts({
           prompt = "Files> ",
           no_ignore = false,         -- respect ".gitignore"  by default
           fzf_opts = {
@@ -189,7 +191,7 @@ return {
               scrollbar = "float",
             },
           },
-        })
+        }))
       end, { desc = "Find files filtered by clipboard content" })
 
       vim.keymap.set("n", "<leader>lS", function()
