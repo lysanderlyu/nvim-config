@@ -23,7 +23,7 @@ local function is_graphical_terminal()
 end
 
 -- Pathspecs for git-log preview: prefer item.files (renames from git_log_file),
--- then opts.pathspec / cmd_args after `--` (nvim-tree gd scopes a file/dir).
+-- then opts.pathspec / cmd_args after `--` (nvim-tree gl scopes a file/dir).
 local function git_log_pathspec(ctx)
   local function clean(list)
     local out = {}

@@ -4,7 +4,7 @@ return {
     "kyazdani42/nvim-tree.lua",
     config = function()
       local nvim_tree_api = require("nvim-tree.api")
-      -- gd: git log (file/dir) for node under cursor — mirrors <leader>gD for files
+      -- gl: git log (file/dir) for node under cursor — mirrors <leader>gl / <leader>gD for files
       local function git_log_node()
         local api = require("nvim-tree.api")
         local node = api.tree.get_node_under_cursor()
@@ -437,7 +437,7 @@ return {
               nowait = true,
             })
           end
-          tree_map("gd", git_log_node, "Git Log: File/Dir")
+          tree_map("gl", git_log_node, "Git Log: File/Dir")
           tree_map("go", git_status_node, "Git Status: Dir")
           tree_map("sd", find_dir_node, "Find Directory ([count]sd = hierarchy level)")
           tree_map("ss", search_unnamed_node, "Search yank ([count]ss = hierarchy level)")
@@ -499,7 +499,7 @@ return {
           vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
           vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
           vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
-          vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
+          vim.keymap.set('n', 'gl', git_log_node, opts('Git Log: File/Dir'))
           vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
           vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory ([count]sd = hierarchy level)'))
           vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank ([count]ss = hierarchy level)'))
@@ -677,7 +677,7 @@ return {
             vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
             vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
             vim.keymap.set('n', 'gy', api.fs.copy.absolute_path, opts('Copy Abosulute Path'))
-            vim.keymap.set('n', 'gd', git_log_node, opts('Git Log: File/Dir'))
+            vim.keymap.set('n', 'gl', git_log_node, opts('Git Log: File/Dir'))
             vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
             vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory ([count]sd = hierarchy level)'))
             vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank ([count]ss = hierarchy level)'))
