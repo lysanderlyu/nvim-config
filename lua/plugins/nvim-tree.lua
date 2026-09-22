@@ -190,7 +190,8 @@ return {
         if not cwd then
           return
         end
-        require("fzf-lua").files({
+        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        require("fzf-lua").files(require("utils.clipboard").picker_opts({
           cwd = cwd,
           prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
           winopts = {
@@ -199,7 +200,7 @@ return {
             layout = "horizontal",
             preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
           },
-        })
+        }))
       end
 
       -- fF: same picker, pre-filled from the unnamed register
@@ -216,7 +217,8 @@ return {
         if not cwd then
           return
         end
-        require("fzf-lua").files({
+        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        require("fzf-lua").files(require("utils.clipboard").picker_opts({
           cwd = cwd,
           prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
           no_ignore = false,
@@ -236,7 +238,7 @@ return {
               scrollbar = "float",
             },
           },
-        })
+        }))
       end
 
       -- ss / sS / sg: grep scoped to the node under cursor (mirrors <leader>ss / sS / sg)

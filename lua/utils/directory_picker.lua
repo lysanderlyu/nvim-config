@@ -402,6 +402,49 @@ current_row = function(picker)
   return state.rows[state.cursor]
 end
 
+---Path of the row under the tree-preview cursor. Falls back to the directory
+---selected in the list — the tree is empty for a leaf folder, and the preview
+---is a plain dir listing when the item is not a directory.
+---@param picker snacks.Picker
+---@return string?
+local function current_path(picker)
+  local row = current_row(picker)
+  local path = row and row.path
+  if not path then
+    local item = picker:current()
+    path = item and Snacks.picker.util.dir(item)
+  end
+  return path
+end
+
+---Mirror of the ff pickers' <C-c>/<C-S-c> pair: copy the path under the
+---tree-preview cursor, as a realpath or relative to its repo. The picker
+---stays open.
+---@param picker snacks.Picker
+---@param map fun(path: string): string
+---@param label string
+local function copy_current(picker, map, label)
+  local path = current_path(picker)
+  if not path then
+    vim.notify("No path under the cursor", vim.log.levels.WARN)
+    return
+  end
+
+  local copied = map(path)
+  require("utils.clipboard").copy_paths({ copied })
+  vim.notify(label .. " copied: " .. copied)
+end
+
+---@param picker snacks.Picker
+local function copy_current_realpath(picker)
+  copy_current(picker, require("utils.clipboard").realpath, "Realpath")
+end
+
+---@param picker snacks.Picker
+local function copy_current_relpath(picker)
+  copy_current(picker, require("utils.clipboard").relpath, "Relative path")
+end
+
 ---@param picker snacks.Picker
 ---@param delta integer
 local function move_cursor(picker, delta)
@@ -481,6 +524,8 @@ function M.open(cwd)
     ["<c-s>"] = { "dir_preview_split", mode = { "i", "n" } },
     ["<c-v>"] = { "dir_preview_vsplit", mode = { "i", "n" } },
     ["<c-t>"] = { "dir_preview_tabedit", mode = { "i", "n" } },
+    ["<c-c>"] = { "dir_copy_realpath", mode = { "i", "n" } },
+    ["<c-s-c>"] = { "dir_copy_relpath", mode = { "i", "n" } },
   }
 
   -- 30% + 20% + 45% of the editor; picker width is that 95% total.
@@ -559,6 +604,16 @@ function M.open(cwd)
           picker_ref:action("dir_preview_tabedit")
         end
       end,
+      ["<c-c>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_copy_realpath")
+        end
+      end,
+      ["<c-s-c>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_copy_relpath")
+        end
+      end,
       ["<Esc>"] = function()
         if picker_ref then
           picker_ref:close()
@@ -631,6 +686,8 @@ function M.open(cwd)
       reveal_in_nvim_tree(dir)
     end,
     actions = {
+      dir_copy_realpath = copy_current_realpath,
+      dir_copy_relpath = copy_current_relpath,
       dir_preview_down = function(picker)
         move_cursor(picker, 1)
       end,
@@ -706,6 +763,8 @@ function M.open(cwd)
           ["<c-s>"] = "dir_preview_split",
           ["<c-v>"] = "dir_preview_vsplit",
           ["<c-t>"] = "dir_preview_tabedit",
+          ["<c-c>"] = "dir_copy_realpath",
+          ["<c-s-c>"] = "dir_copy_relpath",
         },
       },
       preview = {
@@ -720,6 +779,8 @@ function M.open(cwd)
           ["<c-s>"] = "dir_preview_split",
           ["<c-v>"] = "dir_preview_vsplit",
           ["<c-t>"] = "dir_preview_tabedit",
+          ["<c-c>"] = "dir_copy_realpath",
+          ["<c-s-c>"] = "dir_copy_relpath",
         },
       },
     },
