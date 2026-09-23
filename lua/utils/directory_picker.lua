@@ -417,9 +417,8 @@ local function current_path(picker)
   return path
 end
 
----Mirror of the ff pickers' <C-c>/<C-S-c> pair: copy the path under the
----tree-preview cursor, as a realpath or relative to its repo. The picker
----stays open.
+---Mirror of the ff pickers' path/file copy keys: <C-y> realpath, <C-S-y>
+---relative path, <C-c> filesystem object. The picker stays open.
 ---@param picker snacks.Picker
 ---@param map fun(path: string): string
 ---@param label string
@@ -443,6 +442,28 @@ end
 ---@param picker snacks.Picker
 local function copy_current_relpath(picker)
   copy_current(picker, require("utils.clipboard").relpath, "Relative path")
+end
+
+---Copy the filesystem object under the tree-preview cursor (nvim-tree `C` / <C-c>).
+---@param picker snacks.Picker
+local function copy_current_fs_object(picker)
+  local path = current_path(picker)
+  if not path then
+    vim.notify("No path under the cursor", vim.log.levels.WARN)
+    return
+  end
+  require("utils.clipboard").copy_fs_object(path)
+end
+
+---Open the file under the tree-preview cursor with the system app (<leader>op / <C-o>).
+---@param picker snacks.Picker
+local function open_current_with_system(picker)
+  local path = current_path(picker)
+  if not path then
+    vim.notify("No path under the cursor", vim.log.levels.WARN)
+    return
+  end
+  require("utils.clipboard").open_path(require("utils.clipboard").realpath(path))
 end
 
 ---@param picker snacks.Picker
@@ -524,8 +545,10 @@ function M.open(cwd)
     ["<c-s>"] = { "dir_preview_split", mode = { "i", "n" } },
     ["<c-v>"] = { "dir_preview_vsplit", mode = { "i", "n" } },
     ["<c-t>"] = { "dir_preview_tabedit", mode = { "i", "n" } },
-    ["<c-c>"] = { "dir_copy_realpath", mode = { "i", "n" } },
-    ["<c-s-c>"] = { "dir_copy_relpath", mode = { "i", "n" } },
+    ["<c-y>"] = { "dir_copy_realpath", mode = { "i", "n" } },
+    ["<c-s-y>"] = { "dir_copy_relpath", mode = { "i", "n" } },
+    ["<c-c>"] = { "dir_copy_fs_object", mode = { "i", "n" } },
+    ["<c-o>"] = { "dir_preview_system_open", mode = { "i", "n" } },
   }
 
   -- 30% + 20% + 45% of the editor; picker width is that 95% total.
@@ -604,14 +627,24 @@ function M.open(cwd)
           picker_ref:action("dir_preview_tabedit")
         end
       end,
-      ["<c-c>"] = function()
+      ["<c-y>"] = function()
         if picker_ref then
           picker_ref:action("dir_copy_realpath")
         end
       end,
-      ["<c-s-c>"] = function()
+      ["<c-s-y>"] = function()
         if picker_ref then
           picker_ref:action("dir_copy_relpath")
+        end
+      end,
+      ["<c-c>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_copy_fs_object")
+        end
+      end,
+      ["<c-o>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_preview_system_open")
         end
       end,
       ["<Esc>"] = function()
@@ -688,6 +721,8 @@ function M.open(cwd)
     actions = {
       dir_copy_realpath = copy_current_realpath,
       dir_copy_relpath = copy_current_relpath,
+      dir_copy_fs_object = copy_current_fs_object,
+      dir_preview_system_open = open_current_with_system,
       dir_preview_down = function(picker)
         move_cursor(picker, 1)
       end,
@@ -763,8 +798,10 @@ function M.open(cwd)
           ["<c-s>"] = "dir_preview_split",
           ["<c-v>"] = "dir_preview_vsplit",
           ["<c-t>"] = "dir_preview_tabedit",
-          ["<c-c>"] = "dir_copy_realpath",
-          ["<c-s-c>"] = "dir_copy_relpath",
+          ["<c-y>"] = "dir_copy_realpath",
+          ["<c-s-y>"] = "dir_copy_relpath",
+          ["<c-c>"] = "dir_copy_fs_object",
+          ["<c-o>"] = "dir_preview_system_open",
         },
       },
       preview = {
@@ -779,8 +816,10 @@ function M.open(cwd)
           ["<c-s>"] = "dir_preview_split",
           ["<c-v>"] = "dir_preview_vsplit",
           ["<c-t>"] = "dir_preview_tabedit",
-          ["<c-c>"] = "dir_copy_realpath",
-          ["<c-s-c>"] = "dir_copy_relpath",
+          ["<c-y>"] = "dir_copy_realpath",
+          ["<c-s-y>"] = "dir_copy_relpath",
+          ["<c-c>"] = "dir_copy_fs_object",
+          ["<c-o>"] = "dir_preview_system_open",
         },
       },
     },

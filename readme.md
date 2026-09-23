@@ -165,8 +165,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>/` | 当前缓冲区模糊查找 |
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
-| `<leader>ff` | 全局文件搜索 |
-| `<leader>sd` | Snacks 目录搜索：左栏 30% 搜目录，中栏 20% 目录树，右栏 45% 文件内容。Ctrl+j/k 在树中选文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开该文件，Ctrl+h/l 折叠/展开目录；Enter 仍在 nvim-tree 中打开选中目录（不切换工作目录） |
+| `<leader>ff` | 全局文件搜索；Ctrl+y 复制 realpath，Ctrl+Shift+y 复制相对路径，Ctrl+c 复制文件到系统剪切板，Ctrl+o 用系统应用打开 |
+| `<leader>sd` | Snacks 目录搜索：左栏 30% 搜目录，中栏 20% 目录树，右栏 45% 文件内容。Ctrl+j/k 在树中选文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开该文件，Ctrl+y/Ctrl+Shift+y/Ctrl+c 同 ff 的路径/文件拷贝，Ctrl+o 用系统应用打开，Ctrl+h/l 折叠/展开目录；Enter 仍在 nvim-tree 中打开选中目录（不切换工作目录） |
 | `<leader>sD` | 搜索当前 Buffer 的诊断信息 |
 | `<leader>fr` | 搜索最近打开的文件 |
 | `<leader>fF` | 根据剪贴板内容过滤搜索文件 |
@@ -284,11 +284,11 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `gy` | 复制当前文件绝对路径 |
 | `gl` | Git log 查看光标下文件或目录的提交历史（自动定位最近仓库 / 软链接真实路径）；Enter 打开该文件 diff，Ctrl+Enter 打开整个 commit |
 | `go` | Git status 查看光标下目录（文件则取其父目录）的变更，与 `<leader>go` 同一窗口；仅列出该目录下的文件（自动定位最近仓库 / 软链接真实路径） |
-| `sd` | 在光标下的文件夹中搜索子目录；左 30% / 中 20% 目录树 / 右 45% 文件预览。Ctrl+j/k 选择文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开文件，Ctrl+h/l 折叠/展开目录；Enter 跳转并展开（不切换工作目录） |
+| `sd` | 在光标下的文件夹中搜索子目录；左 30% / 中 20% 目录树 / 右 45% 文件预览。Ctrl+j/k 选择文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开文件，Ctrl+y 复制 realpath，Ctrl+Shift+y 复制相对路径，Ctrl+c 复制文件到系统剪切板，Ctrl+o 用系统应用打开，Ctrl+h/l 折叠/展开目录；Enter 跳转并展开（不切换工作目录） |
 | `[1-9]sd` | 同 `sd`，但按项目根到光标路径的目录层级：`1sd` = 根下第 1 层目录 |
-| `ff` | 在光标下的文件夹中搜索文件（文件则取其父目录），与 `<leader>ff` 同一窗口 |
+| `ff` | 在光标下的文件夹中搜索文件（文件则取其父目录），与 `<leader>ff` 同一窗口；Ctrl+y/Ctrl+Shift+y/Ctrl+c/Ctrl+o 同上 |
 | `[1-9]ff` | 同 `ff`，目录层级作用范围同上 |
-| `fF` | 用 `"` 寄存器内容预填搜索框，在光标下的文件夹中搜索文件，与 `<leader>fF` 同一窗口 |
+| `fF` | 用 `"` 寄存器内容预填搜索框，在光标下的文件夹中搜索文件，与 `<leader>fF` 同一窗口；Ctrl+y/Ctrl+Shift+y/Ctrl+c/Ctrl+o 同上 |
 | `[1-9]fF` | 同 `fF`，目录层级作用范围同上 |
 | `sg` | 在光标下的文件夹中打开文本搜索框（文件则取其父目录），与 `<leader>sg` 同一窗口；Ctrl+g 切换 live grep，Ctrl+r 切换忽略文件 |
 | `ss` | 将当前 `"` 寄存器的文本在光标下的文件夹中全局搜索（文件则取其父目录），与 `<leader>ss` 同一窗口 |

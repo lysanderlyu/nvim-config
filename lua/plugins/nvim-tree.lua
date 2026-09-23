@@ -265,7 +265,7 @@ return {
         if not cwd then
           return
         end
-        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        -- <C-y>: realpath, <C-S-y>: relative path, <C-c>: file object, <C-o>: system open
         require("fzf-lua").files(require("utils.clipboard").picker_opts({
           cwd = cwd,
           prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
@@ -292,7 +292,7 @@ return {
         if not cwd then
           return
         end
-        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        -- <C-y>: realpath, <C-S-y>: relative path, <C-c>: file object, <C-o>: system open
         require("fzf-lua").files(require("utils.clipboard").picker_opts({
           cwd = cwd,
           prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
