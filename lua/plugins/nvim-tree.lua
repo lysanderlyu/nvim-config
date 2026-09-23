@@ -559,6 +559,11 @@ return {
           ignore = false,     -- show ignored files
           timeout = 500,
         },
+        -- Huge trees (Android/kernel) exhaust FS watchers and spam
+        -- "Could not start the fs_event watcher". Refresh via R or BufWritePost.
+        filesystem_watchers = {
+          enable = false,
+        },
         modified = {
           enable = true,
           show_on_dirs = true,
@@ -590,6 +595,9 @@ return {
             git = {
               enable  = true,      -- must be true for git filters to work
               timeout = 4000,      -- git timeout in milliseconds
+            },
+            filesystem_watchers = {
+              enable = false,
             },
             renderer = {
               group_empty = true,
@@ -737,6 +745,11 @@ return {
             enable = true,      -- show git status icons
             ignore = false,     -- show ignored files
             timeout = 500,
+          },
+
+          -- Same as main setup: avoid watcher spam on huge trees.
+          filesystem_watchers = {
+            enable = false,
           },
 
           sync_root_with_cwd = true,
