@@ -488,7 +488,7 @@ return {
           })
           vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
           vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
-          vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
+          -- vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
           vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
           vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
           vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
@@ -511,6 +511,12 @@ return {
             vim.keymap.set('n', lhs, rhs, opts(desc))
           end)
           -- Copy the file using cb copy
+          vim.keymap.set(
+            "n",
+            "C",
+            require("utils.clipboard").copy_fs_object_from_nvim_tree,
+            { noremap = true, silent = true, desc = "Copy filesystem object" }
+          )
         end,
 
         view = {
@@ -664,7 +670,7 @@ return {
               desc = 'nvim-tree: Up', buffer = bufnr, noremap = true, silent = true, nowait = false,
             })
             vim.keymap.set('n', 'E', api.tree.expand_all, opts('Expand All'))
-            vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
+            -- vim.keymap.set('n', 'C', api.tree.collapse_all, opts('Collapse All'))
             vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
             vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
             vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
@@ -688,6 +694,12 @@ return {
               vim.keymap.set('n', lhs, rhs, opts(desc))
             end)
             -- Copy the file using cb copy
+            vim.keymap.set(
+              "n",
+              "C",
+              require("utils.clipboard").copy_fs_object_from_nvim_tree,
+              { noremap = true, silent = true, desc = "Copy filesystem object" }
+            )
           end,
 
           view = {
