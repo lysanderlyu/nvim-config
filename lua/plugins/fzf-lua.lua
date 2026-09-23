@@ -133,7 +133,7 @@ return {
 
       -- Map <leader>ff to find files
       vim.keymap.set("n", "<leader>ff", function()
-        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        -- <C-y>: realpath, <C-S-y>: relative path, <C-c>: file object, <C-o>: system open
         fzf.files(require("utils.clipboard").picker_opts({
           prompt = "Files> ",
           winopts = {
@@ -171,7 +171,7 @@ return {
         yank = yank:gsub("[\r\n]+$", "")  -- trim newlines
         yank = yank:gsub("^%s*(.-)%s*$", "%1")  -- trim spaces
       
-        -- <C-c>: copy the realpath, <C-S-c>: the relative path
+        -- <C-y>: realpath, <C-S-y>: relative path, <C-c>: file object, <C-o>: system open
         require("fzf-lua").files(require("utils.clipboard").picker_opts({
           prompt = "Files> ",
           no_ignore = false,         -- respect ".gitignore"  by default

@@ -569,27 +569,7 @@ local function open_current_file()
     path = vim.fn.expand("%:p")
   end
 
-  if vim.fn.isdirectory(path) == 1 then
-    vim.notify("Directory selected", vim.log.levels.INFO)
-    return
-  end
-
-  if path == "" then
-    vim.notify("No file to open", vim.log.levels.WARN)
-    return
-  end
-
-  local cmd
-  local sys = vim.loop.os_uname().sysname
-  if sys == "Darwin" then
-    cmd = 'open "' .. path .. '"'
-  elseif vim.fn.executable("wslview") == 1 then
-    cmd = 'wslview "' .. path .. '"'
-  else
-    cmd = 'xdg-open "' .. path .. '"'
-  end
-
-  vim.fn.jobstart(cmd, { detach = true })
+  require("utils.clipboard").open_path(path)
 end
 
 vim.keymap.set("n", "<leader>op", open_current_file, {
