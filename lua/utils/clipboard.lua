@@ -8,6 +8,41 @@ _G.__nvim_fs_clipboard = _G.__nvim_fs_clipboard or {}
 ---Back-compat alias; prefer get/set helpers below.
 M._fs_clipboard = _G.__nvim_fs_clipboard
 
+---Shared across all Neovim instances for this user (cross-terminal paste).
+---OS MIME clipboards (esp. Wayland text/uri-list) are unreliable between nvims.
+---@return string
+local function shared_clipboard_path()
+  return vim.fs.joinpath(vim.fn.stdpath("cache"), "fs-clipboard")
+end
+
+---@param paths string[]
+---@return boolean ok
+local function write_shared_clipboard(paths)
+  local file = shared_clipboard_path()
+  local ok_mkdir = pcall(vim.fn.mkdir, vim.fn.fnamemodify(file, ":h"), "p")
+  if not ok_mkdir then
+    return false
+  end
+  local ok, err = pcall(vim.fn.writefile, paths or {}, file)
+  return ok and err == 0
+end
+
+---@return string[]
+local function read_shared_clipboard()
+  local file = shared_clipboard_path()
+  if vim.fn.filereadable(file) == 0 then
+    return {}
+  end
+  local recovered = {}
+  for _, line in ipairs(vim.fn.readfile(file)) do
+    line = vim.trim(line)
+    if line ~= "" and vim.uv.fs_stat(line) then
+      recovered[#recovered + 1] = vim.fn.fnamemodify(line, ":p"):gsub("/$", "")
+    end
+  end
+  return recovered
+end
+
 ---@return string[]
 function M.get_fs_clipboard()
   local paths = _G.__nvim_fs_clipboard
@@ -21,6 +56,7 @@ end
 function M.set_fs_clipboard(paths)
   _G.__nvim_fs_clipboard = paths or {}
   M._fs_clipboard = _G.__nvim_fs_clipboard
+  write_shared_clipboard(_G.__nvim_fs_clipboard)
 end
 
 ---Encode a local path as a `file://` URI (spaces etc. percent-encoded).
@@ -39,6 +75,10 @@ end
 local function file_uri_to_path(uri)
   uri = vim.trim(uri or ""):gsub("\r$", "")
   if uri == "" or uri:sub(1, 1) == "#" then
+    return nil
+  end
+  -- GNOME/KDE sometimes prefix with "copy"/"cut" on their own MIME; skip those.
+  if uri == "copy" or uri == "cut" or uri == "link" then
     return nil
   end
   uri = uri:gsub("^file://localhost", ""):gsub("^file://", "")
@@ -68,6 +108,30 @@ local function parse_clipboard_paths(text)
   return recovered
 end
 
+---Run a clipboard CLI with `data` on stdin. Uses a temp file so forking tools
+---(wl-copy/xclip) still see the full payload after Neovim closes the pipe.
+---@param cmd string[]
+---@param data string
+---@return boolean ok
+---@return string out
+local function system_stdin(cmd, data)
+  local tmp = vim.fn.tempname()
+  local fh, err = io.open(tmp, "wb")
+  if not fh then
+    return false, err or "open temp failed"
+  end
+  fh:write(data)
+  fh:close()
+
+  local shell_cmd = table.concat(vim.tbl_map(function(a)
+    return vim.fn.shellescape(a)
+  end, cmd), " ") .. " < " .. vim.fn.shellescape(tmp)
+  local out = vim.fn.system(shell_cmd)
+  local ok = vim.v.shell_error == 0
+  pcall(vim.fn.delete, tmp)
+  return ok, out or ""
+end
+
 ---Read file paths from the OS clipboard (cross-Neovim / file-manager paste).
 ---macOS: file pasteboard; Linux: text/uri-list via wl-paste/xclip; else `+` text.
 ---@return string[]
@@ -91,37 +155,40 @@ end try]],
 
   -- Linux: prefer text/uri-list (what wl-copy/xclip write for file objects).
   if vim.fn.executable("wl-paste") == 1 then
-    local out = vim.fn.system({ "wl-paste", "-t", "text/uri-list", "-n" })
-    if vim.v.shell_error == 0 then
-      local paths = parse_clipboard_paths(out)
-      if #paths > 0 then
-        return paths
-      end
-    end
-    -- Some compositors only expose text/plain with a file:// line.
-    out = vim.fn.system({ "wl-paste", "-n" })
-    if vim.v.shell_error == 0 then
-      local paths = parse_clipboard_paths(out)
-      if #paths > 0 then
-        return paths
+    for _, args in ipairs({
+      { "wl-paste", "--type", "text/uri-list", "--no-newline" },
+      { "wl-paste", "-t", "text/uri-list", "-n" },
+      { "wl-paste", "-t", "text/uri-list" },
+      { "wl-paste", "--type", "x-special/gnome-copied-files" },
+      { "wl-paste", "-n" },
+      { "wl-paste" },
+    }) do
+      local out = vim.fn.system(args)
+      if vim.v.shell_error == 0 then
+        local paths = parse_clipboard_paths(out)
+        if #paths > 0 then
+          return paths
+        end
       end
     end
   elseif vim.fn.executable("xclip") == 1 then
-    local out = vim.fn.system({
-      "xclip",
-      "-selection",
-      "clipboard",
-      "-t",
-      "text/uri-list",
-      "-o",
-    })
-    if vim.v.shell_error == 0 then
-      local paths = parse_clipboard_paths(out)
-      if #paths > 0 then
-        return paths
+    for _, target in ipairs({ "text/uri-list", "x-special/gnome-copied-files", "UTF8_STRING", "TEXT" }) do
+      local out = vim.fn.system({
+        "xclip",
+        "-selection",
+        "clipboard",
+        "-t",
+        target,
+        "-o",
+      })
+      if vim.v.shell_error == 0 then
+        local paths = parse_clipboard_paths(out)
+        if #paths > 0 then
+          return paths
+        end
       end
     end
-    out = vim.fn.system({ "xclip", "-selection", "clipboard", "-o" })
+    local out = vim.fn.system({ "xclip", "-selection", "clipboard", "-o" })
     if vim.v.shell_error == 0 then
       local paths = parse_clipboard_paths(out)
       if #paths > 0 then
@@ -142,7 +209,7 @@ end try]],
   return parse_clipboard_paths(vim.fn.getreg("+"))
 end
 
----Paths remembered from Ctrl-c, or recovered from the OS / `+` register.
+---Paths remembered from Ctrl-c / C, then shared cache file, then OS clipboard.
 ---@return string[]
 local function resolve_fs_clipboard()
   local paths = M.get_fs_clipboard()
@@ -150,18 +217,24 @@ local function resolve_fs_clipboard()
     return paths
   end
 
+  -- Cross-terminal: another Neovim wrote ~/.cache/nvim/fs-clipboard.
+  paths = read_shared_clipboard()
+  if #paths > 0 then
+    _G.__nvim_fs_clipboard = paths
+    M._fs_clipboard = paths
+    return paths
+  end
+
   paths = paths_from_os_clipboard()
   if #paths > 0 then
-    -- Do not persist OS recovery into in-process clipboard permanently when
-    -- empty was intentional — but caching helps repeated pastes in this nvim.
     M.set_fs_clipboard(paths)
   end
   return paths
 end
 
 ---Write `paths` to the Linux/Wayland/X11 clipboard as text/uri-list (and plain
----text when the tool cannot do MIME types), so another Neovim or a file
----manager can paste them.
+---text when the tool cannot do MIME types), so a file manager can paste them.
+---Cross-Neovim paste relies on the shared cache file, not this.
 ---@param paths string[]
 ---@return boolean ok
 local function copy_paths_linux(paths)
@@ -169,45 +242,46 @@ local function copy_paths_linux(paths)
   for _, path in ipairs(paths) do
     lines[#lines + 1] = path_to_file_uri(path)
   end
-  -- text/uri-list: one URI per line, terminated by CRLF per RFC 2483 (LF ok).
   local uri_list = table.concat(lines, "\n") .. "\n"
   local plain = table.concat(paths, "\n")
 
   if vim.fn.executable("wl-copy") == 1 then
-    local out = vim.fn.system({ "wl-copy", "-t", "text/uri-list" }, uri_list)
-    if vim.v.shell_error ~= 0 then
-      vim.notify("wl-copy failed: " .. (out or ""), vim.log.levels.ERROR)
-      return false
+    local ok, out = system_stdin({ "wl-copy", "-t", "text/uri-list" }, uri_list)
+    if ok then
+      return true
     end
-    return true
+    if out ~= "" then
+      vim.notify("wl-copy failed: " .. out, vim.log.levels.WARN)
+    end
   end
 
   if vim.fn.executable("xclip") == 1 then
-    local out = vim.fn.system({
+    local ok, out = system_stdin({
       "xclip",
       "-selection",
       "clipboard",
       "-t",
       "text/uri-list",
     }, uri_list)
-    if vim.v.shell_error ~= 0 then
-      vim.notify("xclip failed: " .. (out or ""), vim.log.levels.ERROR)
-      return false
+    if ok then
+      return true
     end
-    return true
+    if out ~= "" then
+      vim.notify("xclip failed: " .. out, vim.log.levels.WARN)
+    end
   end
 
   if vim.fn.executable("xsel") == 1 then
-    -- xsel has no MIME types; plain absolute paths so another nvim can read `+`.
-    local out = vim.fn.system({ "xsel", "--clipboard", "--input" }, plain)
-    if vim.v.shell_error ~= 0 then
-      vim.notify("xsel failed: " .. (out or ""), vim.log.levels.ERROR)
-      return false
+    local ok, out = system_stdin({ "xsel", "--clipboard", "--input" }, plain)
+    if ok then
+      return true
     end
-    return true
+    if out ~= "" then
+      vim.notify("xsel failed: " .. out, vim.log.levels.WARN)
+    end
   end
 
-  vim.notify("No clipboard tool found (wl-copy/xclip/xsel)", vim.log.levels.ERROR)
+  -- No OS tool — shared file still enables cross-nvim paste.
   return false
 end
 
@@ -327,6 +401,7 @@ function M.copy_fs_object(path, opts)
   local name = vim.fn.fnamemodify(path, ":t")
 
   -- Remember before the OS call so paste never races an empty clipboard.
+  -- Also writes ~/.cache/nvim/fs-clipboard for cross-terminal Neovim paste.
   if opts.remember ~= false then
     M.set_fs_clipboard({ path })
   end
@@ -350,10 +425,14 @@ function M.copy_fs_object(path, opts)
     )
     vim.fn.system(cmd)
 
-  -- Linux / other: text/uri-list so another nvim or a file manager can paste.
+  -- Linux / other: OS clipboard for file managers; shared file for other nvims.
   else
     if not copy_paths_linux({ path }) then
-      return false
+      vim.notify(
+        "Copied for nvim paste (OS clipboard unavailable): " .. name,
+        vim.log.levels.WARN
+      )
+      return true
     end
   end
 
