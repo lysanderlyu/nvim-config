@@ -265,7 +265,7 @@ return {
         if not cwd then
           return
         end
-        -- <C-y>: realpath, <C-S-y>: relative path, <C-c>: file object, <C-o>: system open
+        -- <C-y>/<C-S-y>: path text; <C-c>/<C-p>: copy/paste FS object; <C-o>: system open
         require("fzf-lua").files(require("utils.clipboard").picker_opts({
           cwd = cwd,
           prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
@@ -292,7 +292,7 @@ return {
         if not cwd then
           return
         end
-        -- <C-y>: realpath, <C-S-y>: relative path, <C-c>: file object, <C-o>: system open
+        -- <C-y>/<C-S-y>: path text; <C-c>/<C-p>: copy/paste FS object; <C-o>: system open
         require("fzf-lua").files(require("utils.clipboard").picker_opts({
           cwd = cwd,
           prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
@@ -445,6 +445,12 @@ return {
           tree_map("sg", search_grep_node, "Search ([count]sg)")
           tree_map("ff", find_files_node, "Find Files ([count]ff = hierarchy level)")
           tree_map("fF", find_files_node_from_yank, "Find Files (yank) ([count]fF)")
+          tree_map("p", function()
+            require("utils.clipboard").paste_fs_or_nvim_tree()
+          end, "Paste")
+          tree_map("<C-p>", function()
+            require("utils.clipboard").paste_fs_to_nvim_tree()
+          end, "Paste FS clipboard")
           bind_hierarchy_up_maps(tree_map)
           -- Allow -[1-9]… sequences: plain `-` must wait (no nowait)
           vim.keymap.set("n", "-", require("nvim-tree.api").tree.change_root_to_parent, {
@@ -492,7 +498,12 @@ return {
           vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
           vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
           vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
-          vim.keymap.set('n', 'p', api.fs.paste, opts('Paste'))
+          vim.keymap.set('n', 'p', function()
+            require("utils.clipboard").paste_fs_or_nvim_tree()
+          end, opts('Paste'))
+          vim.keymap.set('n', '<C-p>', function()
+            require("utils.clipboard").paste_fs_to_nvim_tree()
+          end, opts('Paste FS clipboard'))
           vim.keymap.set('n', 'D', api.fs.trash, opts('Trash'))
           vim.keymap.set('n', 'r', api.fs.rename, opts('Rename'))
           vim.keymap.set('n', 'R', api.tree.reload, opts('Refresh'))
@@ -678,7 +689,12 @@ return {
             vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
             vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
             vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
-            vim.keymap.set('n', 'p', api.fs.paste, opts('Paste'))
+            vim.keymap.set('n', 'p', function()
+              require("utils.clipboard").paste_fs_or_nvim_tree()
+            end, opts('Paste'))
+            vim.keymap.set('n', '<C-p>', function()
+              require("utils.clipboard").paste_fs_to_nvim_tree()
+            end, opts('Paste FS clipboard'))
             vim.keymap.set('n', 'D', api.fs.trash, opts('Trash'))
             vim.keymap.set('n', 'r', api.fs.rename, opts('Rename'))
             vim.keymap.set('n', 'R', api.tree.reload, opts('Refresh'))

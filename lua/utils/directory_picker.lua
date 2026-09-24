@@ -455,6 +455,14 @@ local function copy_current_fs_object(picker)
   require("utils.clipboard").copy_fs_object(path)
 end
 
+---Paste FS clipboard into nvim-tree (companion to <C-c>).
+---@param _picker snacks.Picker
+local function paste_fs_to_nvim_tree(_picker)
+  vim.schedule(function()
+    require("utils.clipboard").paste_fs_to_nvim_tree()
+  end)
+end
+
 ---Open the file under the tree-preview cursor with the system app (<leader>op / <C-o>).
 ---@param picker snacks.Picker
 local function open_current_with_system(picker)
@@ -548,6 +556,7 @@ function M.open(cwd)
     ["<c-y>"] = { "dir_copy_realpath", mode = { "i", "n" } },
     ["<c-s-y>"] = { "dir_copy_relpath", mode = { "i", "n" } },
     ["<c-c>"] = { "dir_copy_fs_object", mode = { "i", "n" } },
+    ["<c-p>"] = { "dir_paste_fs_to_nvim_tree", mode = { "i", "n" } },
     ["<c-o>"] = { "dir_preview_system_open", mode = { "i", "n" } },
   }
 
@@ -642,6 +651,11 @@ function M.open(cwd)
           picker_ref:action("dir_copy_fs_object")
         end
       end,
+      ["<c-p>"] = function()
+        if picker_ref then
+          picker_ref:action("dir_paste_fs_to_nvim_tree")
+        end
+      end,
       ["<c-o>"] = function()
         if picker_ref then
           picker_ref:action("dir_preview_system_open")
@@ -722,6 +736,7 @@ function M.open(cwd)
       dir_copy_realpath = copy_current_realpath,
       dir_copy_relpath = copy_current_relpath,
       dir_copy_fs_object = copy_current_fs_object,
+      dir_paste_fs_to_nvim_tree = paste_fs_to_nvim_tree,
       dir_preview_system_open = open_current_with_system,
       dir_preview_down = function(picker)
         move_cursor(picker, 1)
@@ -801,6 +816,7 @@ function M.open(cwd)
           ["<c-y>"] = "dir_copy_realpath",
           ["<c-s-y>"] = "dir_copy_relpath",
           ["<c-c>"] = "dir_copy_fs_object",
+          ["<c-p>"] = "dir_paste_fs_to_nvim_tree",
           ["<c-o>"] = "dir_preview_system_open",
         },
       },
@@ -819,6 +835,7 @@ function M.open(cwd)
           ["<c-y>"] = "dir_copy_realpath",
           ["<c-s-y>"] = "dir_copy_relpath",
           ["<c-c>"] = "dir_copy_fs_object",
+          ["<c-p>"] = "dir_paste_fs_to_nvim_tree",
           ["<c-o>"] = "dir_preview_system_open",
         },
       },
