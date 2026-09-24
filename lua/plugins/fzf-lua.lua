@@ -194,6 +194,177 @@ return {
         }))
       end, { desc = "Find files filtered by clipboard content" })
 
+      -- <leader>[1-9]{ss,sS,sg,ff,fF} / <leader>-[1-9]{…}: same hierarchy as
+      -- nvim-tree [1-9]/[1-9], from buffer path under workdir / tree root (not git).
+      do
+        local hier = require("utils.hierarchy")
+        local grep_winopts = {
+          width = 0.95,
+          height = 0.95,
+          layout = "horizontal",
+          preview = { layout = "vertical", vertical = "right:55%" },
+        }
+        local files_winopts = {
+          width = 0.95,
+          height = 0.95,
+          layout = "horizontal",
+          preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
+        }
+
+        local function yank_for_grep(reg)
+          local yank = vim.fn.getreg(reg)
+          if yank == "" then
+            vim.notify("No yanked text", vim.log.levels.INFO)
+            return nil
+          end
+          yank = yank:gsub("[\r\n]+$", "")
+          yank = yank:gsub([[\]], [[\\]]):gsub([["]], [[\"]])
+          return yank
+        end
+
+        local function grep_in_dir(search, cwd, extra)
+          if not cwd then
+            return
+          end
+          local opts = {
+            cwd = cwd,
+            search = search,
+            prompt = "Search (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
+            fzf_opts = {
+              ["--ansi"] = "",
+              ["--layout"] = "reverse",
+              ["--info"] = "default",
+            },
+            winopts = grep_winopts,
+          }
+          if type(extra) == "table" then
+            for k, v in pairs(extra) do
+              opts[k] = v
+            end
+          end
+          fzf.grep(opts)
+        end
+
+        local function files_in_dir(cwd, query)
+          if not cwd then
+            return
+          end
+          local opts = {
+            cwd = cwd,
+            prompt = "Files (" .. vim.fn.fnamemodify(cwd, ":t") .. ")> ",
+            winopts = files_winopts,
+          }
+          if query then
+            opts.no_ignore = false
+            opts.fzf_opts = {
+              ["--query"] = query,
+              ["--ansi"] = "",
+              ["--layout"] = "reverse",
+              ["--info"] = "default",
+            }
+            opts.winopts = {
+              width = 0.9,
+              height = 0.9,
+              layout = "horizontal",
+              preview = {
+                layout = "vertical",
+                vertical = "right:55%",
+                scrollbar = "float",
+              },
+            }
+          end
+          fzf.files(require("utils.clipboard").picker_opts(opts))
+        end
+
+        local function bind(lhs, rhs, desc)
+          vim.keymap.set("n", lhs, rhs, { desc = desc })
+        end
+
+        for i = 1, 9 do
+          local level = i
+
+          -- From project root down: <leader>1ss …
+          bind("<leader>" .. i .. "ss", function()
+            local yank = yank_for_grep('"')
+            if yank then
+              grep_in_dir(yank, hier.dir_at_hierarchy_level(level))
+            end
+          end, string.format("Search yank (hierarchy level %d)", i))
+          bind("<leader>" .. i .. "sS", function()
+            local yank = yank_for_grep("+")
+            if yank then
+              grep_in_dir(yank, hier.dir_at_hierarchy_level(level))
+            end
+          end, string.format("Search clipboard (hierarchy level %d)", i))
+          bind("<leader>" .. i .. "sg", function()
+            grep_in_dir("", hier.dir_at_hierarchy_level(level), {
+              actions = {
+                ["ctrl-g"] = { actions.grep_lgrep },
+                ["ctrl-r"] = { actions.toggle_ignore },
+              },
+            })
+          end, string.format("Search (hierarchy level %d)", i))
+          bind("<leader>" .. i .. "ff", function()
+            files_in_dir(hier.dir_at_hierarchy_level(level))
+          end, string.format("Find files (hierarchy level %d)", i))
+          bind("<leader>" .. i .. "fF", function()
+            local yank = vim.fn.getreg('"')
+            if yank == "" then
+              vim.notify("Clipboard is empty", vim.log.levels.INFO)
+              return
+            end
+            yank = yank:gsub("[\r\n]+$", ""):gsub("^%s*(.-)%s*$", "%1")
+            files_in_dir(hier.dir_at_hierarchy_level(level), yank)
+          end, string.format("Find files yank (hierarchy level %d)", i))
+          bind("<leader>" .. i .. "sd", function()
+            local cwd = hier.dir_at_hierarchy_level(level)
+            if cwd then
+              require("utils.directory_picker").open(cwd)
+            end
+          end, string.format("Find directory (hierarchy level %d)", i))
+
+          -- Up toward project root: <leader>-1ss …
+          bind("<leader>-" .. i .. "ss", function()
+            local yank = yank_for_grep('"')
+            if yank then
+              grep_in_dir(yank, hier.dir_n_levels_up(level))
+            end
+          end, string.format("Search yank (%d levels up)", i))
+          bind("<leader>-" .. i .. "sS", function()
+            local yank = yank_for_grep("+")
+            if yank then
+              grep_in_dir(yank, hier.dir_n_levels_up(level))
+            end
+          end, string.format("Search clipboard (%d levels up)", i))
+          bind("<leader>-" .. i .. "sg", function()
+            grep_in_dir("", hier.dir_n_levels_up(level), {
+              actions = {
+                ["ctrl-g"] = { actions.grep_lgrep },
+                ["ctrl-r"] = { actions.toggle_ignore },
+              },
+            })
+          end, string.format("Search (%d levels up)", i))
+          bind("<leader>-" .. i .. "ff", function()
+            files_in_dir(hier.dir_n_levels_up(level))
+          end, string.format("Find files (%d levels up)", i))
+          bind("<leader>-" .. i .. "fF", function()
+            local yank = vim.fn.getreg('"')
+            if yank == "" then
+              vim.notify("Clipboard is empty", vim.log.levels.INFO)
+              return
+            end
+            yank = yank:gsub("[\r\n]+$", ""):gsub("^%s*(.-)%s*$", "%1")
+            files_in_dir(hier.dir_n_levels_up(level), yank)
+          end, string.format("Find files yank (%d levels up)", i))
+          bind("<leader>-" .. i .. "sd", function()
+            local cwd = hier.dir_n_levels_up(level)
+            if cwd then
+              require("utils.directory_picker").open(cwd)
+            end
+          end, string.format("Find directory (%d levels up)", i))
+        end
+      end
+
       vim.keymap.set("n", "<leader>lS", function()
         local yank = vim.fn.getreg('"')
       

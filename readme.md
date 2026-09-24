@@ -108,6 +108,7 @@ nvim
 | `<leader>sg` | 打开文本全局搜索框 |
 | `<leader>ss` | 将当前`"`寄存器的文本进行全局搜索 |
 | `<leader>sS` | 将当前`+`寄存器（也就是系统剪切板）的文本进行全局搜索 |
+| `<leader>[1-9]ss` / `<leader>-[1-9]ss` | 同 `<leader>ss`，但从**当前 buffer 相对 workdir / nvim-tree 根**收窄（与树内 `[1-9]ss` / `-[1-9]ss` 同一套层级，不用 git 根）：`1ss` = workdir 下第 1 层，`-1ss` = 当前文件目录的父目录（`sS`/`sg`/`sd`/`ff`/`fF` 同理） |
 | `<leader>sn` | 列出当前文件类型可用的代码片段（无需先输入关键字，选中后插入） |
 | `<C-Space>` | Insert 模式下列出当前文件类型的代码片段（无需先输入关键字） |
 | `tab` | Normal 模式下，按Tab会打开/折叠当前块 |
@@ -166,10 +167,13 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>km` | 查看所有快捷键 |
 | `<leader>cm` | 查看所有命令 |
 | `<leader>ff` | 全局文件搜索；Ctrl+y 复制 realpath，Ctrl+Shift+y 复制相对路径，Ctrl+c 复制文件到系统剪切板，Ctrl+p 粘贴到 nvim-tree 光标目录，Ctrl+o 用系统应用打开 |
+| `<leader>[1-9]ff` / `<leader>-[1-9]ff` | 同 `<leader>ff`，相对 workdir / nvim-tree 根收窄（同树内 `[1-9]ff`）：`1ff` = workdir 下第 1 层，`-1ff` = 当前文件目录的父目录 |
 | `<leader>sd` | Snacks 目录搜索：左栏 30% 搜目录，中栏 20% 目录树，右栏 45% 文件内容。Ctrl+j/k 在树中选文件，Ctrl+d/u 滚动文件预览，Ctrl+Enter 打开该文件，Ctrl+y/Ctrl+Shift+y/Ctrl+c/Ctrl+p 同 ff 的路径/文件拷贝粘贴，Ctrl+o 用系统应用打开，Ctrl+h/l 折叠/展开目录；Enter 仍在 nvim-tree 中打开选中目录（不切换工作目录） |
+| `<leader>[1-9]sd` / `<leader>-[1-9]sd` | 同 `<leader>sd`，目录层级作用范围同上（相对当前 buffer） |
 | `<leader>sD` | 搜索当前 Buffer 的诊断信息 |
 | `<leader>fr` | 搜索最近打开的文件 |
 | `<leader>fF` | 根据剪贴板内容过滤搜索文件 |
+| `<leader>[1-9]fF` / `<leader>-[1-9]fF` | 同 `<leader>fF`，目录层级作用范围同上 |
 | `<leader>fb` | 查看已打开的Buffer |
 | `<leader>fG` | Git 文件搜索 |
 | `<leader>gf` | Git 文件搜索 |
