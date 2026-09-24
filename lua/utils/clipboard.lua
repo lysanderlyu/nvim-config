@@ -23,15 +23,56 @@ function M.set_fs_clipboard(paths)
   M._fs_clipboard = _G.__nvim_fs_clipboard
 end
 
----Paths remembered from Ctrl-c, or recovered from the OS / `+` register.
----@return string[]
-local function resolve_fs_clipboard()
-  local paths = M.get_fs_clipboard()
-  if #paths > 0 then
-    return paths
-  end
+---Encode a local path as a `file://` URI (spaces etc. percent-encoded).
+---@param path string
+---@return string
+local function path_to_file_uri(path)
+  local encoded = path:gsub("([^A-Za-z0-9%-%._~/])", function(c)
+    return string.format("%%%02X", string.byte(c))
+  end)
+  return "file://" .. encoded
+end
 
-  -- macOS: Ctrl-c puts a file URL on the pasteboard; recover that path.
+---Decode a `file://` URI (or bare path) to a local filesystem path.
+---@param uri string
+---@return string|nil
+local function file_uri_to_path(uri)
+  uri = vim.trim(uri or ""):gsub("\r$", "")
+  if uri == "" or uri:sub(1, 1) == "#" then
+    return nil
+  end
+  uri = uri:gsub("^file://localhost", ""):gsub("^file://", "")
+  uri = uri:gsub("%%(%x%x)", function(hex)
+    return string.char(tonumber(hex, 16))
+  end)
+  if uri == "" then
+    return nil
+  end
+  return vim.fn.fnamemodify(uri, ":p"):gsub("/$", "")
+end
+
+---Parse newline-separated `text/uri-list` or plain paths into existing paths.
+---@param text string|nil
+---@return string[]
+local function parse_clipboard_paths(text)
+  local recovered = {}
+  if type(text) ~= "string" or text == "" then
+    return recovered
+  end
+  for _, line in ipairs(vim.split(text, "\n", { plain = true, trimempty = true })) do
+    local path = file_uri_to_path(line)
+    if path and vim.uv.fs_stat(path) then
+      recovered[#recovered + 1] = path
+    end
+  end
+  return recovered
+end
+
+---Read file paths from the OS clipboard (cross-Neovim / file-manager paste).
+---macOS: file pasteboard; Linux: text/uri-list via wl-paste/xclip; else `+` text.
+---@return string[]
+local function paths_from_os_clipboard()
+  -- macOS file pasteboard (same type copy_fs_object writes).
   if vim.fn.has("mac") == 1 then
     local out = vim.fn.system({
       "osascript",
@@ -41,34 +82,133 @@ local function resolve_fs_clipboard()
 end try]],
     })
     if vim.v.shell_error == 0 then
-      out = vim.trim(out or "")
-      if out ~= "" then
-        out = out:gsub("/$", "")
-        if vim.uv.fs_stat(out) then
-          M.set_fs_clipboard({ out })
-          return M.get_fs_clipboard()
-        end
+      local paths = parse_clipboard_paths(out)
+      if #paths > 0 then
+        return paths
       end
     end
   end
 
-  -- Text paths on `+` (nvim-tree / copy_paths style).
-  local reg = vim.fn.getreg("+")
-  if type(reg) == "string" and reg ~= "" then
-    local recovered = {}
-    for _, line in ipairs(vim.split(reg, "\n", { plain = true, trimempty = true })) do
-      line = vim.trim(line):gsub("^file://", "")
-      if line ~= "" and vim.uv.fs_stat(line) then
-        recovered[#recovered + 1] = vim.fn.fnamemodify(line, ":p"):gsub("/$", "")
+  -- Linux: prefer text/uri-list (what wl-copy/xclip write for file objects).
+  if vim.fn.executable("wl-paste") == 1 then
+    local out = vim.fn.system({ "wl-paste", "-t", "text/uri-list", "-n" })
+    if vim.v.shell_error == 0 then
+      local paths = parse_clipboard_paths(out)
+      if #paths > 0 then
+        return paths
       end
     end
-    if #recovered > 0 then
-      M.set_fs_clipboard(recovered)
-      return recovered
+    -- Some compositors only expose text/plain with a file:// line.
+    out = vim.fn.system({ "wl-paste", "-n" })
+    if vim.v.shell_error == 0 then
+      local paths = parse_clipboard_paths(out)
+      if #paths > 0 then
+        return paths
+      end
+    end
+  elseif vim.fn.executable("xclip") == 1 then
+    local out = vim.fn.system({
+      "xclip",
+      "-selection",
+      "clipboard",
+      "-t",
+      "text/uri-list",
+      "-o",
+    })
+    if vim.v.shell_error == 0 then
+      local paths = parse_clipboard_paths(out)
+      if #paths > 0 then
+        return paths
+      end
+    end
+    out = vim.fn.system({ "xclip", "-selection", "clipboard", "-o" })
+    if vim.v.shell_error == 0 then
+      local paths = parse_clipboard_paths(out)
+      if #paths > 0 then
+        return paths
+      end
+    end
+  elseif vim.fn.executable("xsel") == 1 then
+    local out = vim.fn.system({ "xsel", "--clipboard", "--output" })
+    if vim.v.shell_error == 0 then
+      local paths = parse_clipboard_paths(out)
+      if #paths > 0 then
+        return paths
+      end
     end
   end
 
-  return {}
+  -- Neovim `+` register (text paths / file:// lines).
+  return parse_clipboard_paths(vim.fn.getreg("+"))
+end
+
+---Paths remembered from Ctrl-c, or recovered from the OS / `+` register.
+---@return string[]
+local function resolve_fs_clipboard()
+  local paths = M.get_fs_clipboard()
+  if #paths > 0 then
+    return paths
+  end
+
+  paths = paths_from_os_clipboard()
+  if #paths > 0 then
+    -- Do not persist OS recovery into in-process clipboard permanently when
+    -- empty was intentional — but caching helps repeated pastes in this nvim.
+    M.set_fs_clipboard(paths)
+  end
+  return paths
+end
+
+---Write `paths` to the Linux/Wayland/X11 clipboard as text/uri-list (and plain
+---text when the tool cannot do MIME types), so another Neovim or a file
+---manager can paste them.
+---@param paths string[]
+---@return boolean ok
+local function copy_paths_linux(paths)
+  local lines = {}
+  for _, path in ipairs(paths) do
+    lines[#lines + 1] = path_to_file_uri(path)
+  end
+  -- text/uri-list: one URI per line, terminated by CRLF per RFC 2483 (LF ok).
+  local uri_list = table.concat(lines, "\n") .. "\n"
+  local plain = table.concat(paths, "\n")
+
+  if vim.fn.executable("wl-copy") == 1 then
+    local out = vim.fn.system({ "wl-copy", "-t", "text/uri-list" }, uri_list)
+    if vim.v.shell_error ~= 0 then
+      vim.notify("wl-copy failed: " .. (out or ""), vim.log.levels.ERROR)
+      return false
+    end
+    return true
+  end
+
+  if vim.fn.executable("xclip") == 1 then
+    local out = vim.fn.system({
+      "xclip",
+      "-selection",
+      "clipboard",
+      "-t",
+      "text/uri-list",
+    }, uri_list)
+    if vim.v.shell_error ~= 0 then
+      vim.notify("xclip failed: " .. (out or ""), vim.log.levels.ERROR)
+      return false
+    end
+    return true
+  end
+
+  if vim.fn.executable("xsel") == 1 then
+    -- xsel has no MIME types; plain absolute paths so another nvim can read `+`.
+    local out = vim.fn.system({ "xsel", "--clipboard", "--input" }, plain)
+    if vim.v.shell_error ~= 0 then
+      vim.notify("xsel failed: " .. (out or ""), vim.log.levels.ERROR)
+      return false
+    end
+    return true
+  end
+
+  vim.notify("No clipboard tool found (wl-copy/xclip/xsel)", vim.log.levels.ERROR)
+  return false
 end
 
 ---Pick a free destination path under `dest_dir` (basename preserved; adds " copy").
@@ -210,22 +350,9 @@ function M.copy_fs_object(path, opts)
     )
     vim.fn.system(cmd)
 
-  -- Linux
+  -- Linux / other: text/uri-list so another nvim or a file manager can paste.
   else
-    if vim.fn.executable("wl-copy") == 1 then
-      vim.fn.system(
-        string.format("printf 'file://%s' | wl-copy -t text/uri-list", path)
-      )
-    elseif vim.fn.executable("xclip") == 1 then
-      vim.fn.system(
-        string.format("printf 'file://%s' | xclip -selection clipboard -t text/uri-list", path)
-      )
-    elseif vim.fn.executable("xsel") == 1 then
-      vim.fn.system(
-        string.format("printf 'file://%s' | xsel --clipboard --input", path)
-      )
-    else
-      vim.notify("No clipboard tool found (wl-copy/xclip/xsel)", vim.log.levels.ERROR)
+    if not copy_paths_linux({ path }) then
       return false
     end
   end
@@ -467,9 +594,20 @@ function M.fzf_copy_fs_object(selected, opts)
 
   -- Remember first (process-global) so Ctrl-p never races an empty clipboard.
   M.set_fs_clipboard(paths)
-  -- OS clipboard gets the first item (file managers usually expect one).
-  M.copy_fs_object(paths[1], { remember = false })
-  -- copy_fs_object with remember=false must not wipe multi-select.
+  -- Publish to the OS clipboard (all paths on Linux uri-list; first on macOS/Win).
+  if vim.fn.has("mac") ~= 1 and vim.fn.has("win32") ~= 1 and vim.fn.has("wsl") ~= 1 then
+    if not copy_paths_linux(paths) then
+      return
+    end
+    local name = vim.fn.fnamemodify(paths[1], ":t")
+    if #paths == 1 then
+      vim.notify("Copied filesystem object: " .. name)
+    else
+      vim.notify(string.format("Copied %d filesystem objects", #paths))
+    end
+  else
+    M.copy_fs_object(paths[1], { remember = false })
+  end
   M.set_fs_clipboard(paths)
   if #paths > 1 then
     require("fzf-lua.utils").info(("%d items ready to paste (Ctrl-p)"):format(#paths))
