@@ -59,7 +59,8 @@ return {
         -- optional: escape backslash and double quote
         yank = yank:gsub([[\]], [[\\]]):gsub([["]], [[\"]])
 
-        fzf.grep({
+        -- <C-y>/<C-S-y>/<C-c>/<C-p>/<C-o>: same path/file actions as ff
+        fzf.grep(require("utils.clipboard").picker_opts({
           -- search = '"' .. yank .. '"',
           search = yank,  -- just the raw string
           prompt = "Search> ",
@@ -76,7 +77,7 @@ return {
             layout = "horizontal",
             preview = { layout = "vertical", vertical = "right:55%" },
           },
-        })
+        }))
       end, { desc = "Search clipboard (+ register) with native preview" })
 
       --  Search unnamed register (" register)
@@ -90,7 +91,8 @@ return {
         -- optional: escape backslash and double quote
         yank = yank:gsub([[\]], [[\\]]):gsub([["]], [[\"]])
 
-        fzf.grep({
+        -- <C-y>/<C-S-y>/<C-c>/<C-p>/<C-o>: same path/file actions as ff
+        fzf.grep(require("utils.clipboard").picker_opts({
           -- search = '"' .. yank .. '"',
           search = yank,  -- just the raw string
           prompt = "Search> ",
@@ -106,11 +108,12 @@ return {
             layout = "horizontal",
             preview = { layout = "vertical", vertical = "right:55%" },
           },
-        })
+        }))
       end, { desc = "Search last yank (\" register) with native preview" })
 
       vim.keymap.set("n", "<leader>sg", function()
-        fzf.grep({
+        -- <C-y>/<C-S-y>/<C-c>/<C-p>/<C-o>: same path/file actions as ff
+        fzf.grep(require("utils.clipboard").picker_opts({
           search = "",  -- just the raw string
           prompt = "Search> ",
           fzf_opts = {
@@ -128,7 +131,7 @@ return {
             ["ctrl-g"]      = { actions.grep_lgrep },
             ["ctrl-r"]   = { actions.toggle_ignore }
           },
-        })
+        }))
       end, { desc = "Search native preview" })
 
       -- Map <leader>ff to find files
@@ -242,7 +245,7 @@ return {
               opts[k] = v
             end
           end
-          fzf.grep(opts)
+          fzf.grep(require("utils.clipboard").picker_opts(opts))
         end
 
         local function files_in_dir(cwd, query)

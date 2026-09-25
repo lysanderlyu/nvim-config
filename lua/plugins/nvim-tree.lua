@@ -345,7 +345,8 @@ return {
             opts[k] = v
           end
         end
-        require("fzf-lua").grep(opts)
+        -- <C-y>/<C-S-y>/<C-c>/<C-p>/<C-o>: same path/file actions as ff
+        require("fzf-lua").grep(require("utils.clipboard").picker_opts(opts))
       end
 
       local function yank_for_grep(reg)
