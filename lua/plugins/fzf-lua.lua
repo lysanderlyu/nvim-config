@@ -41,6 +41,12 @@ return {
           ["ctrl-k"] = "preview-up",
         },
       },
+      -- Current-buffer grep inherits grep's ctrl-g (grep_lgrep). Leave that
+      -- key alone so a file buffer keeps Neovim's CTRL-G (name, cursor, modified).
+      -- Project and directory finders still bind ctrl-g themselves.
+      grep_curbuf = {
+        actions = { ["ctrl-g"] = false },
+      },
     },
     ---@diagnostics enable: missing-fields
     config = function(_, opts)
