@@ -7,7 +7,13 @@ return {
     },
     event = { "BufReadPost", "BufNewFile" },
     keys = {
-      { "<leader>ao", "<cmd>AerialToggle<CR>", desc = "Aerial Outline" },
+      {
+        "<leader>ao",
+        function()
+          require("aerial").toggle({ focus = false })
+        end,
+        desc = "Aerial Outline",
+      },
     },
     opts = {
       backends = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
@@ -16,12 +22,24 @@ return {
       layout = {
         min_width = 10,
       },
+      keymaps = {
+        ["q"] = function()
+          local aer = require("aerial")
+          aer.close()
+        end,
+      },
       open_automatic = function(bufnr)
         if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= "" then
           return false
         end
         local name = vim.api.nvim_buf_get_name(bufnr)
         if name == "" or vim.fn.isdirectory(name) == 1 then
+          return false
+        end
+        -- A manual close (q or <leader>ao) sets was_closed until the next open.
+        -- Without this, entering the file buffer opens the outline again immediately.
+        local aer = require("aerial")
+        if aer.was_closed() then
           return false
         end
         return require("aerial.backends").is_supported(bufnr, "treesitter")
