@@ -5,15 +5,19 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
+    event = { "BufReadPost", "BufNewFile" },
     keys = {
       { "<leader>ao", "<cmd>AerialToggle<CR>", desc = "Aerial Outline" },
     },
     opts = {
       backends = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
-      lazy_load = true,
       layout = {
         min_width = 10,
       },
+      open_automatic = function(bufnr)
+        return require("aerial.backends").is_supported(bufnr, "treesitter")
+      end,
+      close_automatic_events = { "unsupported" },
       filter_kind = {
         "Class",
         "Constructor",
