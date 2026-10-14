@@ -7,14 +7,11 @@ return {
     ---@diagnostics disable: missing-fields
     opts = {
       keymap = {
-        preview = {
-          ["<C-d>"] = "preview-page-down",
-          ["<C-u>"] = "preview-page-up",
-        },
         builtin = {
           -- true,        -- uncomment to inherit all the below in your custom config
-          ["<C-j>"]       = "preview-down",
-          ["<C-k>"]       = "preview-up",
+          -- <C-j>/<C-k> are left to fzf so they move the candidate list.
+          ["<C-d>"]       = "preview-half-page-down",
+          ["<C-u>"]       = "preview-half-page-up",
           ["<M-Esc>"]     = "hide",     -- hide fzf-lua, `:FzfLua resume` to continue
           ["<F1>"]        = "toggle-help",
           ["<F2>"]        = "toggle-fullscreen",
@@ -37,8 +34,10 @@ return {
         },
         fzf = {
           true, -- inherit fzf-lua's default fzf binds
-          ["ctrl-j"] = "preview-down",
-          ["ctrl-k"] = "preview-up",
+          ["ctrl-j"] = "down",
+          ["ctrl-k"] = "up",
+          ["ctrl-d"] = "preview-half-page-down",
+          ["ctrl-u"] = "preview-half-page-up",
         },
       },
       -- Current-buffer grep inherits grep's ctrl-g (grep_lgrep). Leave that
