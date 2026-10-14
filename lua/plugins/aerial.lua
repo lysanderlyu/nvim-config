@@ -11,6 +11,8 @@ return {
     },
     opts = {
       backends = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
+      -- One outline per tab; it follows the current window instead of opening again on split.
+      attach_mode = "global",
       layout = {
         min_width = 10,
       },
