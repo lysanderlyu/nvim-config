@@ -10,31 +10,21 @@ return {
     config = function()
       local telescope = require("telescope")
       local previewers = require("telescope.previewers")
-      local action_state = require("telescope.actions.state")
-      local telescope_state = require("telescope.state")
+      local actions = require("telescope.actions")
 
-      -- Scroll the preview a fixed number of lines instead of half a page
-      local function preview_scroll_lines(lines)
-        return function(prompt_bufnr)
-          local previewer = action_state.get_current_picker(prompt_bufnr).previewer
-          local status = telescope_state.get_status(prompt_bufnr)
-          if type(previewer) ~= "table" or previewer.scroll_fn == nil or status.preview_win == nil then
-            return
-          end
-          previewer:scroll_fn(lines)
-        end
-      end
-
-      local preview_scroll_keys = {
-        ["<C-j>"] = preview_scroll_lines(1),
-        ["<C-k>"] = preview_scroll_lines(-1),
+      -- Candidate list with Ctrl-j/k; preview half-page with Ctrl-d/u.
+      local two_pane_keys = {
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
+        ["<C-d>"] = actions.preview_scrolling_down,
+        ["<C-u>"] = actions.preview_scrolling_up,
       }
 
       telescope.setup({
         defaults = {
           mappings = {
-            i = preview_scroll_keys,
-            n = preview_scroll_keys,
+            i = two_pane_keys,
+            n = two_pane_keys,
           },
         },
         pickers = {

@@ -110,16 +110,32 @@ local function git_log_stat_preview(ctx)
   Snacks.picker.preview.cmd(cmd, ctx, { ft = "git" })
 end
 
--- Scroll the picker preview a fixed number of lines instead of half a page
-local function preview_scroll_lines(count, up)
-  return function(picker)
-    local win = picker.preview.win
-    if not win:valid() then
-      return
+-- List + preview only. Extra panes (directory picker's file window) keep their own keys.
+local function is_two_pane(picker)
+  local wins = picker.layout and picker.layout.wins
+  if not wins or not wins.list or not wins.preview then
+    return false
+  end
+  for name in pairs(wins) do
+    if name ~= "input" and name ~= "list" and name ~= "preview" then
+      return false
     end
-    vim.api.nvim_win_call(win.win, function()
-      vim.cmd(("normal! %d%s"):format(count, Snacks.util.keycode(up and "<c-y>" or "<c-e>")))
-    end)
+  end
+  return wins.preview:valid()
+end
+
+local function preview_half(picker, up)
+  if is_two_pane(picker) then
+    if picker.preview.win:valid() then
+      picker.preview.win:scroll(up)
+    end
+    return
+  end
+  local actions = Snacks.picker.actions
+  if up then
+    actions.list_scroll_up(picker)
+  else
+    actions.list_scroll_down(picker)
   end
 end
 
@@ -147,22 +163,30 @@ return {
       },
       picker = {
         enabled = true,
-        -- <c-j>/<c-k> scroll the preview in every picker; list nav stays on <c-n>/<c-p>
+        -- Two-pane pickers (go/gl): Ctrl-j/k move the candidate, Ctrl-d/u half-page the preview.
         actions = {
-          preview_lines_down = preview_scroll_lines(1, false),
-          preview_lines_up = preview_scroll_lines(1, true),
+          preview_half_down = function(picker)
+            preview_half(picker, false)
+          end,
+          preview_half_up = function(picker)
+            preview_half(picker, true)
+          end,
         },
         win = {
           input = {
             keys = {
-              ["<c-j>"] = { "preview_lines_down", mode = { "i", "n" } },
-              ["<c-k>"] = { "preview_lines_up", mode = { "i", "n" } },
+              ["<c-j>"] = { "list_down", mode = { "i", "n" } },
+              ["<c-k>"] = { "list_up", mode = { "i", "n" } },
+              ["<c-d>"] = { "preview_half_down", mode = { "i", "n" } },
+              ["<c-u>"] = { "preview_half_up", mode = { "i", "n" } },
             },
           },
           list = {
             keys = {
-              ["<c-j>"] = "preview_lines_down",
-              ["<c-k>"] = "preview_lines_up",
+              ["<c-j>"] = "list_down",
+              ["<c-k>"] = "list_up",
+              ["<c-d>"] = "preview_half_down",
+              ["<c-u>"] = "preview_half_up",
             },
           },
         },
