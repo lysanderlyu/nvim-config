@@ -17,6 +17,13 @@ return {
         min_width = 10,
       },
       open_automatic = function(bufnr)
+        if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= "" then
+          return false
+        end
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        if name == "" or vim.fn.isdirectory(name) == 1 then
+          return false
+        end
         return require("aerial.backends").is_supported(bufnr, "treesitter")
       end,
       close_automatic_events = { "unsupported" },
@@ -37,5 +44,116 @@ return {
         include_lists = false,
       },
     },
+    config = function(_, opts)
+      local aerial = require("aerial")
+      aerial.setup(opts)
+
+      local function is_outline_win(winid)
+        local buf = vim.api.nvim_win_get_buf(winid)
+        if vim.bo[buf].filetype == "aerial" then
+          return true
+        end
+        local ok, flag = pcall(vim.api.nvim_win_get_var, winid, "is_aerial_win")
+        return ok and flag == true
+      end
+
+      local function is_file_win(winid)
+        if not vim.api.nvim_win_is_valid(winid) or vim.api.nvim_win_get_config(winid).relative ~= "" then
+          return false
+        end
+        if is_outline_win(winid) then
+          return false
+        end
+        local buf = vim.api.nvim_win_get_buf(winid)
+        if not vim.api.nvim_buf_is_valid(buf) then
+          return false
+        end
+        local name = vim.api.nvim_buf_get_name(buf)
+        return vim.bo[buf].buftype == "" and name ~= "" and vim.fn.isdirectory(name) == 0
+      end
+
+      local function is_blank_win(winid)
+        if is_outline_win(winid) then
+          return false
+        end
+        local buf = vim.api.nvim_win_get_buf(winid)
+        return vim.bo[buf].buftype == "" and vim.api.nvim_buf_get_name(buf) == ""
+      end
+
+      -- Tree, terminal, help, and other real windows should keep Neovim open.
+      -- A leftover unnamed buffer or the outline should not.
+      local function is_keep_win(winid)
+        if not vim.api.nvim_win_is_valid(winid) or vim.api.nvim_win_get_config(winid).relative ~= "" then
+          return false
+        end
+        if is_outline_win(winid) or is_blank_win(winid) then
+          return false
+        end
+        return true
+      end
+
+      local function close_outline_windows()
+        for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          if vim.api.nvim_win_is_valid(winid) and is_outline_win(winid) then
+            pcall(vim.api.nvim_win_close, winid, false)
+          end
+        end
+      end
+
+      local function tab_has(pred, tab)
+        for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(tab or 0)) do
+          if pred(winid) then
+            return true
+          end
+        end
+        return false
+      end
+
+      local scheduled = false
+      local quit_blocked = false
+      local group = vim.api.nvim_create_augroup("AerialCloseWithoutFile", { clear = true })
+      vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "BufDelete", "BufWipeout", "WinClosed" }, {
+        desc = "Close Aerial when the tab has no file buffer",
+        group = group,
+        callback = function()
+          if scheduled then
+            return
+          end
+          scheduled = true
+          -- Wait until buffer delete and Aerial's own window update have finished.
+          vim.defer_fn(function()
+            scheduled = false
+            if tab_has(is_file_win) then
+              quit_blocked = false
+              return
+            end
+            if tab_has(is_keep_win) then
+              close_outline_windows()
+              return
+            end
+            if quit_blocked then
+              return
+            end
+
+            local current = vim.api.nvim_get_current_tabpage()
+            local elsewhere = false
+            for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+              if tab ~= current and (tab_has(is_file_win, tab) or tab_has(is_keep_win, tab)) then
+                elsewhere = true
+                break
+              end
+            end
+
+            -- Nothing left but the outline and/or an empty window: leave Neovim.
+            -- Another tab still in use: close only this tab.
+            local ok = pcall(vim.cmd, elsewhere and "tabclose" or "qa")
+            if not ok then
+              quit_blocked = true
+              close_outline_windows()
+            end
+          end, 50)
+        end,
+      })
+    end,
   },
 }
