@@ -1,18 +1,5 @@
 local M = {}
 
--- Skip these when walking *down* into a parent folder looking for a repo.
--- Do not skip names that people use as project folders (build, target, …).
-local SKIP_DOWN = {
-  [".git"] = true,
-  [".cache"] = true,
-  [".venv"] = true,
-  [".mypy_cache"] = true,
-  [".tox"] = true,
-  [".Trash"] = true,
-  node_modules = true,
-  venv = true,
-}
-
 local function norm(path)
   if not path or path == "" then
     return nil
@@ -90,58 +77,6 @@ local function toplevel(dir)
     root = out[1],
     gitdir = out[2] or (out[1] .. "/.git"),
   }
-end
-
----Breadth-first: first `.git` at the smallest depth (alphabetical if tied).
----Symlink directories are resolved so a linked project is still found.
----@param start string
----@param max_depth? integer
----@return { root: string, gitdir: string }|nil
-local function walk_down(start, max_depth)
-  max_depth = max_depth or 8
-  start = M.realpath(start) or start
-  local level = { start }
-  local seen = { [start] = true }
-  for _ = 0, max_depth do
-    local hits = {}
-    local next_level = {}
-    for _, dir in ipairs(level) do
-      if vim.uv.fs_stat(dir .. "/.git") then
-        hits[#hits + 1] = dir
-      else
-        local handle = vim.uv.fs_scandir(dir)
-        if handle then
-          while true do
-            local name, typ = vim.uv.fs_scandir_next(handle)
-            if not name then
-              break
-            end
-            if not SKIP_DOWN[name] then
-              local child = dir .. "/" .. name
-              if typ == "directory" or typ == "link"
-                  or (typ == nil and vim.fn.isdirectory(child) == 1) then
-                child = vim.uv.fs_realpath(child) or child
-                child = norm(child) or child
-                if not seen[child] then
-                  seen[child] = true
-                  next_level[#next_level + 1] = child
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-    if #hits > 0 then
-      table.sort(hits)
-      return toplevel(hits[1])
-    end
-    if #next_level == 0 then
-      return nil
-    end
-    level = next_level
-  end
-  return nil
 end
 
 ---@param start? string
@@ -281,8 +216,9 @@ function M.history_pathspec(info, rel)
   return names
 end
 
----Nearest git work tree for a path (or the current file, then cwd).
----Walks up first (normal git), then searches downward for a nested `.git`.
+---Nearest enclosing git work tree for a path (or the current file, then cwd).
+---Git walks upward through the path's parents and therefore chooses the
+---innermost repository when repositories are nested.
 ---Start paths are realpath-resolved so a symlink file/dir still finds its repo.
 ---@param opts? { start?: string, silent?: boolean }
 ---@return { root: string, gitdir: string, file?: string }|nil
@@ -306,15 +242,8 @@ function M.nearest(opts)
     end
   end
 
-  for _, dir in ipairs(dirs) do
-    local info = walk_down(dir)
-    if info then
-      return finish(info)
-    end
-  end
-
   if not opts.silent then
-    vim.notify("Not a git repo (no .git above or under this path)", vim.log.levels.ERROR)
+    vim.notify("Not inside a git repo (no .git in this path or its parents)", vim.log.levels.ERROR)
   end
   return nil
 end

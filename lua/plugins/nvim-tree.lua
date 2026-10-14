@@ -19,8 +19,7 @@ return {
         local is_dir = node.type == "directory" or vim.fn.isdirectory(real) == 1
         local base = is_dir and real or vim.fn.fnamemodify(real, ":h")
 
-        -- Walk up from this node, then search down for a nested .git
-        -- (cwd may not be a repo; a child folder might be).
+        -- Walk upward from this node and choose the nearest enclosing repo.
         local repo = git_util.nearest({ start = real })
         if not repo then
           return
@@ -33,7 +32,7 @@ return {
         -- Let git report the repo-relative location: --show-toplevel is
         -- symlink-resolved, so comparing it against the tree path fails
         -- whenever any component is a symlink. Empty when `base` is a
-        -- parent of the repo (we just found a nested .git below it).
+        -- repo-relative path for the selected node.
         local prefix_out = vim.fn.systemlist({
           "git", "-C", base, "rev-parse", "--show-prefix",
         })
