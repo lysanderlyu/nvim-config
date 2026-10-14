@@ -83,7 +83,7 @@ vim.keymap.set("n", "<leader>sh", builtin.help_tags, opts)
 -- vim.loop.cwd() and hard-errors ("<cwd> is not a git directory") when that
 -- directory is not a repo — e.g. an editor opened at /data/sansan while the
 -- buffer lives in a nested repo underneath it. Resolve the repo the way the
--- rest of the config does instead (realpath, walk up, then search down), and
+-- rest of the config does instead (realpath, then walk up through parents), and
 -- hand it to telescope as `cwd`.
 local function repo_cwd()
   local file = vim.fn.expand("%:p")
@@ -226,7 +226,7 @@ vim.keymap.set("n", "<leader>gD", function()
   end
 
   -------------------------------------------------------
-  -- 2. Nearest git repo (realpath, walk up, then search down)
+  -- 2. Nearest enclosing git repo (realpath, then walk up through parents)
   -------------------------------------------------------
   local git = require("utils.git")
   local info = git.nearest({ start = file })
