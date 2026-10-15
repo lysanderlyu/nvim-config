@@ -6,6 +6,7 @@ return {
       "nvim-treesitter/nvim-treesitter",
     },
     event = { "BufReadPost", "BufNewFile" },
+    ft = "man",
     keys = {
       {
         "<leader>ao",
@@ -28,8 +29,13 @@ return {
           aer.close()
         end,
       },
+      -- Do not skip help, man, or other non-empty buftypes. Aerial's default
+      -- "special" setting ignores every buftype except normal, help, and man.
+      ignore = {
+        buftypes = false,
+      },
       open_automatic = function(bufnr)
-        if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= "" then
+        if not vim.api.nvim_buf_is_valid(bufnr) then
           return false
         end
         local name = vim.api.nvim_buf_get_name(bufnr)
@@ -42,9 +48,17 @@ return {
         if aer.was_closed() then
           return false
         end
-        return require("aerial.backends").is_supported(bufnr, "treesitter")
+        -- man2 (:Man) and other non-Tree-sitter documents use their own backend.
+        local backends = require("aerial.backends")
+        for _, name in ipairs(require("aerial.config").backends(bufnr)) do
+          if backends.is_supported(bufnr, name) then
+            return true
+          end
+        end
+        return false
       end,
-      close_automatic_events = { "unsupported" },
+      -- Keep a manual open visible even when the buffer has no symbol backend.
+      close_automatic_events = {},
       filter_kind = {
         "Class",
         "Constructor",
@@ -86,8 +100,9 @@ return {
         if not vim.api.nvim_buf_is_valid(buf) then
           return false
         end
+        -- Any named file keeps the outline, whatever its buftype is.
         local name = vim.api.nvim_buf_get_name(buf)
-        return vim.bo[buf].buftype == "" and name ~= "" and vim.fn.isdirectory(name) == 0
+        return name ~= "" and vim.fn.isdirectory(name) == 0
       end
 
       local function is_blank_win(winid)
@@ -172,6 +187,34 @@ return {
           end, 50)
         end,
       })
+
+      local function open_if_supported(bufnr)
+        vim.defer_fn(function()
+          if not vim.api.nvim_buf_is_valid(bufnr) or vim.api.nvim_get_current_buf() ~= bufnr then
+            return
+          end
+          if vim.bo[bufnr].filetype ~= "man" or require("aerial").is_open() then
+            return
+          end
+          require("aerial.autocommands").on_enter_buffer()
+        end, 50)
+      end
+
+      -- man2 runs `nvim -c "Man …" -c "wincmd o"`. The man filetype is set after
+      -- the first BufEnter, and this plugin is loaded from that FileType event,
+      -- so the event itself is already over. wincmd o also runs before a synchronous
+      -- open would survive. Open once the startup commands have finished.
+      vim.api.nvim_create_autocmd("FileType", {
+        desc = "Open Aerial on a man page",
+        pattern = "man",
+        group = vim.api.nvim_create_augroup("AerialOpenOnMan", { clear = true }),
+        callback = function(args)
+          open_if_supported(args.buf)
+        end,
+      })
+      if vim.bo.filetype == "man" then
+        open_if_supported(vim.api.nvim_get_current_buf())
+      end
     end,
   },
 }
