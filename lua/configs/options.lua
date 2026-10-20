@@ -128,6 +128,7 @@ vim.filetype.add({
     qml = "qmljs",
     drawio = "xml",
     inc = "bitbake",
+    uc = "javascript",
   },
   pattern = {
     [".*Config.*%.in"] = "kconfig",
