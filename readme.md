@@ -104,7 +104,7 @@ nvim
 | `';` | Visual模式下复制到系统剪贴板 |
 | `;'` | 粘贴系统剪贴板内容 |
 | `<leader>sb` | 打开当前文件搜索框 |
-| `<leader>sB` | 打开所有已打开的文件搜索框 |
+| `<leader>sB` | 同 `<leader>sb`（当前 buffer 内搜行），但用 `"` 寄存器内容预填搜索框 |
 | `<leader>sg` | 打开文本全局搜索框；Ctrl+y/Ctrl+Shift+y/Ctrl+c/Ctrl+p/Ctrl+o 同 ff |
 | `<leader>ss` | 将当前`"`寄存器的文本进行全局搜索；快捷键同 sg |
 | `<leader>sS` | 将当前`+`寄存器（也就是系统剪切板）的文本进行全局搜索；快捷键同 sg |
