@@ -386,6 +386,41 @@ return {
         }, node_dir_at_hierarchy_level(vim.v.count))
       end
 
+      -- 0{ss,sS,sg,sd,ff,fF}: hierarchy level 0 (current node). Vim count cannot be 0.
+      local function bind_hierarchy_zero_maps(map_fn)
+        local level = 0
+        map_fn("0ss", function()
+          local yank = yank_for_grep('"')
+          if yank then
+            grep_in_node(yank, nil, node_dir_at_hierarchy_level(level))
+          end
+        end, "Search yank (current directory)")
+        map_fn("0sS", function()
+          local yank = yank_for_grep("+")
+          if yank then
+            grep_in_node(yank, nil, node_dir_at_hierarchy_level(level))
+          end
+        end, "Search clipboard (current directory)")
+        map_fn("0sg", function()
+          local actions = require("fzf-lua").actions
+          grep_in_node("", {
+            actions = {
+              ["ctrl-g"] = { actions.grep_lgrep },
+              ["ctrl-r"] = { actions.toggle_ignore },
+            },
+          }, node_dir_at_hierarchy_level(level))
+        end, "Search (current directory)")
+        map_fn("0sd", function()
+          find_dir_node(node_dir_at_hierarchy_level(level))
+        end, "Find Directory (current directory)")
+        map_fn("0ff", function()
+          find_files_node(node_dir_at_hierarchy_level(level))
+        end, "Find Files (current directory)")
+        map_fn("0fF", function()
+          find_files_node_from_yank(node_dir_at_hierarchy_level(level))
+        end, "Find Files yank (current directory)")
+      end
+
       -- -[1-9]{ss,sS,sg,sd,ff,fF}: N levels up from current file/dir toward project root.
       -- Literal sequences (vim has no negative count). Requires `-` without nowait.
       local function bind_hierarchy_up_maps(map_fn)
@@ -451,6 +486,7 @@ return {
           tree_map("<C-p>", function()
             require("utils.clipboard").paste_fs_to_nvim_tree()
           end, "Paste FS clipboard")
+          bind_hierarchy_zero_maps(tree_map)
           bind_hierarchy_up_maps(tree_map)
           -- Allow -[1-9]… sequences: plain `-` must wait (no nowait)
           vim.keymap.set("n", "-", require("nvim-tree.api").tree.change_root_to_parent, {
@@ -518,6 +554,9 @@ return {
           vim.keymap.set('n', 'sg', search_grep_node, opts('Search ([count]sg)'))
           vim.keymap.set('n', 'ff', find_files_node, opts('Find Files ([count]ff = hierarchy level)'))
           vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank) ([count]fF)'))
+          bind_hierarchy_zero_maps(function(lhs, rhs, desc)
+            vim.keymap.set('n', lhs, rhs, opts(desc))
+          end)
           bind_hierarchy_up_maps(function(lhs, rhs, desc)
             vim.keymap.set('n', lhs, rhs, opts(desc))
           end)
@@ -709,6 +748,9 @@ return {
             vim.keymap.set('n', 'sg', search_grep_node, opts('Search ([count]sg)'))
             vim.keymap.set('n', 'ff', find_files_node, opts('Find Files ([count]ff = hierarchy level)'))
             vim.keymap.set('n', 'fF', find_files_node_from_yank, opts('Find Files (yank) ([count]fF)'))
+            bind_hierarchy_zero_maps(function(lhs, rhs, desc)
+              vim.keymap.set('n', lhs, rhs, opts(desc))
+            end)
             bind_hierarchy_up_maps(function(lhs, rhs, desc)
               vim.keymap.set('n', lhs, rhs, opts(desc))
             end)

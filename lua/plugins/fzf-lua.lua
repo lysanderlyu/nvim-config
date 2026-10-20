@@ -202,8 +202,8 @@ return {
         }))
       end, { desc = "Find files filtered by clipboard content" })
 
-      -- <leader>[1-9]{ss,sS,sg,ff,fF} / <leader>-[1-9]{…}: same hierarchy as
-      -- nvim-tree [1-9]/[1-9], from buffer path under workdir / tree root (not git).
+      -- <leader>[0-9]{ss,sS,sg,ff,fF} / <leader>-[1-9]{…}: same hierarchy as
+      -- nvim-tree [0-9]/-[1-9], from buffer path under workdir / tree root (not git).
       do
         local hier = require("utils.hierarchy")
         local grep_winopts = {
@@ -288,10 +288,10 @@ return {
           vim.keymap.set("n", lhs, rhs, { desc = desc })
         end
 
-        for i = 1, 9 do
+        for i = 0, 9 do
           local level = i
 
-          -- From project root down: <leader>1ss …
+          -- From project root down: <leader>0ss = current buffer dir, <leader>1ss …
           bind("<leader>" .. i .. "ss", function()
             local yank = yank_for_grep('"')
             if yank then
