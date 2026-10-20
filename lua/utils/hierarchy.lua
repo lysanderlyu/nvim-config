@@ -1,4 +1,4 @@
----Path hierarchy helpers for buffer-scoped pickers (`<leader>[1-9]ss`, `<leader>-1ff`, …).
+---Path hierarchy helpers for buffer-scoped pickers (`<leader>[0-9]ss`, `<leader>-1ff`, …).
 ---Mirrors nvim-tree `[count]ss` / `-[1-9]ss`: walk from the **workdir / nvim-tree
 ---root** (not the git toplevel) down the current buffer path.
 
