@@ -345,6 +345,15 @@ return {
       end, desc = "Git Log Line" },
       -- Grep
       { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
+      { "<leader>sB", function()
+        local yank = vim.fn.getreg('"')
+        if yank == "" then
+          vim.notify("No yanked text", vim.log.levels.INFO)
+          return
+        end
+        yank = yank:gsub("[\r\n]+", " "):gsub("^%s*(.-)%s*$", "%1")
+        Snacks.picker.lines({ pattern = yank })
+      end, desc = 'Buffer Lines (" register)' },
 
       -- search
       -- { "<leader>sC", function() Snacks.terminal() end, desc = "System command line" },
