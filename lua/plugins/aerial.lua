@@ -23,6 +23,21 @@ return {
       layout = {
         min_width = 10,
       },
+      -- After <CR> in the outline, put the target line at the top of the window (default is zz).
+      post_jump_cmd = "normal! zt",
+      on_attach = function(bufnr)
+        local aerial = require("aerial")
+        vim.keymap.set("n", "<C-j>", function()
+          if aerial.is_open() then
+            aerial.next(vim.v.count1)
+          end
+        end, { buffer = bufnr, desc = "Next outline symbol (Aerial open)" })
+        vim.keymap.set("n", "<C-k>", function()
+          if aerial.is_open() then
+            aerial.prev(vim.v.count1)
+          end
+        end, { buffer = bufnr, desc = "Previous outline symbol (Aerial open)" })
+      end,
       keymaps = {
         ["q"] = function()
           local aer = require("aerial")
