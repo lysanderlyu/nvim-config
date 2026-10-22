@@ -397,7 +397,19 @@ return {
         })
       end, { desc = "Live workspace symbols (clangd, seeded)" })
 
-    vim.keymap.set("n", "<leader>fb", "<cmd>FzfLua buffers<CR>", { desc = "Fzf Buffers" })
+      vim.keymap.set("n", "<leader>fb", function()
+        fzf.buffers({
+          actions = {
+            ["enter"] = require("utils.buffer_picker").switch_tab_or_tabnew,
+          },
+          winopts = {
+            width = 0.95,
+            height = 0.95,
+            layout = "horizontal",
+            preview = { layout = "vertical", vertical = "right:55%", scrollbar = "float" },
+          },
+        })
+      end, { desc = "Fzf Buffers" })
     vim.keymap.set("n", "<leader>fG", "<cmd>FzfLua git_files<CR>", { desc = "Fzf Git files" })
     vim.keymap.set("n", "<leader>:", "<cmd>FzfLua command_history<CR>", { desc = "Fzf command_history" })
     vim.keymap.set("n", '<leader>s"', "<cmd>FzfLua registers<CR>", { desc = "Fzf registers" })
