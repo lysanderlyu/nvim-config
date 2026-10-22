@@ -202,7 +202,7 @@ return {
         }))
       end, { desc = "Find files filtered by clipboard content" })
 
-      -- <leader>[0-9]{ss,sS,sg,ff,fF} / <leader>-[1-9]{…}: same hierarchy as
+      -- <leader>[0-9]{ss,sS,sg,sd,sD,ff,fF} / <leader>-[1-9]{…}: same hierarchy as
       -- nvim-tree [0-9]/-[1-9], from buffer path under workdir / tree root (not git).
       do
         local hier = require("utils.hierarchy")
@@ -251,6 +251,28 @@ return {
             end
           end
           fzf.grep(require("utils.clipboard").picker_opts(opts))
+        end
+
+        local function yank_for_dir_picker()
+          local yank = vim.fn.getreg('"')
+          if yank == "" then
+            vim.notify("No yanked text", vim.log.levels.INFO)
+            return nil
+          end
+          yank = yank:gsub("[\r\n]+$", "")
+          yank = yank:gsub("^%s*(.-)%s*$", "%1")
+          return yank
+        end
+
+        local function dir_picker_in_dir(cwd, pattern)
+          if not cwd then
+            return
+          end
+          if pattern then
+            require("utils.directory_picker").open(cwd, { pattern = pattern })
+          else
+            require("utils.directory_picker").open(cwd)
+          end
         end
 
         local function files_in_dir(cwd, query)
@@ -325,11 +347,14 @@ return {
             files_in_dir(hier.dir_at_hierarchy_level(level), yank)
           end, string.format("Find files yank (hierarchy level %d)", i))
           bind("<leader>" .. i .. "sd", function()
-            local cwd = hier.dir_at_hierarchy_level(level)
-            if cwd then
-              require("utils.directory_picker").open(cwd)
-            end
+            dir_picker_in_dir(hier.dir_at_hierarchy_level(level))
           end, string.format("Find directory (hierarchy level %d)", i))
+          bind("<leader>" .. i .. "sD", function()
+            local yank = yank_for_dir_picker()
+            if yank then
+              dir_picker_in_dir(hier.dir_at_hierarchy_level(level), yank)
+            end
+          end, string.format("Find directory yank (hierarchy level %d)", i))
 
           -- Up toward project root: <leader>-1ss …
           bind("<leader>-" .. i .. "ss", function()
@@ -365,11 +390,14 @@ return {
             files_in_dir(hier.dir_n_levels_up(level), yank)
           end, string.format("Find files yank (%d levels up)", i))
           bind("<leader>-" .. i .. "sd", function()
-            local cwd = hier.dir_n_levels_up(level)
-            if cwd then
-              require("utils.directory_picker").open(cwd)
-            end
+            dir_picker_in_dir(hier.dir_n_levels_up(level))
           end, string.format("Find directory (%d levels up)", i))
+          bind("<leader>-" .. i .. "sD", function()
+            local yank = yank_for_dir_picker()
+            if yank then
+              dir_picker_in_dir(hier.dir_n_levels_up(level), yank)
+            end
+          end, string.format("Find directory yank (%d levels up)", i))
         end
       end
 

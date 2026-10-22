@@ -530,9 +530,69 @@ local function open_row(picker, cmd)
   end)
 end
 
+---Turn yanked path text into a picker pattern that matches fd's cwd-relative dir paths.
+---@param yank string
+---@param cwd string
+---@return string
+local function yank_to_dir_pattern(yank, cwd)
+  yank = vim.trim(yank:gsub("[\r\n].*", ""))
+  if yank == "" then
+    return ""
+  end
+
+  local path = yank
+  if path:find("^~", 1, true) == 1 then
+    path = vim.fn.expand(path)
+  end
+
+  local looks_like_path = path:find("^/", 1, true) == 1 or path:find("[/\\]", 1, true) ~= nil
+  if not looks_like_path then
+    return yank
+  end
+
+  path = vim.fs.normalize(path)
+  if path ~= "/" then
+    path = path:gsub("/$", "")
+  end
+  cwd = vim.fs.normalize(cwd)
+  if cwd ~= "/" then
+    cwd = cwd:gsub("/$", "")
+  end
+
+  if vim.fn.isdirectory(path) ~= 1 and vim.fn.filereadable(path) == 1 then
+    path = vim.fs.normalize(vim.fn.fnamemodify(path, ":h"))
+    if path ~= "/" then
+      path = path:gsub("/$", "")
+    end
+  end
+
+  if path == cwd then
+    return "."
+  end
+  local prefix = cwd .. "/"
+  if path:find(prefix, 1, true) == 1 then
+    return path:sub(#prefix + 1)
+  end
+
+  local parts = vim.split(path, "/", { trimempty = true })
+  if #parts == 0 then
+    return yank
+  end
+  if #parts >= 2 then
+    return table.concat(parts, "/", #parts - 1, #parts)
+  end
+  return parts[#parts]
+end
+
 ---@param cwd? string
-function M.open(cwd)
+---@param opts? { pattern?: string, search?: string }
+function M.open(cwd, opts)
+  opts = opts or {}
   cwd = cwd or vim.uv.cwd() or vim.fn.getcwd()
+  local pattern = opts.pattern or opts.search
+  if pattern and pattern ~= "" then
+    pattern = yank_to_dir_pattern(pattern, cwd)
+  end
   local cmd, args
   if vim.fn.executable("fd") == 1 then
     cmd, args = "fd", { "--type", "d", "--color", "never", "-E", ".git" }
@@ -677,6 +737,7 @@ function M.open(cwd)
   local picker = Snacks.picker({
     find = false,
     show_empty = true,
+    pattern = pattern,
     title = "Directories: " .. vim.fn.fnamemodify(cwd, ":t"),
     cwd = cwd,
     format = "file",
