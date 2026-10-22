@@ -574,6 +574,11 @@ local function yank_to_dir_pattern(yank, cwd)
     return path:sub(#prefix + 1)
   end
 
+  -- Relative path (fd lists cwd-relative dirs): keep the full chain, e.g. device/sampledir/aaa.
+  if path:find("^/", 1, true) ~= 1 then
+    return path
+  end
+
   local parts = vim.split(path, "/", { trimempty = true })
   if #parts == 0 then
     return yank
