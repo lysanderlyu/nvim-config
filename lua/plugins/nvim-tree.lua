@@ -257,6 +257,30 @@ return {
         require("utils.directory_picker").open(cwd)
       end
 
+      local function yank_for_dir_picker()
+        local yank = vim.fn.getreg('"')
+        if yank == "" then
+          vim.notify("No yanked text", vim.log.levels.INFO)
+          return nil
+        end
+        yank = yank:gsub("[\r\n]+$", "")
+        yank = yank:gsub("^%s*(.-)%s*$", "%1")
+        return yank
+      end
+
+      -- sD: directory picker with "" register pre-filled in the search box (like fF)
+      local function find_dir_node_from_yank(cwd)
+        local yank = yank_for_dir_picker()
+        if not yank then
+          return
+        end
+        cwd = cwd or node_dir_at_hierarchy_level(vim.v.count)
+        if not cwd then
+          return
+        end
+        require("utils.directory_picker").open(cwd, { pattern = yank })
+      end
+
       -- ff: file picker scoped to the node under cursor
       -- [count]ff: same, but at hierarchy depth `count` from the project root
       local function find_files_node(cwd)
@@ -386,7 +410,7 @@ return {
         }, node_dir_at_hierarchy_level(vim.v.count))
       end
 
-      -- 0{ss,sS,sg,sd,ff,fF}: hierarchy level 0 (current node). Vim count cannot be 0.
+      -- 0{ss,sS,sg,sd,sD,ff,fF}: hierarchy level 0 (current node). Vim count cannot be 0.
       local function bind_hierarchy_zero_maps(map_fn)
         local level = 0
         map_fn("0ss", function()
@@ -413,6 +437,9 @@ return {
         map_fn("0sd", function()
           find_dir_node(node_dir_at_hierarchy_level(level))
         end, "Find Directory (current directory)")
+        map_fn("0sD", function()
+          find_dir_node_from_yank(node_dir_at_hierarchy_level(level))
+        end, "Find Directory (yank) (current directory)")
         map_fn("0ff", function()
           find_files_node(node_dir_at_hierarchy_level(level))
         end, "Find Files (current directory)")
@@ -421,7 +448,7 @@ return {
         end, "Find Files yank (current directory)")
       end
 
-      -- -[1-9]{ss,sS,sg,sd,ff,fF}: N levels up from current file/dir toward project root.
+      -- -[1-9]{ss,sS,sg,sd,sD,ff,fF}: N levels up from current file/dir toward project root.
       -- Literal sequences (vim has no negative count). Requires `-` without nowait.
       local function bind_hierarchy_up_maps(map_fn)
         for i = 1, 9 do
@@ -450,6 +477,9 @@ return {
           map_fn("-" .. i .. "sd", function()
             find_dir_node(node_dir_n_levels_up(level))
           end, string.format("Find Directory (%d levels up)", i))
+          map_fn("-" .. i .. "sD", function()
+            find_dir_node_from_yank(node_dir_n_levels_up(level))
+          end, string.format("Find Directory (yank) (%d levels up)", i))
           map_fn("-" .. i .. "ff", function()
             find_files_node(node_dir_n_levels_up(level))
           end, string.format("Find Files (%d levels up)", i))
@@ -475,6 +505,7 @@ return {
           tree_map("gl", git_log_node, "Git Log: File/Dir")
           tree_map("go", git_status_node, "Git Status: Dir")
           tree_map("sd", find_dir_node, "Find Directory ([count]sd = hierarchy level)")
+          tree_map("sD", find_dir_node_from_yank, "Find Directory (yank) ([count]sD)")
           tree_map("ss", search_unnamed_node, "Search yank ([count]ss = hierarchy level)")
           tree_map("sS", search_clipboard_node, "Search clipboard ([count]sS)")
           tree_map("sg", search_grep_node, "Search ([count]sg)")
@@ -549,6 +580,7 @@ return {
           vim.keymap.set('n', 'gl', git_log_node, opts('Git Log: File/Dir'))
           vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
           vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory ([count]sd = hierarchy level)'))
+          vim.keymap.set('n', 'sD', find_dir_node_from_yank, opts('Find Directory (yank) ([count]sD)'))
           vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank ([count]ss = hierarchy level)'))
           vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard ([count]sS)'))
           vim.keymap.set('n', 'sg', search_grep_node, opts('Search ([count]sg)'))
@@ -748,6 +780,7 @@ return {
             vim.keymap.set('n', 'gl', git_log_node, opts('Git Log: File/Dir'))
             vim.keymap.set('n', 'go', git_status_node, opts('Git Status: Dir'))
             vim.keymap.set('n', 'sd', find_dir_node, opts('Find Directory ([count]sd = hierarchy level)'))
+            vim.keymap.set('n', 'sD', find_dir_node_from_yank, opts('Find Directory (yank) ([count]sD)'))
             vim.keymap.set('n', 'ss', search_unnamed_node, opts('Search yank ([count]ss = hierarchy level)'))
             vim.keymap.set('n', 'sS', search_clipboard_node, opts('Search clipboard ([count]sS)'))
             vim.keymap.set('n', 'sg', search_grep_node, opts('Search ([count]sg)'))
