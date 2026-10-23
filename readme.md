@@ -174,7 +174,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>fr` | 搜索最近打开的文件 |
 | `<leader>fF` | 根据剪贴板内容过滤搜索文件 |
 | `<leader>[0-9]fF` / `<leader>-[1-9]fF` | 同 `<leader>fF`，目录层级作用范围同上 |
-| `<leader>fb` | 查看已打开的Buffer |
+| `<leader>fb` | 查看已打开的 Buffer；路径/文件快捷键同 `<leader>ff`（对有磁盘路径的 buffer 有效） |
 | `<leader>fG` | Git 文件搜索 |
 | `<leader>gf` | Git 文件搜索 |
 | `<leader>:` | 查看命令历史 |
