@@ -113,7 +113,9 @@ nvim
 | `<C-Space>` | Insert 模式下列出当前文件类型的代码片段（无需先输入关键字） |
 | `tab` | Normal 模式下，按Tab会打开/折叠当前块 |
 | `shift-tab` | Normal 模式下，按Shift+Tab会打开/折叠所有块 |
-| `<leader>tl` | 使用谷歌翻译当前行 |
+| `<leader>ty` | 使用谷歌翻译当前行 |
+| `<leader>th` | 将当前 tab 左移一位 |
+| `<leader>tl` | 将当前 tab 右移一位 |
 | `T` | 使用谷歌翻译当前字 |
 | `<leader>n<leader>tr` | 使用谷歌翻译n行 |
 
