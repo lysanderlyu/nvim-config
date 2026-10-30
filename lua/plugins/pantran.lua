@@ -23,10 +23,10 @@ return {
       -- Translate a motion (e.g., <leader>trip to translate a paragraph)
       vim.keymap.set("n", "<leader>tr", pantran.motion_translate, opts)
 
-      -- Translate current line
-      vim.keymap.set("n", "<leader>tl", function()
+      -- Translate current line (<leader>tl is move tab right)
+      vim.keymap.set("n", "<leader>ty", function()
         return pantran.motion_translate() .. "_"
-      end, opts)
+      end, { noremap = true, silent = true, expr = true, desc = "Translate current line" })
 
       -- Translate selection in visual mode
       vim.keymap.set("x", "<leader>tr", pantran.motion_translate, opts)

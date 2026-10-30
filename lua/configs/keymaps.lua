@@ -36,6 +36,8 @@ end
 vim.keymap.set("n", "<leader>tt", ":tabnew<cr>", { desc = "New Tab" })
 vim.keymap.set("n", "<leader>lt", ":tabnext<cr>", { desc = "Next Tab" })
 vim.keymap.set("n", "<leader>ht", ":tabprevious<cr>", { desc = "Previous Tab" })
+vim.keymap.set("n", "<leader>th", ":tabm -1<cr>", { desc = "Move tab left" })
+vim.keymap.set("n", "<leader>tl", ":tabm +1<cr>", { desc = "Move tab right" })
 -- gF opens a new tab; gf stays the original same-window jump
 vim.keymap.set({ "n", "x" }, "gF", "<C-w>gf", { desc = "Go to file in new tab" })
 
