@@ -51,6 +51,11 @@ return {
     config = function(_, opts)
       local fzf = require("fzf-lua")
       local actions = fzf.actions
+      opts.actions = vim.tbl_deep_extend("force", opts.actions or {}, {
+        files = {
+          ["ctrl-r"] = { actions.toggle_ignore },
+        },
+      })
       fzf.setup(opts)
 
       --  Search clipboard (+ register)
