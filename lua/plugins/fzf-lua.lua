@@ -51,6 +51,12 @@ return {
     config = function(_, opts)
       local fzf = require("fzf-lua")
       local actions = fzf.actions
+      opts.actions = vim.tbl_deep_extend("force", opts.actions or {}, {
+        files = {
+          true, -- inherit default file actions (enter, ctrl-s/t/v, …)
+          ["ctrl-r"] = { fn = actions.toggle_ignore, reuse = true, header = false },
+        },
+      })
       fzf.setup(opts)
 
       --  Search clipboard (+ register)
@@ -134,7 +140,7 @@ return {
           },
           actions = {
             ["ctrl-g"]      = { actions.grep_lgrep },
-            ["ctrl-r"]   = { actions.toggle_ignore }
+            ["ctrl-r"]   = { actions.toggle_ignore },
           },
         }))
       end, { desc = "Search native preview" })
