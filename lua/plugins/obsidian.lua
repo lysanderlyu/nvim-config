@@ -1,4 +1,27 @@
-local notes_vault = "~/Notes"
+--- Resolve the notes vault for the current machine.
+--- `$OBSIDIAN_VAULT` wins; otherwise the first candidate that exists on disk is used.
+---@return string|nil
+local function resolve_vault()
+  local candidates = { "~/Notes", "~/notes", "~/Documents/Notes" }
+  if vim.env.OBSIDIAN_VAULT and vim.env.OBSIDIAN_VAULT ~= "" then
+    table.insert(candidates, 1, vim.env.OBSIDIAN_VAULT)
+  end
+  for _, candidate in ipairs(candidates) do
+    local path = vim.fs.normalize(vim.fn.expand(candidate))
+    if vim.fn.isdirectory(path) == 1 then
+      return path
+    end
+  end
+  return nil
+end
+
+local notes_vault = resolve_vault()
+
+-- No vault on this machine: skip obsidian.nvim entirely so nothing errors or
+-- maps <leader>oo to a nonexistent vault. Set $OBSIDIAN_VAULT to enable it.
+if notes_vault == nil then
+  return {}
+end
 
 --- Read Obsidian app daily-note settings from `<vault>/.obsidian/daily-notes.json`.
 ---@param vault string
@@ -48,8 +71,8 @@ return {
     { "<leader>oo", "<cmd>Obsidian open<cr>", desc = "Open in Obsidian" },
   },
   event = {
-    "BufReadPre " .. vim.fn.expand(notes_vault) .. "/*.md",
-    "BufNewFile " .. vim.fn.expand(notes_vault) .. "/*.md",
+    "BufReadPre " .. notes_vault .. "/*.md",
+    "BufNewFile " .. notes_vault .. "/*.md",
   },
   ---@module "obsidian"
   ---@type obsidian.config
