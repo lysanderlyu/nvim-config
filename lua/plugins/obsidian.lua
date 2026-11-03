@@ -43,14 +43,13 @@ return {
   "obsidian-nvim/obsidian.nvim",
   version = "*",
   lazy = true,
-  ft = "markdown",
   cmd = { "Obsidian" },
   keys = {
     { "<leader>oo", "<cmd>Obsidian open<cr>", desc = "Open in Obsidian" },
   },
   event = {
-    "BufReadPre " .. vim.fn.expand(notes_vault) .. "/**/*.md",
-    "BufNewFile " .. vim.fn.expand(notes_vault) .. "/**/*.md",
+    "BufReadPre " .. vim.fn.expand(notes_vault) .. "/*.md",
+    "BufNewFile " .. vim.fn.expand(notes_vault) .. "/*.md",
   },
   ---@module "obsidian"
   ---@type obsidian.config
@@ -167,13 +166,6 @@ return {
       enable = true,
       update_debounce = 200,
       max_file_length = 5000,
-      checkboxes = {
-        [" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
-        ["x"] = { char = "", hl_group = "ObsidianDone" },
-        [">"] = { char = "", hl_group = "ObsidianRightArrow" },
-        ["~"] = { char = "󰰱", hl_group = "ObsidianTilde" },
-        ["!"] = { char = "", hl_group = "ObsidianImportant" },
-      },
       bullets = { char = "•", hl_group = "ObsidianBullet" },
       external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
       reference_text = { hl_group = "ObsidianRefText" },
