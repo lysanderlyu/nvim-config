@@ -45,6 +45,9 @@ return {
   lazy = true,
   ft = "markdown",
   cmd = { "Obsidian" },
+  keys = {
+    { "<leader>oo", "<cmd>Obsidian open<cr>", desc = "Open in Obsidian" },
+  },
   event = {
     "BufReadPre " .. vim.fn.expand(notes_vault) .. "/**/*.md",
     "BufNewFile " .. vim.fn.expand(notes_vault) .. "/**/*.md",
