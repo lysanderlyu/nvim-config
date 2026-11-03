@@ -325,6 +325,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>ps` | 将当前的Puml文件保存为其它格式，默认是png |
 | `<leader>v` | 进入ASCII画图模式 |
 | `<leader>op` | 使用系统应用打开当前文件 |
+| `<leader>oo` | 在 Obsidian 中打开当前笔记 |
 | `<leader>cd` | 切换工作目录 |
 | `<leader>dg` | diffget 获取修改 |
 | `<leader>dp` | diffput 推送修改 |
@@ -452,4 +453,5 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 - 推荐配合 `git`, `rg`, `bat`, `fzf` 等工具  
 - 可以根据自己的习惯修改 `lua/plugins/` 或 `lua/configs/` 中的配置
 - `Keymaps.lua`文件中并不是包含所有的快捷键映射，独立的插件文件比如`lua/plugins/fzf-lua.lua`插件文件也有自己的快捷键映射，但不是放在`keymaps.lua`文件中
+- Obsidian 笔记库按以下顺序自动查找：环境变量 `$OBSIDIAN_VAULT` → `~/Notes` → `~/notes` → `~/Documents/Notes`；都找不到时不会加载 obsidian.nvim，配置仍可正常使用
 
