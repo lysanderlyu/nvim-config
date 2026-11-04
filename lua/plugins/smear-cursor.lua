@@ -40,5 +40,25 @@ return {
       scroll_buffer_space = true,
       legacy_computing_symbols_support = false,
     },
+    config = function(_, opts)
+      require("smear_cursor").setup(opts)
+
+      -- While animating, smear-cursor hides the real cursor by appending
+      -- `a:SmearCursorHide` to guicursor, and only restores it when an
+      -- animation finishes. Pressing `:` right after a visual selection
+      -- changes mode V -> n -> c before the smear settles, so the real cursor
+      -- stays hidden for the whole command line; with smear_to_cmd = false
+      -- nothing restores it, and Noice's cmdline popup has no cursor at all.
+      -- Jumping to the cursor position calls smear's own unhide routine and
+      -- clears that state before the popup draws.
+      vim.api.nvim_create_autocmd("CmdlineEnter", {
+        callback = function()
+          local ok, animation = pcall(require, "smear_cursor.animation")
+          if ok and type(animation.jump) == "function" then
+            pcall(animation.jump, vim.fn.screenrow(), vim.fn.screencol())
+          end
+        end,
+      })
+    end,
   }
 }
