@@ -12,7 +12,7 @@
 ```bash
 mkdir ~/bin/
 cd ~/bin
-wget https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-macos-arm64.tar.gz
+wget https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz
 tar -vxf nvim-macos-arm64.tar.gz
 ln -s nvim-macos-arm64/bin/nvim ./
 ```
