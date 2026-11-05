@@ -112,15 +112,8 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "bitbake_filetype",
 })
 
--- parse *Config*.in file as kconfig 
-vim.api.nvim_create_augroup("kconfig_filetype", { clear = true })
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-    pattern = "*Config*.in",
-    command = "set filetype=kconfig",
-    group = "kconfig_filetype",
-})
-
--- Same rules for vim.filetype.match() (sd file preview, etc.)
+-- parse *config*.in as kconfig regardless of letter case
+-- (Config.in, config.in, FOOconfig.IN). configure.in is autoconf, not Kconfig.
 vim.filetype.add({
   extension = {
     tshark = "tshark",
@@ -131,7 +124,14 @@ vim.filetype.add({
     uc = "javascript",
   },
   pattern = {
-    [".*Config.*%.in"] = "kconfig",
+    -- Lua patterns are case-sensitive, so spell out both cases.
+    [".*[cC][oO][nN][fF][iI][gG].*%.[iI][nN]"] = function(path)
+      -- configure.in is Autoconf, not Kconfig.
+      if vim.fs.basename(path):lower() == "configure.in" then
+        return "config"
+      end
+      return "kconfig"
+    end,
   },
 })
 
