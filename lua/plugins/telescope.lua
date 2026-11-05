@@ -31,6 +31,11 @@ return {
         defaults = {
           -- Replaces last char of caret/prefix when multi-selected (Telescope convention).
           multi_icon = "•",
+          preview = {
+            treesitter = {
+              enable = false, -- nvim-treesitter main 移除了 configs API，禁用避免 preview 报错
+            },
+          },
           mappings = {
             i = two_pane_keys,
             n = two_pane_keys,

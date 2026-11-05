@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/aerial.nvim",
-    branch = "nvim-0.11",
+    branch = "master",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
