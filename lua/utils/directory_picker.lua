@@ -155,17 +155,19 @@ local function file_win_set(win, title, lines)
   win:set_title(title)
 end
 
+-- Keys are lowercase; names are lowercased before lookup.
 local IN_FT_SKIP = {
   ["configure.in"] = true,
-  ["MANIFEST.in"] = true,
+  ["manifest.in"] = true,
   ["requirements.in"] = true,
 }
 
----Same filetype as `:edit`, with `.in` treated as kconfig (Config.in / *Config*.in).
+---Same filetype as `:edit`, with `.in` treated as kconfig (Config.in / *Config*.in,
+---in any letter case).
 ---@param path string
 ---@return string?
 local function preview_filetype(path)
-  local name = vim.fn.fnamemodify(path, ":t")
+  local name = vim.fn.fnamemodify(path, ":t"):lower()
   if name:find("%.in$") and not IN_FT_SKIP[name] then
     return "kconfig"
   end
