@@ -88,6 +88,7 @@ nvim
   - `statuscol.nvim`：状态栏和行号
   - `which-key.nvim`：快捷键提示
   - `soil.nvim`：快速格式化
+  - `gitlab.nvim`：GitLab MR 浏览、评论、审批与合并（依赖 `nui.nvim`、`diffview-plus.nvim`）
 
 ---
 
@@ -244,6 +245,31 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `cc` | 提交当前Stage区内容 |
 | `cw` | 修改上一次提交的提交提示信息 |
 | `ca` | 修改上一次提交的提交提示信息并可追加遗漏的更改至该提交上 |
+
+
+#### GitLab MR 评审（gitlab.nvim）
+
+需要个人访问令牌（PAT），权限至少包含 `api` scope：放在环境变量 `GITLAB_TOKEN`；自建实例再设置 `GITLAB_URL`。也可以在项目根目录放 `.gitlab.nvim`（`auth_token=...`、`gitlab_url=...`），该文件优先于环境变量。
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>gm` / `glc` | 选择 MR 进入评审 |
+| `<leader>gR` / `glS` | 评审当前分支对应的 MR |
+| `glA` | 批准 MR |
+| `glR` | 撤销批准 |
+| `glM` | 合并 MR 并关闭 |
+| `glC` | 为当前分支创建 MR |
+| `glD` | 切换草稿/实时模式 |
+| `glP` | 发布所有草稿评论 |
+| `gld` | 打开/关闭讨论窗口 |
+| `glo` | 在浏览器打开 MR |
+| `glp` | 查看 pipeline 状态 |
+| `glrr` | 在服务端 Rebase 并刷新 |
+| `g?` | 显示 GitLab 快捷键帮助 |
+
+在讨论树中：`r` 回复、`-` 解决/取消解决、`e` 编辑、`dd` 删除、`o` 跳到文件位置、`b` 在浏览器打开。在评审 diff 中：`c` 评论、`s` 建议、`a` 跳回讨论树。
+
+> `<leader>gm` / `<leader>gR` 是本配置添加的入口；`gl*` 是插件自带的全局快捷键，插件加载（VeryLazy）后生效。首次使用会在 `~/.local/share/nvim/gitlab.nvim/bin/server` 编译本地 Go server，需要 Go ≥ 1.25.1。
 
 
 ### 6. LSP
@@ -452,7 +478,8 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 
 - 本配置适合 macOS / Linux / Windows  
-- 推荐配合 `git`, `rg`, `bat`, `fzf` 等工具  
+- 推荐配合 `git`, `rg`, `bat`, `fzf` 等工具
+- 使用 `gitlab.nvim` 需要安装 Go（≥ 1.25.1），并设置 `GITLAB_TOKEN`  
 - 可以根据自己的习惯修改 `lua/plugins/` 或 `lua/configs/` 中的配置
 - `Keymaps.lua`文件中并不是包含所有的快捷键映射，独立的插件文件比如`lua/plugins/fzf-lua.lua`插件文件也有自己的快捷键映射，但不是放在`keymaps.lua`文件中
 - Obsidian 笔记库按以下顺序自动查找：环境变量 `$OBSIDIAN_VAULT` → `~/Notes` → `~/notes` → `~/Documents/Notes`；都找不到时不会加载 obsidian.nvim，配置仍可正常使用
