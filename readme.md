@@ -269,7 +269,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 在讨论树中：`r` 回复、`-` 解决/取消解决、`e` 编辑、`dd` 删除、`o` 跳到文件位置、`b` 在浏览器打开。在评审 diff 中：`c` 评论、`s` 建议、`a` 跳回讨论树。
 
-> `<leader>gm` / `<leader>gR` 是本配置添加的入口；`gl*` 是插件自带的全局快捷键，插件加载（VeryLazy）后生效。首次使用会在 `~/.local/share/nvim/gitlab.nvim/bin/server` 编译本地 Go server，需要 Go ≥ 1.25.1。
+> `<leader>gm` / `<leader>gR` 是本配置添加的入口；`gl*` 是插件自带的全局快捷键，插件加载（VeryLazy）后生效。首次使用会在 `~/.local/share/nvim/gitlab.nvim/bin/server` 编译本地 Go server，需要 Go ≥ 1.25.1。如果本机没有 Go 或版本过低，插件会自动禁用，启动时不会提示 unhealthy。
 
 
 ### 6. LSP

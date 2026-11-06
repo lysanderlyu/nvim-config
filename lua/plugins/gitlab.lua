@@ -1,8 +1,24 @@
+-- gitlab.nvim builds and runs its own Go server. On machines without a
+-- supported Go toolchain it is unusable and setup() prints a "Plugin
+-- unhealthy" warning, so skip loading it there entirely.
+local function has_supported_go()
+  if vim.fn.executable("go") == 0 then
+    return false
+  end
+  local ok, result = pcall(vim.system, { "go", "version" }, { text = true })
+  if not ok then
+    return false
+  end
+  local version = vim.version.parse(result:wait().stdout or "", { strict = false })
+  return version ~= nil and vim.version.ge(version, "1.25.1")
+end
+
 return {
   {
     "harrisoncramer/gitlab.nvim",
     branch = "main", -- upstream default is "develop"; main is the stable branch
     tag = "v4.1.2", -- pin to release; bump manually after reading changelog
+    enabled = has_supported_go(),
     event = "VeryLazy",
     dependencies = {
       "MunifTanjim/nui.nvim",
