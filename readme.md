@@ -41,9 +41,11 @@ ln -s nvim-linux-x86_64/bin/nvim ./
 ```bash
 git clone https://github.com/lysanderlyu/nvim-config ~/.config/nvim
 cd ~/.config/nvim
-git checkout for-ssh-client     # 这个适用于远程SSH客户端使用, 主要是适配远程拷贝到本地系统剪切板功能
-git checkout master             # 这个适合本地系统使用
 ```
+
+不需要为远程 SSH 单独切换分支。配置启动时会检测 `SSH_CONNECTION` / `SSH_TTY` / `SSH_CLIENT`（以及没有 `DISPLAY` / `WAYLAND_DISPLAY` 的本地 Linux），命中后自动使用 OSC 52 共享剪贴板：复制走 OSC 52，粘贴读取 unnamed register，避免 OSC 52 的读请求阻塞 Neovim；本地会话仍使用系统剪贴板。
+
+> 在 tmux 中使用 OSC 52 需要开启 `set -g set-clipboard on`，否则复制不会转发到外层终端。
 
 2. 打开 Neovim：
 
