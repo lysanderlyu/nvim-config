@@ -551,16 +551,16 @@ return {
     config = function(_, opts)
       require("render-markdown").setup(opts)
 
-      -- Body-row separators otherwise reuse the row highlight and look as heavy
-      -- as the outer border. Keep the solid `─` but blend the color toward the
-      -- background so the lines read finer without turning into dashes.
-      local separator_hl = "RenderMarkdownTableSeparator"
+      -- Body rows otherwise reuse the row highlight, so their pipes, the
+      -- separators, and the bottom border look as heavy as the heading. Render
+      -- the whole body with a dimmed border color; the heading keeps `head`.
+      local body_border_hl = "RenderMarkdownTableBodyBorder"
       local ratio = 0.5 -- 1 = table row color, 0 = background
 
-      local function set_separator_hl()
+      local function set_body_border_hl()
         local row = vim.api.nvim_get_hl(0, { name = "RenderMarkdownTableRow", link = false })
         if not row.fg then
-          vim.api.nvim_set_hl(0, separator_hl, { link = "RenderMarkdownTableRow" })
+          vim.api.nvim_set_hl(0, body_border_hl, { link = "RenderMarkdownTableRow" })
           return
         end
         local bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
@@ -574,24 +574,24 @@ return {
         local color = mix(channel(row.fg, 16), channel(bg, 16)) * 65536
           + mix(channel(row.fg, 8), channel(bg, 8)) * 256
           + mix(channel(row.fg, 0), channel(bg, 0))
-        vim.api.nvim_set_hl(0, separator_hl, { fg = color })
+        vim.api.nvim_set_hl(0, body_border_hl, { fg = color })
       end
 
-      set_separator_hl()
+      set_body_border_hl()
       vim.api.nvim_create_autocmd("ColorScheme", {
-        group = vim.api.nvim_create_augroup("RenderMarkdownSeparatorHl", { clear = true }),
+        group = vim.api.nvim_create_augroup("RenderMarkdownBodyBorderHl", { clear = true }),
         callback = function()
-          vim.schedule(set_separator_hl)
+          vim.schedule(set_body_border_hl)
         end,
       })
 
       local ok, table_render = pcall(require, "render-markdown.render.markdown.table")
-      if ok and table_render.separators then
-        local separators = table_render.separators
-        table_render.separators = function(self, wrapped)
+      if ok and table_render.run then
+        local run = table_render.run
+        table_render.run = function(self)
           local row = self.config.row
-          self.config.row = separator_hl
-          local success, err = pcall(separators, self, wrapped)
+          self.config.row = body_border_hl
+          local success, err = pcall(run, self)
           self.config.row = row
           if not success then
             error(err)
