@@ -1,6 +1,10 @@
 return {
   {
-    "MeanderingProgrammer/render-markdown.nvim",
+    -- Temporary fork pin for PR #710 (`pipe_table.full_grid`); revert to
+    -- MeanderingProgrammer/render-markdown.nvim once it is merged.
+    "StudentWeis/render-markdown.nvim",
+    branch = "feat/table-full-grid",
+    commit = "d41aad87ddcabfaeb36c7d29d1fa119cb341068e",
     ft= { "markdown", "Avante", "codecompanion", "copilot-chat" },
     opts = {
       file_types = { "markdown", "Avante", "codecompanion", "copilot-chat" },
@@ -441,6 +445,8 @@ return {
          padding = 1,
          -- Minimum column width to use for padded or trimmed cell.
          min_width = 0,
+         -- Draw a horizontal separator between every body row.
+         full_grid = true,
          -- Characters used to replace table border.
          -- Correspond to top(3), delimiter(3), bottom(3), vertical, & horizontal.
          -- stylua: ignore
@@ -544,6 +550,54 @@ return {
     },
     config = function(_, opts)
       require("render-markdown").setup(opts)
+
+      -- Body-row separators otherwise reuse the row highlight and look as heavy
+      -- as the outer border. Keep the solid `─` but blend the color toward the
+      -- background so the lines read finer without turning into dashes.
+      local separator_hl = "RenderMarkdownTableSeparator"
+      local ratio = 0.5 -- 1 = table row color, 0 = background
+
+      local function set_separator_hl()
+        local row = vim.api.nvim_get_hl(0, { name = "RenderMarkdownTableRow", link = false })
+        if not row.fg then
+          vim.api.nvim_set_hl(0, separator_hl, { link = "RenderMarkdownTableRow" })
+          return
+        end
+        local bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+          or (vim.o.background == "dark" and 0x000000 or 0xffffff)
+        local function channel(color, shift)
+          return math.floor(color / 2 ^ shift) % 256
+        end
+        local function mix(fg, bg)
+          return math.floor(fg * ratio + bg * (1 - ratio) + 0.5)
+        end
+        local color = mix(channel(row.fg, 16), channel(bg, 16)) * 65536
+          + mix(channel(row.fg, 8), channel(bg, 8)) * 256
+          + mix(channel(row.fg, 0), channel(bg, 0))
+        vim.api.nvim_set_hl(0, separator_hl, { fg = color })
+      end
+
+      set_separator_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("RenderMarkdownSeparatorHl", { clear = true }),
+        callback = function()
+          vim.schedule(set_separator_hl)
+        end,
+      })
+
+      local ok, table_render = pcall(require, "render-markdown.render.markdown.table")
+      if ok and table_render.separators then
+        local separators = table_render.separators
+        table_render.separators = function(self, wrapped)
+          local row = self.config.row
+          self.config.row = separator_hl
+          local success, err = pcall(separators, self, wrapped)
+          self.config.row = row
+          if not success then
+            error(err)
+          end
+        end
+      end
     end,
   },
 }
