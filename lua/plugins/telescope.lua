@@ -74,6 +74,13 @@ return {
                 buffer = prompt_bufnr,
                 desc = "telescope|git_staging_toggle",
               })
+              -- Checkout the file under the cursor (discards unstaged changes).
+              vim.keymap.set({ "i", "n" }, "<C-g>x", function()
+                actions.git_checkout(prompt_bufnr)
+              end, {
+                buffer = prompt_bufnr,
+                desc = "telescope|git_checkout",
+              })
               -- Re-bind open keys after Telescope defaults (multi-open via action_set.edit hook).
               vim.schedule(function()
                 telescope_multi.bind_open_keys(prompt_bufnr)

@@ -222,7 +222,7 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | 快捷键 | 功能 |
 |--------|------|
 | `<leader>gs` | 打开 Git status, 可git add 和checkout 和reset |
-| `<leader>go` | Git 状态总览窗口 |
+| `<leader>go` | Git 状态总览窗口；`<C-g>s` stage/unstage 当前文件，`<C-g>x` checkout 当前文件（均只作用于光标下文件） |
 | `<leader>gb` | Git 分支切换窗口 |
 | `<leader>gS` | Git stash 当前文件 |
 | `<leader>gSa` | Git stash 所有 |
