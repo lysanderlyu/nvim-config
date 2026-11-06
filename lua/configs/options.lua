@@ -148,3 +148,34 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
+
+-- Remote sessions have no OS clipboard of their own, so copy through OSC 52.
+-- Paste reads the unnamed register instead: an OSC 52 read is a request the
+-- terminal must answer, and most refuse it for security, which blocks Neovim
+-- for ~10s on every access to "+ / "*.
+local is_ssh = vim.env.SSH_CONNECTION or vim.env.SSH_TTY or vim.env.SSH_CLIENT
+
+-- Also cover local Linux without a display server (TTY / container).
+local has_local_clipboard = vim.fn.has("mac") == 1
+  or vim.fn.has("win32") == 1
+  or vim.env.DISPLAY ~= nil
+  or vim.env.WAYLAND_DISPLAY ~= nil
+
+if is_ssh or not has_local_clipboard then
+  local osc52 = require("vim.ui.clipboard.osc52")
+  local function paste_from_unnamed()
+    return vim.fn.getreg('"', 1, true)
+  end
+
+  vim.g.clipboard = {
+    name = "OSC 52 (remote)",
+    copy = {
+      ["+"] = osc52.copy("+"),
+      ["*"] = osc52.copy("*"),
+    },
+    paste = {
+      ["+"] = paste_from_unnamed,
+      ["*"] = paste_from_unnamed,
+    },
+  }
+end
