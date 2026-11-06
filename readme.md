@@ -32,6 +32,34 @@ ln -s nvim-linux-x86_64/bin/nvim ./
 
 - 推荐使用 [Neovim 官方发布版](https://github.com/neovim/neovim/releases)
 
+4. Go（仅 `gitlab.nvim` 需要）：
+
+   要求 Go ≥ 1.25.1。Go 的压缩包解压后是一个 `go/` 目录，和 Neovim 一样放到 `~/bin` 下，再把 `~/bin/go/bin` 加入 `PATH`。
+
+   Linux (x86_64):
+
+   ```bash
+   cd ~
+   mkdir -p bin
+   wget https://go.dev/dl/go1.27.3.linux-amd64.tar.gz
+   tar -C ~/bin -xzf go1.27.3.linux-amd64.tar.gz
+   echo 'export PATH="$HOME/bin/go/bin:$PATH"' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+
+   macOS (Apple Silicon):
+
+   ```bash
+   cd ~
+   mkdir -p bin
+   curl -LO https://go.dev/dl/go1.27.3.darwin-arm64.tar.gz
+   tar -C ~/bin -xzf go1.27.3.darwin-arm64.tar.gz
+   echo 'export PATH="$HOME/bin/go/bin:$PATH"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+
+   Intel Mac 把文件名换成 `go1.27.3.darwin-amd64.tar.gz`。验证：`go version` 输出 `go version go1.27.3 ...` 即可。
+
 ---
 
 ## 二、使用方法
