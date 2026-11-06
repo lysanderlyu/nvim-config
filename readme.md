@@ -507,7 +507,9 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 
 - 本配置适合 macOS / Linux / Windows  
 - 推荐配合 `git`, `rg`, `bat`, `fzf` 等工具
-- 使用 `gitlab.nvim` 需要安装 Go（≥ 1.25.1），并设置 `GITLAB_TOKEN`  
+- 使用 `gitlab.nvim` 需要安装 Go（≥ 1.25.1），并设置 `GITLAB_TOKEN`
+- 图片上传 `<leader>pi` 需要 `picgo`（picgo-core）；`picgo` 不在 `PATH` 中时该插件会自动禁用
+- 如果启动时出现 `E1568: Terminal did not respond to DSR request for 'background' color`（常见于 SSH / tmux 或响应较慢的终端），在启动 Neovim **之前**设置 `NVIM_NOTTYFAST=1`，例如写入对应机器的 `~/.zshrc` 或 `~/.bashrc`：`export NVIM_NOTTYFAST=1`。这会跳过终端查询，建议同时显式设置 `background`  
 - 可以根据自己的习惯修改 `lua/plugins/` 或 `lua/configs/` 中的配置
 - `Keymaps.lua`文件中并不是包含所有的快捷键映射，独立的插件文件比如`lua/plugins/fzf-lua.lua`插件文件也有自己的快捷键映射，但不是放在`keymaps.lua`文件中
 - Obsidian 笔记库按以下顺序自动查找：环境变量 `$OBSIDIAN_VAULT` → `~/Notes` → `~/notes` → `~/Documents/Notes`；都找不到时不会加载 obsidian.nvim，配置仍可正常使用
