@@ -112,8 +112,9 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     group = "bitbake_filetype",
 })
 
--- parse *config*.in as kconfig regardless of letter case
--- (Config.in, config.in, FOOconfig.IN). configure.in is autoconf, not Kconfig.
+-- parse *config*.in and Config.src as kconfig regardless of letter case
+-- (Config.in, config.in, FOOconfig.IN, Config.src). configure.in is autoconf,
+-- not Kconfig.
 vim.filetype.add({
   extension = {
     tshark = "tshark",
@@ -132,6 +133,13 @@ vim.filetype.add({
       end
       return "kconfig"
     end,
+    -- Config.src is a Kconfig source file in some projects. Patterns without a
+    -- slash match the basename and are implicitly anchored, so this hits
+    -- Config.src only, not e.g. Fooconfig.src.
+    ["[cC][oO][nN][fF][iI][gG]%.[sS][rR][cC]"] = "kconfig",
+    -- Kbuild.src is a Kbuild fragment; use the same filetype Neovim gives
+    -- the Kbuild file itself.
+    ["[kK][bB][uU][iI][lL][dD]%.[sS][rR][cC]"] = "make",
   },
 })
 
