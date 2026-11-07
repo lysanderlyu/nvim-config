@@ -18,7 +18,13 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("TSPHighlight", { clear = true }),
         callback = function(args)
-          pcall(vim.treesitter.start, args.buf)
+          -- parser 比 queries 旧时 query.get 会抛错，语言没有 highlights 查询时返回 nil；
+          -- 两种情况都跳过，否则报错会在每次重绘时从 decoration provider 里刷屏
+          local ok_lang, lang = pcall(vim.treesitter.language.get_lang, vim.bo[args.buf].filetype)
+          if not ok_lang or not lang then return end
+          local ok_q, q = pcall(vim.treesitter.query.get, lang, "highlights")
+          if not ok_q or not q then return end
+          vim.treesitter.start(args.buf)
         end,
       })
 
