@@ -1,7 +1,34 @@
+-- Parsers inherited from the old master-branch setup. The main branch installs
+-- nothing by itself, so list them explicitly: `install` fills in missing parsers
+-- on startup (a cheap no-op once installed), and `build` installs/updates them
+-- when :Lazy updates the plugin.
+local parsers = {
+  "arduino", "asm", "awk", "bash", "bitbake", "bp", "c", "c_sharp", "cmake",
+  "cpp", "css", "csv", "cuda", "desktop", "devicetree", "diff", "disassembly",
+  "dockerfile", "dot", "git_config", "git_rebase", "gitattributes", "gitcommit",
+  "gitignore", "go", "html", "http", "java", "javadoc", "javascript", "json",
+  "kconfig", "kotlin", "llvm", "lua", "luadoc", "make", "markdown",
+  "markdown_inline", "matlab", "nasm", "ninja", "passwd", "perl", "php",
+  "proto", "python", "qmljs", "rst", "ruby", "rust", "smali", "sql",
+  "ssh_config", "strace", "toml", "udev", "vue", "xml", "yaml",
+}
+
+-- Wait for an nvim-treesitter async task and surface failures to :Lazy.
+local function wait(task, what)
+  local ok, res = task:pwait(1800000)
+  if not ok or res == false then
+    error(("treesitter: %s failed: %s"):format(what, tostring(res)))
+  end
+end
+
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
+    build = function()
+      local ts = require("nvim-treesitter")
+      wait(ts.install(parsers), "install")
+      wait(ts.update(), "update")
+    end,
     branch = "main",
     lazy = false, -- nvim-treesitter 不支持懒加载
     init = function()
@@ -13,6 +40,9 @@ return {
     },
     config = function()
       require("nvim-treesitter").setup {}
+      -- Install anything missing from `parsers` asynchronously; no-op when all
+      -- are already present.
+      require("nvim-treesitter").install(parsers)
 
       -- 高亮：Neovim 原生，全局 FileType 启用
       vim.api.nvim_create_autocmd("FileType", {
