@@ -74,14 +74,23 @@ ln -s nvim-linux-x86_64/bin/nvim ./
 
    > 注意 Homebrew 的 `tree-sitter` 公式现在只包含库（`libtree-sitter`），CLI 需要单独安装 `tree-sitter-cli`。
 
-   Linux / 通用方式（Cargo）：
+   Ubuntu（apt，注意版本）：
+
+   ```bash
+   sudo apt install tree-sitter-cli   # 在 universe 源中
+   tree-sitter --version              # nvim-treesitter main 要求 >= 0.26.1
+   ```
+
+   > Ubuntu 24.04 LTS 自带 0.20.8、26.04 LTS 自带 0.25.9，都低于要求的 0.26.1；目前只有 26.10 起的 0.26.11 满足要求。版本不够时改用下面的 Cargo 方式。
+
+   Linux / 通用方式（Cargo，可装最新版）：
 
    ```bash
    cargo install tree-sitter-cli
    # 安装到 ~/.cargo/bin，确保该目录在 PATH 中
    ```
 
-   也可以用 npm：`npm install -g tree-sitter-cli`，但这种方式装的是 Node 脚本，`PATH` 中必须有 `node` 才能运行。
+   也可以用 npm：`npm install -g tree-sitter-cli`，但上游不推荐这种方式：装出来是 Node 脚本，`PATH` 中必须有 `node` 才能运行。
 
    验证：`tree-sitter --version`。
 
