@@ -33,12 +33,11 @@ return {
       -- Default guicursor maps mode `c` to block; prefer an insert-style bar.
       vim.opt.guicursor:append("c:ver25")
 
-      -- Keymap to show notification history
-      -- Option A: Noice built-in (Opens in a split as per your config)
-      -- vim.keymap.set("n", "<leader>n", "<cmd>Noice history<CR>", { desc = "Show Notification History" })
-
-      -- Option B: If you use Telescope (highly recommended for searching history)
-      vim.keymap.set("n", "<leader>n", "<cmd>Telescope notify<CR>", { desc = "Search Notification History" })
+      -- Noice's `notify` view prefers Snacks as its backend when available, so
+      -- notifications never enter nvim-notify's history and `:Telescope notify`
+      -- stays empty. Use Noice's own history instead: it is backend-agnostic and
+      -- also contains errors, warnings, and LSP messages.
+      vim.keymap.set("n", "<leader>n", "<cmd>Noice telescope<CR>", { desc = "Search Notification History" })
     end,
   }
 }
