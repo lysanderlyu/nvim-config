@@ -27,6 +27,24 @@ return {
           view_warn = "notify",
           view_history = "messages", -- Redirects history to Noice's message view
         },
+        commands = {
+          -- Used by both `:Noice history` and `:Noice telescope` (<leader>n).
+          -- The default filter only keeps `msg_show` events of kind "", so
+          -- echo/echomsg/print/command output never reaches the picker; add a
+          -- catch-all for every msg_show kind.
+          history = {
+            filter = {
+              any = {
+                { event = "notify" },
+                { error = true },
+                { warning = true },
+                { event = "msg_show", kind = { "" } },
+                { event = "lsp", kind = "message" },
+                { event = "msg_show" },
+              },
+            },
+          },
+        },
       })
 
       -- Noice (Neovim 0.11+) draws a real cursor in the cmdline popup.
