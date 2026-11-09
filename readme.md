@@ -60,6 +60,31 @@ ln -s nvim-linux-x86_64/bin/nvim ./
 
    Intel Mac 把文件名换成 `go1.27.3.darwin-amd64.tar.gz`。验证：`go version` 输出 `go version go1.27.3 ...` 即可。
 
+5. tree-sitter CLI（仅安装 / 更新 Treesitter parser 时需要）：
+
+   本配置使用 `nvim-treesitter` 的 `main` 分支，安装或更新 parser 时会调用外部的 `tree-sitter` CLI。首次启动会按 `lua/plugins/treesitter.lua` 中的列表自动补齐缺失的 parser，因此需要该命令在 `PATH` 中。
+
+   macOS（推荐，原生二进制，不依赖 Node）：
+
+   ```bash
+   # 之前用 npm 装过的话先卸载，否则会与 brew 的链接冲突
+   npm uninstall -g tree-sitter-cli
+   brew install tree-sitter-cli
+   ```
+
+   > 注意 Homebrew 的 `tree-sitter` 公式现在只包含库（`libtree-sitter`），CLI 需要单独安装 `tree-sitter-cli`。
+
+   Linux / 通用方式（Cargo）：
+
+   ```bash
+   cargo install tree-sitter-cli
+   # 安装到 ~/.cargo/bin，确保该目录在 PATH 中
+   ```
+
+   也可以用 npm：`npm install -g tree-sitter-cli`，但这种方式装的是 Node 脚本，`PATH` 中必须有 `node` 才能运行。
+
+   验证：`tree-sitter --version`。
+
 ---
 
 ## 二、使用方法
