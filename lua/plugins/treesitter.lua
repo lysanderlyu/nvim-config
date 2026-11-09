@@ -21,10 +21,31 @@ local function wait(task, what)
   end
 end
 
+-- The main branch builds parsers with the external `tree-sitter` CLI. A Neovim
+-- started outside a login shell (Finder, some GUI terminals) can get a PATH
+-- without Homebrew, and vim.system then reports a confusing ENOENT for
+-- 'tree-sitter'. Prepend the usual locations when the CLI is not resolvable.
+local function ensure_ts_cli()
+  if vim.fn.exepath("tree-sitter") ~= "" then
+    return true
+  end
+  local path = vim.env.PATH or ""
+  for _, dir in ipairs({ "/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin" }) do
+    if vim.fn.executable(dir .. "/tree-sitter") == 1 then
+      vim.env.PATH = dir .. ":" .. path
+      return vim.fn.exepath("tree-sitter") ~= ""
+    end
+  end
+  return false
+end
+
 return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = function()
+      if not ensure_ts_cli() then
+        error("treesitter: `tree-sitter` CLI not found in PATH; install it or add its directory to PATH")
+      end
       local ts = require("nvim-treesitter")
       wait(ts.install(parsers), "install")
       wait(ts.update(), "update")
@@ -42,7 +63,14 @@ return {
       require("nvim-treesitter").setup {}
       -- Install anything missing from `parsers` asynchronously; no-op when all
       -- are already present.
-      require("nvim-treesitter").install(parsers)
+      if ensure_ts_cli() then
+        require("nvim-treesitter").install(parsers)
+      else
+        vim.notify(
+          "nvim-treesitter: `tree-sitter` CLI not found in PATH; cannot install parsers",
+          vim.log.levels.ERROR
+        )
+      end
 
       -- 高亮：Neovim 原生，全局 FileType 启用
       vim.api.nvim_create_autocmd("FileType", {
