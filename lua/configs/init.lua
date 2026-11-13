@@ -22,7 +22,13 @@ local plugin_specs = {}
 for _, file in ipairs(vim.fn.globpath(vim.fn.stdpath("config") .. "/lua/plugins", "*.lua", false, true)) do
   local name = vim.fn.fnamemodify(file, ":t:r")
   local spec = require("plugins." .. name)
-  vim.list_extend(plugin_specs, spec) -- merge all plugin tables
+  if type(spec[1]) == "string" then
+    -- A single spec table ({ "owner/repo", opts = ... }): keep it whole.
+    -- vim.list_extend copies only the array part, dropping event/opts/config.
+    plugin_specs[#plugin_specs + 1] = spec
+  else
+    vim.list_extend(plugin_specs, spec) -- list of plugin specs
+  end
 end
 
 -- Setup Lazy.nvim with all plugins
