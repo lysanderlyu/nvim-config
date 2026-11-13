@@ -347,12 +347,17 @@ return {
       { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
       { "<leader>sB", function()
         local yank = vim.fn.getreg('"')
+        yank = yank:gsub("[\r\n]+", " "):gsub("^%s*(.-)%s*$", "%1")
         if yank == "" then
           vim.notify("No yanked text", vim.log.levels.INFO)
           return
         end
-        yank = yank:gsub("[\r\n]+", " "):gsub("^%s*(.-)%s*$", "%1")
-        Snacks.picker.lines({ pattern = yank })
+        -- The default matcher splits the pattern on whitespace and fuzzy-matches
+        -- each word, so the yank would be matched letter by letter. Use regex
+        -- mode with `\V` (very nomagic) to match the whole text literally.
+        -- `vim.regex` ignores 'ignorecase', so force it with `\c`.
+        local pattern = "\\c\\V" .. yank:gsub("\\", "\\\\")
+        Snacks.picker.lines({ pattern = pattern, matcher = { regex = true } })
       end, desc = 'Buffer Lines (" register)' },
 
       -- search
