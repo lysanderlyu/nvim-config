@@ -83,13 +83,19 @@ cmp.setup({
 -- =======================
 -- Filetype-specific sources
 -- =======================
--- PlantUML keywords live in dicts/puml_keywords.txt and are served by
--- cmp-dictionary (plantuml only, so they never leak into other buffers).
-cmp.setup.filetype("plantuml", {
-  sources = cmp.config.sources({
-    { name = "nvim_lsp" },
-    { name = "dictionary", keyword_length = 2, max_item_count = 15 },
-    { name = "buffer" },
-    { name = "path" },
-  }),
+-- PlantUML keywords (dicts/puml_keywords.txt, 779 entries) matter both in .puml
+-- files and inside ```plantuml fenced blocks in markdown, where the buffer
+-- filetype stays markdown. cmp-dictionary holds only that small list now, so
+-- wiring it up for these two filetypes costs nothing.
+local prose_sources = cmp.config.sources({
+  { name = "nvim_lsp" },
+  { name = "luasnip" },
+  { name = "buffer" },
+  { name = "path" },
+  { name = "dictionary", keyword_length = 2, max_item_count = 15 },
+  { name = "spell", keyword_length = 4, max_item_count = 15 },
+})
+
+cmp.setup.filetype({ "plantuml", "markdown" }, {
+  sources = prose_sources,
 })
