@@ -1,53 +1,20 @@
-local dict = {
-  ["*"] = { vim.fn.stdpath("config") .. "/dicts/words" },
-
-  ft = {
-    plantuml = {
-      vim.fn.stdpath("config") .. "/dicts/puml_keywords.txt",
-    },
-  },
-}
-
+-- Only the PlantUML keyword list is still handled by cmp-dictionary.
+-- The big English word list moved to the built-in spell dictionary (see
+-- configs/options.lua + configs/completion.lua): cmp-dictionary builds a
+-- per-character Lua trie, which turned the 237k-word list into ~200 million
+-- Lua tables (~540 MB RSS). This tiny keyword list costs nothing, and the
+-- "dictionary" source is only wired up for the plantuml filetype.
 return {
   {
     "uga-rosa/cmp-dictionary",
     dependencies = { "hrsh7th/nvim-cmp" },
 
     config = function()
-      local cmp_dict = require("cmp_dictionary")
-
-      -- Check if 'wn' is installed on the system
-      local has_wordnet = vim.fn.executable("wn") == 1
-      
-      cmp_dict.setup({
-        -- Use the 'dic' structure we discussed for better filetype support
-        paths = dict["*"],
-        exact_length = 4,
+      require("cmp_dictionary").setup({
+        paths = { vim.fn.stdpath("config") .. "/dicts/puml_keywords.txt" },
+        exact_length = 2,
         first_case_insensitive = true,
-        document = {
-          -- Automatically enable if 'wn' exists, otherwise disable
-          enable = has_wordnet,
-          command = { "wn", "${label}", "-over" },
-        },
-      })
-
-      -- per-buffer dictionary switching
-      vim.api.nvim_create_autocmd("BufEnter", {
-        callback = function()
-          local ft = vim.bo.filetype
-
-          -- deepcopy to avoid modifying original tables
-          local paths = vim.deepcopy(dict.ft[ft] or {})
-
-          -- append global dictionary
-          vim.list_extend(paths, dict["*"])
-
-          cmp_dict.setup({
-            paths = paths,
-          })
-        end,
       })
     end,
   },
 }
-

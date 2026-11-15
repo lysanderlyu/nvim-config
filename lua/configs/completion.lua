@@ -65,7 +65,7 @@ local sources = cmp.config.sources({
   { name = "luasnip" },
   { name = "buffer" },
   { name = "path" },
-  { name = "dictionary", keyword_length = 4, max_item_count = 15 },
+  { name = "spell", keyword_length = 4, max_item_count = 15 },
   per_filetype = {
     codecompanion = { "codecompanion" },
   }
@@ -83,8 +83,13 @@ cmp.setup({
 -- =======================
 -- Filetype-specific sources
 -- =======================
--- cmp.setup.filetype("codecompanion", {
---   sources = cmp.config.sources({
---     { name = "codecompanion" },
---   }),
--- })
+-- PlantUML keywords live in dicts/puml_keywords.txt and are served by
+-- cmp-dictionary (plantuml only, so they never leak into other buffers).
+cmp.setup.filetype("plantuml", {
+  sources = cmp.config.sources({
+    { name = "nvim_lsp" },
+    { name = "dictionary", keyword_length = 2, max_item_count = 15 },
+    { name = "buffer" },
+    { name = "path" },
+  }),
+})

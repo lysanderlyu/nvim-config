@@ -21,6 +21,12 @@ vim.o.showmode = false
 vim.lsp.log.set_level("ERROR")
 vim.g.fzf_layout = { window = {width = 0.8, height = 0.9 } }
 
+-- English word completion comes from the built-in spell dictionary
+-- (prebuilt .spl trie, mmap'ed, a few MB) instead of a Lua word-list trie.
+-- Toggle per buffer with <leader>us; the "spell" completion source only fires
+-- while 'spell' is on, so code buffers see no prose noise.
+vim.opt.spelllang = { "en" }
+
 -- Dynamic switch tab size
 -- Default: 4 spaces
 vim.opt.tabstop = 4
