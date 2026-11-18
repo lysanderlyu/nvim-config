@@ -104,6 +104,15 @@ return {
         return ok and flag == true
       end
 
+      local function is_file_buf(bufnr)
+        if not vim.api.nvim_buf_is_valid(bufnr) then
+          return false
+        end
+        -- Any named file keeps the outline, whatever its buftype is.
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        return name ~= "" and vim.fn.isdirectory(name) == 0
+      end
+
       local function is_file_win(winid)
         if not vim.api.nvim_win_is_valid(winid) or vim.api.nvim_win_get_config(winid).relative ~= "" then
           return false
@@ -111,13 +120,7 @@ return {
         if is_outline_win(winid) then
           return false
         end
-        local buf = vim.api.nvim_win_get_buf(winid)
-        if not vim.api.nvim_buf_is_valid(buf) then
-          return false
-        end
-        -- Any named file keeps the outline, whatever its buftype is.
-        local name = vim.api.nvim_buf_get_name(buf)
-        return name ~= "" and vim.fn.isdirectory(name) == 0
+        return is_file_buf(vim.api.nvim_win_get_buf(winid))
       end
 
       local function is_blank_win(winid)
@@ -159,11 +162,37 @@ return {
 
       local scheduled = false
       local quit_blocked = false
+      local file_closed = false
+      -- Windows that showed a file when last seen. Floating windows (noice,
+      -- smear-cursor, ...) close on every tab switch; a close only counts as a
+      -- file close when the window held a file.
+      local file_wins = {}
+      local function remember_file_wins()
+        file_wins = {}
+        for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+          for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+            if is_file_win(winid) then
+              file_wins[winid] = true
+            end
+          end
+        end
+      end
+      remember_file_wins()
       local group = vim.api.nvim_create_augroup("AerialCloseWithoutFile", { clear = true })
       vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "BufDelete", "BufWipeout", "WinClosed" }, {
         desc = "Close Aerial when the tab has no file buffer",
         group = group,
-        callback = function()
+        callback = function(args)
+          if args.event == "BufDelete" or args.event == "BufWipeout" then
+            if is_file_buf(args.buf) then
+              file_closed = true
+            end
+          elseif args.event == "WinClosed" then
+            if file_wins[tonumber(args.match)] then
+              file_closed = true
+            end
+          end
+          remember_file_wins()
           if scheduled then
             return
           end
@@ -171,6 +200,8 @@ return {
           -- Wait until buffer delete and Aerial's own window update have finished.
           vim.defer_fn(function()
             scheduled = false
+            local closed = file_closed
+            file_closed = false
             if tab_has(is_file_win) then
               quit_blocked = false
               return
@@ -179,7 +210,13 @@ return {
               close_outline_windows()
               return
             end
-            if quit_blocked then
+            -- Entering a brand-new window (:tabnew, :new) is not a leftover: the
+            -- user just made it, so nothing was deleted that should take it away.
+            -- :bdelete also enters a blank window, but it fires BufDelete as well,
+            -- so only skip when this burst closed nothing. The window only gets
+            -- its empty buffer after WinEnter, so check the window here.
+            local entered = args.event == "BufEnter" or args.event == "WinEnter"
+            if quit_blocked or (entered and not closed and is_blank_win(vim.api.nvim_get_current_win())) then
               return
             end
 
