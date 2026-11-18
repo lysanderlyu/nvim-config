@@ -12,11 +12,37 @@ return {
         local bufnr = vim.api.nvim_get_current_buf()
         local context = {}
 
+        -- Most grammars expose the name directly, but C-family declarations
+        -- only have it at the bottom of the declarator chain, e.g.
+        --   uint8_t                         <- return type on its own line
+        --   foo(...) { ... }                <- function_declarator > identifier
+        -- so the first line of the node text is just "uint8_t".
+        local function node_name(n)
+          local name = n:field("name")[1]
+          if name then
+            local text_ok, text = pcall(vim.treesitter.get_node_text, name, bufnr)
+            if text_ok and text then return text:match("^[^\n]*") end
+          end
+
+          local decl = n:field("declarator")[1]
+          while decl do
+            local inner = decl:field("declarator")[1]
+            if not inner then break end
+            decl = inner
+          end
+          if decl then
+            local text_ok, text = pcall(vim.treesitter.get_node_text, decl, bufnr)
+            if text_ok and text then return text:match("^[^\n]*") end
+          end
+
+          local text_ok, text = pcall(vim.treesitter.get_node_text, n, bufnr)
+          if text_ok and text then return text:match("^[^\n]*") end
+        end
+
         while node do
           local type = node:type()
           if type:match("function") or type:match("method") or type:match("class") or type:match("module") then
-            local text_ok, text = pcall(vim.treesitter.get_node_text, node, bufnr)
-            local name = text_ok and text and text:match("^[^\n]*") or nil
+            local name = node_name(node)
             if name and name ~= "" then
               table.insert(context, 1, name)  -- insert at front for top-down order
             end
