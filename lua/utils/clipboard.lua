@@ -2,8 +2,11 @@ local M = {}
 
 ---Process-global FS clipboard. Kept on `_G` so it survives `utils.clipboard`
 ---module reloads (Lazy/`package.loaded` churn) between picker Ctrl-c and paste.
+---The shared cache file (see below) is authoritative across Neovim instances;
+---this is the fallback for when that write failed.
 ---@type string[]
 _G.__nvim_fs_clipboard = _G.__nvim_fs_clipboard or {}
+_G.__nvim_fs_clipboard_unsynced = _G.__nvim_fs_clipboard_unsynced or false
 
 ---Back-compat alias; prefer get/set helpers below.
 M._fs_clipboard = _G.__nvim_fs_clipboard
@@ -23,8 +26,19 @@ local function write_shared_clipboard(paths)
   if not ok_mkdir then
     return false
   end
-  local ok, err = pcall(vim.fn.writefile, paths or {}, file)
-  return ok and err == 0
+  -- Write a sibling file and rename it into place: another Neovim reading at
+  -- the same moment must never observe a truncated clipboard.
+  local tmp = string.format("%s.%d.tmp", file, vim.uv.os_getpid())
+  local ok = pcall(vim.fn.writefile, paths or {}, tmp)
+  if not ok then
+    pcall(vim.uv.fs_unlink, tmp)
+    return false
+  end
+  if not vim.uv.fs_rename(tmp, file) then
+    pcall(vim.uv.fs_unlink, tmp)
+    return false
+  end
+  return true
 end
 
 ---@return string[]
@@ -43,8 +57,20 @@ local function read_shared_clipboard()
   return recovered
 end
 
+---Paths currently on the FS clipboard.
+---The shared file is checked first: another Neovim may have copied since this
+---process last looked, and a stale in-process copy must not shadow it.
 ---@return string[]
 function M.get_fs_clipboard()
+  if not _G.__nvim_fs_clipboard_unsynced then
+    local shared = read_shared_clipboard()
+    if #shared > 0 then
+      _G.__nvim_fs_clipboard = shared
+      M._fs_clipboard = shared
+      return shared
+    end
+  end
+
   local paths = _G.__nvim_fs_clipboard
   if type(paths) == "table" and #paths > 0 then
     return paths
@@ -56,7 +82,9 @@ end
 function M.set_fs_clipboard(paths)
   _G.__nvim_fs_clipboard = paths or {}
   M._fs_clipboard = _G.__nvim_fs_clipboard
-  write_shared_clipboard(_G.__nvim_fs_clipboard)
+  -- If the shared file cannot be written, this process's copy is the only
+  -- record of the latest copy: keep it ahead of the older file contents.
+  _G.__nvim_fs_clipboard_unsynced = not write_shared_clipboard(_G.__nvim_fs_clipboard)
 end
 
 ---Encode a local path as a `file://` URI (spaces etc. percent-encoded).
@@ -209,19 +237,12 @@ end try]],
   return parse_clipboard_paths(vim.fn.getreg("+"))
 end
 
----Paths remembered from Ctrl-c / C, then shared cache file, then OS clipboard.
+---Paths remembered from Ctrl-c / C (shared cache file, refreshed by every
+---Neovim), then the OS clipboard.
 ---@return string[]
 local function resolve_fs_clipboard()
   local paths = M.get_fs_clipboard()
   if #paths > 0 then
-    return paths
-  end
-
-  -- Cross-terminal: another Neovim wrote ~/.cache/nvim/fs-clipboard.
-  paths = read_shared_clipboard()
-  if #paths > 0 then
-    _G.__nvim_fs_clipboard = paths
-    M._fs_clipboard = paths
     return paths
   end
 
