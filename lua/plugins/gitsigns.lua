@@ -67,6 +67,9 @@ return {
           map("n", "<leader>hu", gs.undo_stage_hunk)
           -- Preview hunk
           map("n", "<leader>hp", gs.preview_hunk)
+          -- Jump to the next / previous diff hunk (差异点)
+          map("n", "<leader>hn", function() gs.nav_hunk("next") end)
+          map("n", "<leader>hN", function() gs.nav_hunk("prev") end)
           -- Blame line
           map("n", "<leader>hb", gs.blame_line)
         end,
