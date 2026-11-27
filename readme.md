@@ -291,7 +291,11 @@ Neovim 支持多开TAB，就像VScode多开文件一样
 | `<leader>hS` | Stage 整个文件 |
 | `<leader>hu` | Undo stage 代码块 |
 | `<leader>hp` | 预览当前代码块 |
+| `<leader>hn` | 跳到下一个代码块（差异点） |
+| `<leader>hN` | 跳到上一个代码块（差异点） |
 | `<leader>hb` | Blame 当前行 |
+
+> `<leader>hn` / `<leader>hN` 是 buffer-local 映射，在 `:Gdiffsplit`、Diffview、DiffBandit 的差异窗口里同样可用。注意 `]c` / `[c` 被 treesitter 占用为 class 跳转，不是差异点跳转。
 
 在 Git Status 界面时：<leader>gs 打开Git Status的交互界面时的快捷键
 
